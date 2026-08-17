@@ -17,6 +17,7 @@ import {
   type TcmMeridian,
 } from '@/lib/tcm-acupoint-data';
 import { WUXING_COLORS_DISPLAY } from '@/components/meridian/constants';
+import { cosUrl } from '@/lib/cos-url';
 
 // ============================================================
 // Props
@@ -39,7 +40,7 @@ export interface TcmBodyModelProps {
 
 // TCM模型坐标缩放因子（原始坐标范围 ~0~1.714，放大到合理3D尺寸）
 const SCALE = 100;
-const MODEL_PATH = '/models/tcm-3d/human.obj';
+const MODEL_PATH = cosUrl('/models/tcm-3d/human.obj');
 
 // ============================================================
 // OBJ模型加载器组件

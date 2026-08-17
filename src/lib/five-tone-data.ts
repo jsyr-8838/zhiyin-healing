@@ -87,36 +87,38 @@ export interface FiveToneData {
 
 // ===== 五音完整数据（单一来源） =====
 
+import { cosUrl } from './cos-url';
+
 export const FIVE_TONES: FiveToneData[] = [
   {
     key: 'jiao', char: '角', pinyin: 'jiǎo', element: '木', organ: '肝',
     wuxing: '角音·木行', mainFreq: 329.63, subFreq: 396, overtoneFreq: 659.25,
     desc: '疏肝解郁·缓解烦躁', color: '#27AE60', note: 'E4',
-    mp3Path: '/audio/five-tone/jiao.mp3',
+    mp3Path: cosUrl('/audio/five-tone/jiao.mp3'),
   },
   {
     key: 'zhi', char: '徵', pinyin: 'zhǐ', element: '火', organ: '心',
     wuxing: '徵音·火行', mainFreq: 392.00, subFreq: 528, overtoneFreq: 783.99,
     desc: '养心安神·清心降火', color: '#E74C3C', note: 'G4',
-    mp3Path: '/audio/five-tone/zhi.mp3',
+    mp3Path: cosUrl('/audio/five-tone/zhi.mp3'),
   },
   {
     key: 'gong', char: '宫', pinyin: 'gōng', element: '土', organ: '脾',
     wuxing: '宫音·土行', mainFreq: 261.63, subFreq: 417, overtoneFreq: 523.25,
     desc: '健脾和胃·调和中焦', color: '#F39C12', note: 'C4',
-    mp3Path: '/audio/five-tone/gong.mp3',
+    mp3Path: cosUrl('/audio/five-tone/gong.mp3'),
   },
   {
     key: 'shang', char: '商', pinyin: 'shāng', element: '金', organ: '肺',
     wuxing: '商音·金行', mainFreq: 293.66, subFreq: 639, overtoneFreq: 587.33,
     desc: '清肺润燥·宣发肃降', color: '#3498DB', note: 'D4',
-    mp3Path: '/audio/five-tone/shang.mp3',
+    mp3Path: cosUrl('/audio/five-tone/shang.mp3'),
   },
   {
     key: 'yu', char: '羽', pinyin: 'yǔ', element: '水', organ: '肾',
     wuxing: '羽音·水行', mainFreq: 440.00, subFreq: 741, overtoneFreq: 880.00,
     desc: '固肾益精·滋阴潜阳', color: '#1ABC9C', note: 'A4',
-    mp3Path: '/audio/five-tone/yu.mp3',
+    mp3Path: cosUrl('/audio/five-tone/yu.mp3'),
   },
 ];
 

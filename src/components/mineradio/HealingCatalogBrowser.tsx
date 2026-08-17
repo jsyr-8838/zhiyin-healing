@@ -11,6 +11,7 @@ import {
 import type { PlayerTrack } from '@/lib/mineradio/playlist';
 import type { HealingTheme } from '@/lib/mineradio/weather-mood';
 import { useWuxing300Audio, type Wuxing300Track } from '@/lib/wuxing300-audio';
+import { cosUrl } from '@/lib/cos-url';
 import {
   Music, Play, PlayCircle, ChevronDown, ChevronUp, RefreshCw,
 } from 'lucide-react';
@@ -113,9 +114,13 @@ export default memo(function HealingCatalogBrowser({
   const { extendedTracks, loading: wuxingLoading, count: wuxingCount, refresh: wuxingRefresh } = useWuxing300Audio();
 
   // 本地曲目：只包含 /audio/healing/ 路径的扩展曲目
+  // 注意：healing-music-catalog.ts 中的 src 已被 cosUrl() 包装，
+  // 开发环境返回原始路径，生产环境返回完整 COS URL。
+  // 因此用 cosUrl('/audio/healing/') 的返回值做 startsWith 检查，两端环境一致。
+  const healingPrefix = cosUrl('/audio/healing/');
   const healingTracks = useMemo(
-    () => HEALING_MUSIC_CATALOG.filter((t) => t.src.startsWith('/audio/healing/')),
-    []
+    () => HEALING_MUSIC_CATALOG.filter((t) => t.src.startsWith(healingPrefix)),
+    [healingPrefix]
   );
 
   // 合并本地 + 外部曲目

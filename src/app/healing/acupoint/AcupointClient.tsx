@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getTcmAcupoints, getTcmMeridians, searchTcmAcupoints, type TcmAcupoint, type TcmMeridian } from '@/lib/tcm-acupoint-data';
 import { XWS_VIDEO_ACUPOINTS } from '@/lib/xws-video-names';
 import { ACUPOINT_LOCATION_IMAGES } from '@/lib/acupoint-image-names';
+import { cosUrl } from '@/lib/cos-url';
 
 // 五行色
 const ELEMENT_COLORS: Record<string, string> = {
@@ -162,7 +163,7 @@ export default function AcupointClient() {
               <div className="bg-[#f8f4ed] px-4 py-3">
                 <p className="text-xs text-[#8b7355] font-medium mb-2">穴位定位图</p>
                 <img
-                  src={`/assets/acupoint/images/${encodeURIComponent(selectedPoint.name)}.jpg`}
+                  src={cosUrl(`/assets/acupoint/images/${encodeURIComponent(selectedPoint.name)}.jpg`)}
                   alt={`${selectedPoint.name}穴位定位图`}
                   className="w-full rounded-xl bg-black/5 shadow-sm"
                   loading="lazy"
@@ -175,7 +176,7 @@ export default function AcupointClient() {
               <div className="bg-[#f8f4ed] px-4 py-3">
                 <p className="text-xs text-[#8b7355] font-medium mb-2">穴位定位视频</p>
                 <video
-                  src={`/videos/acupoints/${encodeURIComponent(selectedPoint.name + '穴')}.mp4`}
+                  src={cosUrl(`/videos/acupoints/${encodeURIComponent(selectedPoint.name + '穴')}.mp4`)}
                   controls
                   preload="metadata"
                   playsInline

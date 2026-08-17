@@ -24,6 +24,7 @@ import type {
   QiParticle,
 } from '@/types/three-global';
 import type { Mesh, Object3D } from 'three';
+import { cosUrl } from '@/lib/cos-url';
 
 export interface MeridianCanvasHandle {
   focusCamera: (point: Acupoint, meridianCode: string) => void;
@@ -435,7 +436,7 @@ export const MeridianCanvas = memo(forwardRef<MeridianCanvasHandle, MeridianCanv
           const promises = batch.map((bone: BoneModel) => {
             return new Promise<void>((resolve) => {
               loader.load(
-                `/models/bones/${bone.file}`,
+                cosUrl(`/models/bones/${bone.file}`),
                 (object: Object3D) => {
                   object.traverse((child: any) => {
                     if (child.isMesh) {

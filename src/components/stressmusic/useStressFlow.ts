@@ -10,6 +10,7 @@ import type {
   MusicStatus,
   BreathPhase,
 } from '@/components/stressmusic/types';
+import { cosUrl } from '@/lib/cos-url';
 
 // ═══════════════════════════════════════════
 // 心率 → 五行 / 呼吸节奏 映射引擎
@@ -24,11 +25,11 @@ const GENRE_ELEMENT: Record<string, string> = {
 
 /** 五行→五音音频路径 */
 const TONE_FILES: Record<string, string> = {
-  wood: '/audio/five-tone/jiao.mp3',
-  fire: '/audio/five-tone/zhi.mp3',
-  earth: '/audio/five-tone/gong.mp3',
-  metal: '/audio/five-tone/shang.mp3',
-  water: '/audio/five-tone/yu.mp3',
+  wood: cosUrl('/audio/five-tone/jiao.mp3'),
+  fire: cosUrl('/audio/five-tone/zhi.mp3'),
+  earth: cosUrl('/audio/five-tone/gong.mp3'),
+  metal: cosUrl('/audio/five-tone/shang.mp3'),
+  water: cosUrl('/audio/five-tone/yu.mp3'),
 };
 
 /**

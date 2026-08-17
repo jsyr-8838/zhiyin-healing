@@ -7,6 +7,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
 import PageContainer from '@/components/layout/PageContainer';
 import { useAppStore } from '@/lib/store';
+import { cosUrl } from '@/lib/cos-url';
 import { consolidateDiagnosis } from '@/lib/unified-diagnosis';
 import {
   TUINA_CATEGORIES,
@@ -318,7 +319,7 @@ export default function TuinaClient() {
                 <div className="relative w-full" style={{ height: '140px', background: 'var(--card-bg, #f9f6f0)' }}>
                   {!hasImgError ? (
                     <Image
-                      src={tech.img}
+                      src={cosUrl(tech.img)}
                       alt={tech.n}
                       fill
                       style={{ objectFit: 'contain' }}
@@ -431,7 +432,7 @@ export default function TuinaClient() {
             <div className="relative w-full" style={{ height: '200px', background: 'rgba(139,69,19,0.06)' }}>
               {!imgErrors.has(selectedTechnique.id) ? (
                 <Image
-                  src={selectedTechnique.img}
+                  src={cosUrl(selectedTechnique.img)}
                   alt={selectedTechnique.n}
                   fill
                   style={{ objectFit: 'contain' }}

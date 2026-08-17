@@ -19,6 +19,12 @@ const nextConfig = {
   // Image optimization
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'zhiyin-media-1320767331.cos.ap-guangzhou.myqcloud.com',
+      },
+    ],
   },
 
   // Security headers
@@ -37,10 +43,10 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://api.qrserver.com https://cdn.pixabay.com",
+              "img-src 'self' data: blob: https://api.qrserver.com https://cdn.pixabay.com https://zhiyin-media-1320767331.cos.ap-guangzhou.myqcloud.com",
               "font-src 'self' data: blob:",
-              "connect-src 'self' blob: https://integrate.api.nvidia.com https://*.nvidia.com https://ipapi.co https://api.open-meteo.com https://api.jamendo.com https://*.storage.jamendo.com https://api.qrserver.com http://localhost:5001 wss: ws:",
-              "media-src 'self' blob: mediastream: https://*.storage.jamendo.com",
+              "connect-src 'self' blob: https://integrate.api.nvidia.com https://*.nvidia.com https://ipapi.co https://api.open-meteo.com https://api.jamendo.com https://*.storage.jamendo.com https://api.qrserver.com https://zhiyin-media-1320767331.cos.ap-guangzhou.myqcloud.com http://localhost:5001 wss: ws:",
+              "media-src 'self' blob: mediastream: https://*.storage.jamendo.com https://zhiyin-media-1320767331.cos.ap-guangzhou.myqcloud.com",
               "manifest-src 'self'",
             ].join("; "),
           },

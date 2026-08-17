@@ -10,6 +10,7 @@ import {
 import { useFlowAudio } from '@/hooks/useFlowAudio';
 import { useZhiYinStore, getTotalDuration, getAverageMoodImprovement, formatDuration } from '@/lib/zhi-yin-session-store';
 import { getClientUserId } from '@/lib/auth';
+import { cosUrl } from '@/lib/cos-url';
 import { useCultivationStore } from '@/lib/cultivation-store';
 import { XIUWEI_GAINS, type WuxingElement } from '@/lib/cultivation-engine';
 import ParticleCanvas from './ParticleCanvas';
@@ -304,7 +305,7 @@ export default function ZhiYinZhiJingClient() {
       // 解说音频 + 语音增强链
       const el = audioRef.current;
       if (el) {
-        el.src = `/audio/zhi-yin-zhi-jing/${modeId}.mp3`;
+        el.src = cosUrl(`/audio/zhi-yin-zhi-jing/${modeId}.mp3`);
         el.volume = volume / 100;
         // 首次播放时初始化语音增强链（均衡→压缩→混响）
         if (!voiceEnhancedRef.current) {

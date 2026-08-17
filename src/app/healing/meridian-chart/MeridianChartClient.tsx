@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { ACUPOINT_LIST } from '@/lib/xws-data';
+import { cosUrl } from '@/lib/cos-url';
 
 // 十四正经 + 经外奇穴
 const MERIDIAN_LIST = [
@@ -122,7 +123,7 @@ export default function MeridianChartClient() {
             <div className="bg-[#f5efe6] flex items-center justify-center p-4 min-h-[300px]">
               {(() => {
                 const suffix = showModel ? '_model.gif' : '_type.jpg';
-                const imgSrc = `/images/meridians/${encodeURIComponent(selectedMeridian)}${suffix}`;
+                const imgSrc = cosUrl(`/images/meridians/${encodeURIComponent(selectedMeridian)}${suffix}`);
                 return (
                   <img
                     src={imgSrc}

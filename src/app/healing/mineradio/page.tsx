@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
@@ -38,6 +38,7 @@ import HealingReportModal from '@/components/stressmusic/HealingReportModal';
 import HeartRateMonitor from '@/components/stressmusic/HeartRateMonitor';
 
 import { ArrowLeft, Music2, Sparkles, ChevronDown, FolderOpen, RefreshCw } from 'lucide-react';
+import { cosUrl } from '@/lib/cos-url';
 
 /** 五行养生音源入口卡片 */
 function Wuxing300EntryCard() {
@@ -786,36 +787,36 @@ function generateShichenPlaylist(element: ElementKey) {
   const cover = '/images/modules/liaoyu.jpg';
   const TONE_MAP: Record<ElementKey, { title: string; artist: string; audioUrl: string; duration: number }[]> = {
     wood: [
-      { title: '角音·木行', artist: '天籁', audioUrl: '/audio/five-tone/jiao.mp3', duration: 180 },
-      { title: '古琴·浴火重生', artist: '天籁', audioUrl: '/audio/guqin/after-the-fire.mp3', duration: 240 },
-      { title: '古筝·山泉清音', artist: '天籁', audioUrl: '/audio/guzheng/mountain-spring.mp3', duration: 300 },
-      { title: '箫·竹林清风', artist: '天籁', audioUrl: '/audio/xiao/zen-bamboo-flow.mp3', duration: 260 },
-      { title: '箫·竹林低语', artist: '天籁', audioUrl: '/audio/xiao/whispers-bamboo-forest.mp3', duration: 280 },
+      { title: '角音·木行', artist: '天籁', audioUrl: cosUrl(''), duration: 180 },
+      { title: '古琴·浴火重生', artist: '天籁', audioUrl: cosUrl(''), duration: 240 },
+      { title: '古筝·山泉清音', artist: '天籁', audioUrl: cosUrl(''), duration: 300 },
+      { title: '箫·竹林清风', artist: '天籁', audioUrl: cosUrl(''), duration: 260 },
+      { title: '箫·竹林低语', artist: '天籁', audioUrl: cosUrl(''), duration: 280 },
     ],
     fire: [
-      { title: '徵音·火行', artist: '天籁', audioUrl: '/audio/five-tone/zhi.mp3', duration: 180 },
-      { title: '古筝·欢爱', artist: '天籁', audioUrl: '/audio/guzheng/happy-love.mp3', duration: 220 },
-      { title: '编钟·新春华章', artist: '天籁', audioUrl: '/audio/bianzhong/lunar-new-year.mp3', duration: 300 },
-      { title: '箫·竹林幽韵', artist: '天籁', audioUrl: '/audio/xiao/whispering-bamboo-melody.mp3', duration: 260 },
+      { title: '徵音·火行', artist: '天籁', audioUrl: cosUrl(''), duration: 180 },
+      { title: '古筝·欢爱', artist: '天籁', audioUrl: cosUrl(''), duration: 220 },
+      { title: '编钟·新春华章', artist: '天籁', audioUrl: cosUrl(''), duration: 300 },
+      { title: '箫·竹林幽韵', artist: '天籁', audioUrl: cosUrl(''), duration: 260 },
     ],
     earth: [
-      { title: '宫音·土行', artist: '天籁', audioUrl: '/audio/five-tone/gong.mp3', duration: 180 },
-      { title: '编钟·金声玉振', artist: '天籁', audioUrl: '/audio/bianzhong/new-year.mp3', duration: 280 },
-      { title: '冥想·静坐归中', artist: '天籁', audioUrl: '/audio/ambient/water/meditation-ambient.mp3', duration: 360 },
-      { title: '合奏·月下花影', artist: '天籁', audioUrl: '/audio/ambient/water/moonlit-blossoms.mp3', duration: 320 },
+      { title: '宫音·土行', artist: '天籁', audioUrl: cosUrl(''), duration: 180 },
+      { title: '编钟·金声玉振', artist: '天籁', audioUrl: cosUrl(''), duration: 280 },
+      { title: '冥想·静坐归中', artist: '天籁', audioUrl: cosUrl(''), duration: 360 },
+      { title: '合奏·月下花影', artist: '天籁', audioUrl: cosUrl(''), duration: 320 },
     ],
     metal: [
-      { title: '商音·金行', artist: '天籁', audioUrl: '/audio/five-tone/shang.mp3', duration: 180 },
-      { title: '箫·桥上清箫', artist: '天籁', audioUrl: '/audio/xiao/bridge-of-avignon.mp3', duration: 260 },
-      { title: '二胡·丝柔如水', artist: '天籁', audioUrl: '/audio/erhu/smooth-as-silk.mp3', duration: 240 },
-      { title: '编钟·禅寺晨钟', artist: '天籁', audioUrl: '/audio/bianzhong/zen-bamboo-temple.mp3', duration: 280 },
+      { title: '商音·金行', artist: '天籁', audioUrl: cosUrl(''), duration: 180 },
+      { title: '箫·桥上清箫', artist: '天籁', audioUrl: cosUrl(''), duration: 260 },
+      { title: '二胡·丝柔如水', artist: '天籁', audioUrl: cosUrl(''), duration: 240 },
+      { title: '编钟·禅寺晨钟', artist: '天籁', audioUrl: cosUrl(''), duration: 280 },
     ],
     water: [
-      { title: '羽音·水行', artist: '天籁', audioUrl: '/audio/five-tone/yu.mp3', duration: 180 },
-      { title: '箫·行远不迷', artist: '天籁', audioUrl: '/audio/xiao/never-be-lost.mp3', duration: 260 },
-      { title: '二胡·溪流奔城', artist: '天籁', audioUrl: '/audio/erhu/stream-to-city.mp3', duration: 240 },
-      { title: '冥想·静心观水', artist: '天籁', audioUrl: '/audio/ambient/water/meditation-music.mp3', duration: 360 },
-      { title: '箫·幽谷空灵', artist: '天籁', audioUrl: '/audio/xiao/silent-valley.mp3', duration: 300 },
+      { title: '羽音·水行', artist: '天籁', audioUrl: cosUrl(''), duration: 180 },
+      { title: '箫·行远不迷', artist: '天籁', audioUrl: cosUrl(''), duration: 260 },
+      { title: '二胡·溪流奔城', artist: '天籁', audioUrl: cosUrl(''), duration: 240 },
+      { title: '冥想·静心观水', artist: '天籁', audioUrl: cosUrl(''), duration: 360 },
+      { title: '箫·幽谷空灵', artist: '天籁', audioUrl: cosUrl(''), duration: 300 },
     ],
   };
 

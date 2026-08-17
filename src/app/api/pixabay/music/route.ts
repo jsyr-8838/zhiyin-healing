@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readdir } from 'fs/promises';
 import { join } from 'path';
+import { cosUrl } from '@/lib/cos-url';
 
 const CACHE_TTL = 30 * 60 * 1000;
 
@@ -67,7 +68,7 @@ async function scanLocalPixabayFiles() {
         name: f.replace(/\.mp3$/, '').replace(/[-_]/g, ' '),
         artist: 'Pixabay 精选',
         duration: 0,
-        audioUrl: `/audio/pixabay/${f}`,
+        audioUrl: cosUrl(`/audio/pixabay/${f}`),
         image: '',
         tags: ['local'],
         source: 'pixabay-local' as const,

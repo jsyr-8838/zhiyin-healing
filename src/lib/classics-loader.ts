@@ -6,6 +6,7 @@
  */
 
 import { CLASSICS_CATEGORIES, type ClassicBook } from './classics-data';
+import { cosUrl } from './cos-url';
 
 /* ========== 类型定义 ========== */
 
@@ -102,7 +103,7 @@ export async function loadClassicText(bookId: string): Promise<ClassicTextData |
   // 再尝试 fetch JSON（养生 16 本，存放在 public/wellness-texts/）
   if (WELLNESS_BOOK_IDS.has(bookId)) {
     try {
-      const res = await fetch(`/wellness-texts/${bookId}.json`);
+      const res = await fetch(cosUrl(`/wellness-texts/${bookId}.json`));
       if (!res.ok) return null;
       return (await res.json()) as ClassicTextData;
     } catch {

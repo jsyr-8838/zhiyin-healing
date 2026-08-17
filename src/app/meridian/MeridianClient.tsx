@@ -14,6 +14,7 @@ import { XWS_VIDEO_ACUPOINTS } from '@/lib/xws-video-names';
 import { ACUPOINT_LOCATION_IMAGES } from '@/lib/acupoint-image-names';
 import { WUXING_COLORS_DISPLAY } from '@/components/meridian/constants';
 import { TcmBodyModel } from '@/components/meridian/TcmBodyModel';
+import { cosUrl } from '@/lib/cos-url';
 import { MeridianTopBar } from '@/components/meridian/MeridianTopBar';
 import { MeridianBottomBar } from '@/components/meridian/MeridianBottomBar';
 import { WuYunLiuQiModal } from '@/components/meridian/WuYunLiuQiModal';
@@ -136,7 +137,7 @@ function TcmAcupointDetail({ point, meridian, infoPanelOpen, onClose, onToggleMe
                 <span className="text-[9px] text-zinc-600 ml-1 cursor-pointer hover:text-emerald-400 transition-colors" onClick={onFocusIn3D}>· 点击查看3D →</span>
               </div>
               <img
-                src={`/assets/acupoint/images/${encodeURIComponent(point.name)}.jpg`}
+                src={cosUrl(`/assets/acupoint/images/${encodeURIComponent(point.name)}.jpg`)}
                 alt={`${point.name}穴位定位图`}
                 className="w-full rounded-lg cursor-pointer hover:brightness-110 hover:ring-2 hover:ring-emerald-400/40 transition-all"
                 loading="lazy"
@@ -153,7 +154,7 @@ function TcmAcupointDetail({ point, meridian, infoPanelOpen, onClose, onToggleMe
                 <span className="text-[9px] text-zinc-600 ml-1">· 播放时3D模型同步脉动</span>
               </div>
               <video
-                src={`/videos/acupoints/${encodeURIComponent(point.name + '穴')}.mp4`}
+                src={cosUrl(`/videos/acupoints/${encodeURIComponent(point.name + '穴')}.mp4`)}
                 controls
                 preload="metadata"
                 playsInline

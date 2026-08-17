@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import { cosUrl } from '@/lib/cos-url';
 
 type PageTheme = 'healing' | 'diagnose' | 'home' | 'divination' | 'classics' | 'dark' | 'custom';
 
@@ -89,7 +90,7 @@ export default function PageContainer({
                 opacity: ss.topOpacity,
                 mixBlendMode: 'multiply',
                 filter: ss.filter,
-                backgroundImage: "url('/textures/shanshui-top.jpg')",
+                backgroundImage: `url('${cosUrl('/textures/shanshui-top.jpg')}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center 30%',
                 backgroundRepeat: 'no-repeat',
@@ -109,7 +110,7 @@ export default function PageContainer({
                 opacity: ss.bottomOpacity,
                 mixBlendMode: 'multiply',
                 filter: ss.filter,
-                backgroundImage: "url('/textures/shanshui-bottom.jpg')",
+                backgroundImage: `url('${cosUrl('/textures/shanshui-bottom.jpg')}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center 60%',
                 backgroundRepeat: 'no-repeat',

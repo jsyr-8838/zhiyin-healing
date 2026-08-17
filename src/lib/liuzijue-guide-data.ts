@@ -15,6 +15,8 @@
  * 文案风格：第二人称「你」建立亲密感 · 中医典籍引用 · 感官浸入
  */
 
+import { cosUrl } from './cos-url';
+
 export type JueId = 'xu' | 'he' | 'hu' | 'si' | 'chui' | 'xi';
 
 export interface LiuzijueGuideSegment {
@@ -42,7 +44,7 @@ export const LIUZIJUE_GUIDE_CONFIG = {
   preludeVolume: 0.85,
 };
 
-const AUDIO_BASE = '/audio/liuzijue';
+const AUDIO_BASE = cosUrl('/audio/liuzijue');
 
 export const LIUZIJUE_GUIDES: Record<JueId, LiuzijueGuideSegment> = {
   xu: {
