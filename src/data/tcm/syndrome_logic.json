@@ -1,0 +1,1566 @@
+{
+  "six_meridian_syndromes": [
+    {
+      "name": "太阳经",
+      "english_name": "Tai Yang",
+      "description": "太阳为一身之藩篱主一身之表统营卫而主表。太阳病为外感病之初期邪在表位。太阳经脉起于目内眦上额交巅入络脑还出别下项循肩髆内挟脊抵腰中。太阳为六经之纲领外邪侵袭首先犯太阳。",
+      "key_symptoms": [
+        "头痛项强",
+        "恶寒发热",
+        "脉浮",
+        "有汗（中风证）",
+        "无汗（伤寒证）",
+        "鼻鸣干呕",
+        "身疼腰痛",
+        "骨节疼痛",
+        "气喘"
+      ],
+      "tongue_pulse": {
+        "tongue": "舌苔薄白",
+        "pulse": "脉浮（中风脉浮缓，伤寒脉浮紧）"
+      },
+      "classic_formulas": [
+        "F001",
+        "F002",
+        "F003",
+        "F004",
+        "F005",
+        "F006",
+        "F007",
+        "F008",
+        "F009",
+        "F010"
+      ],
+      "key_acupoints": [
+        "LU7",
+        "LI4",
+        "BL10",
+        "GB20",
+        "DU14",
+        "BL12",
+        "BL13"
+      ],
+      "ni_comment": "倪师认为太阳病为外感病之初期病位在表。太阳中风与太阳伤寒之鉴别关键在于有汗与无汗。中风为风伤卫卫气不固营气外泄故汗出恶风用桂枝汤调和营卫。伤寒为寒伤营营血凝滞故无汗身疼用麻黄汤发汗解表。太阳病当以解表为第一要务不可过早攻下。"
+    },
+    {
+      "name": "阳明经",
+      "english_name": "Yang Ming",
+      "description": "阳明为多气多血之经主里主热。阳明病为外邪化热入里之极期。阳明经脉起于鼻之交頞中旁纳太阳之脉下循鼻外入上齿中还出挟口环唇下交承浆。阳明病以胃家实为纲分为阳明经证与阳明腑证。",
+      "key_symptoms": [
+        "身热汗自出",
+        "不恶寒反恶热",
+        "大渴引饮",
+        "脉洪大",
+        "腹满痛",
+        "大便秘结",
+        "谵语",
+        "潮热",
+        "手足濈然汗出"
+      ],
+      "tongue_pulse": {
+        "tongue": "舌红苔黄燥或焦黑起刺",
+        "pulse": "脉洪大（经证）或脉沉实（腑证）"
+      },
+      "classic_formulas": [
+        "F030",
+        "F031",
+        "F032",
+        "F033",
+        "F034",
+        "F035",
+        "F136",
+        "F137"
+      ],
+      "key_acupoints": [
+        "LI11",
+        "ST44",
+        "ST36",
+        "ST25",
+        "ST37",
+        "CV12",
+        "GV14"
+      ],
+      "ni_comment": "倪师认为阳明病为外感热病之极期邪已入里化热。阳明经证以四大症状为辨证要点壮热大汗大渴脉洪大用白虎汤清热。阳明腑证以痞满燥实坚为辨证要点用承气汤攻下。倪师强调阳明病当急下存阴不可迟疑。"
+    },
+    {
+      "name": "少阳经",
+      "english_name": "Shao Yang",
+      "description": "少阳为半表半里之经主枢。少阳病为邪正相争于半表半里之间。少阳经脉起于目锐眦上抵头角下耳后循颈入缺盆。少阳为三阳之枢邪在少阳既不在表也不在里故治法以和解为主。",
+      "key_symptoms": [
+        "往来寒热",
+        "胸胁苦满",
+        "默默不欲饮食",
+        "心烦喜呕",
+        "口苦",
+        "咽干",
+        "目眩",
+        "脉弦"
+      ],
+      "tongue_pulse": {
+        "tongue": "舌边红苔薄白或微黄",
+        "pulse": "脉弦"
+      },
+      "classic_formulas": [
+        "F003",
+        "F017",
+        "F018",
+        "F019",
+        "F168"
+      ],
+      "key_acupoints": [
+        "GB34",
+        "GB20",
+        "LR3",
+        "GB41",
+        "TE5",
+        "GB25"
+      ],
+      "ni_comment": "倪师认为少阳病为邪在半表半里治当和解。往来寒热胸胁苦满默默不欲饮食心烦喜呕为少阳病之四大主症用小柴胡汤和解少阳。少阳病禁汗禁吐禁下此为三禁。若少阳兼阳明里实则用大柴胡汤和解与通下并用。"
+    },
+    {
+      "name": "太阴经",
+      "english_name": "Tai Yin",
+      "description": "太阴为三阴之首主脾主运化。太阴病为脾阳虚寒之证。太阴经脉起于大指之端循指内侧白肉际过核骨后上内踝前廉上腨内循胫骨后交出厥阴前。太阴病以腹满而吐食不下自利益甚时腹自痛为纲。",
+      "key_symptoms": [
+        "腹满而吐",
+        "食不下",
+        "自利益甚",
+        "时腹自痛",
+        "口不渴",
+        "手足温",
+        "脉沉迟"
+      ],
+      "tongue_pulse": {
+        "tongue": "舌淡苔白腻或白滑",
+        "pulse": "脉沉迟或缓弱"
+      },
+      "classic_formulas": [
+        "F039",
+        "F040",
+        "F041",
+        "F165",
+        "F079",
+        "F089"
+      ],
+      "key_acupoints": [
+        "CV12",
+        "ST36",
+        "SP6",
+        "SP9",
+        "BL20",
+        "CV6"
+      ],
+      "ni_comment": "倪师认为太阴病为脾阳虚寒之证病机在于脾失健运寒湿内停。腹满而吐食不下自利益甚为太阴病之主症。治当温中散寒用理中汤类方。倪师强调太阴病当以温阳健脾为根本不可过用苦寒之品。"
+    },
+    {
+      "name": "少阴经",
+      "english_name": "Shao Yin",
+      "description": "少阴为心肾之本主水火。少阴病为心肾阳虚或阴虚之极期。少阴经脉起于小指之端斜走足心出于然谷之下循内踝之后入跟中上腨内。少阴病以脉微细但欲寐为纲分为寒化证与热化证。",
+      "key_symptoms": [
+        "脉微细",
+        "但欲寐",
+        "恶寒蜷卧",
+        "四肢厥冷",
+        "下利清谷",
+        "小便清长",
+        "精神萎靡",
+        "欲吐不吐"
+      ],
+      "tongue_pulse": {
+        "tongue": "舌淡白或淡紫（寒化证）舌红少苔（热化证）",
+        "pulse": "脉微细欲绝（寒化证）或脉细数（热化证）"
+      },
+      "classic_formulas": [
+        "F042",
+        "F043",
+        "F044",
+        "F045",
+        "F046",
+        "F047",
+        "F048",
+        "F049",
+        "F050",
+        "F075",
+        "F164"
+      ],
+      "key_acupoints": [
+        "KI3",
+        "HT7",
+        "CV4",
+        "CV6",
+        "KI7",
+        "BL23",
+        "CV14"
+      ],
+      "ni_comment": "倪师认为少阴病为六经病之危重阶段心肾阳气衰微。脉微细但欲寐为少阴病之总纲。寒化证为阳虚寒盛用四逆汤类回阳救逆。热化证为阴虚火旺用黄连阿胶汤滋阴清热。倪师强调少阴病当急温之不可迟疑。"
+    },
+    {
+      "name": "厥阴经",
+      "english_name": "Jue Yin",
+      "description": "厥阴为阴尽阳生之经主肝主风。厥阴病为阴阳交争寒热错杂之证。厥阴经脉起于大指丛毛之际上循足跗上廉去内踝一寸上踝八寸交出太阴之后上腘内廉。厥阴病以消渴气上撞心心中疼热饥而不欲食食则吐蛔为纲。",
+      "key_symptoms": [
+        "消渴",
+        "气上撞心",
+        "心中疼热",
+        "饥而不欲食",
+        "食则吐蛔",
+        "四肢厥冷",
+        "寒热交错",
+        "下利"
+      ],
+      "tongue_pulse": {
+        "tongue": "舌暗红苔黄白相兼",
+        "pulse": "脉沉弦或微"
+      },
+      "classic_formulas": [
+        "F051",
+        "F052",
+        "F053",
+        "F054",
+        "F055",
+        "F056",
+        "F057",
+        "F058",
+        "F166"
+      ],
+      "key_acupoints": [
+        "LR3",
+        "LR14",
+        "CV12",
+        "PC6",
+        "CV4",
+        "GB34",
+        "KI3"
+      ],
+      "ni_comment": "倪师认为厥阴病为六经病之最后阶段寒热错杂阴阳交争。消渴气上撞心心中疼热饥而不欲食为厥阴病之主症。乌梅丸为厥阴病之主方寒热并用攻补兼施。倪师强调厥阴为阴尽阳生之经治厥阴当注意阴阳之转化。"
+    }
+  ],
+  "ten_questions": [
+    {
+      "category": "寒热",
+      "description": "一问寒热",
+      "symptoms": [
+        {
+          "name": "恶寒发热",
+          "value": "外感表证",
+          "related_syndromes": [
+            "太阳中风证",
+            "太阳伤寒证"
+          ],
+          "related_formulas": [
+            "F001",
+            "F002"
+          ],
+          "related_acupoints": [
+            "LU7",
+            "LI4",
+            "GB20",
+            "DU14"
+          ]
+        },
+        {
+          "name": "但寒不热",
+          "value": "阳虚寒证",
+          "related_syndromes": [
+            "少阴寒化证",
+            "太阴病",
+            "阳虚寒凝证"
+          ],
+          "related_formulas": [
+            "F042",
+            "F043",
+            "F165"
+          ],
+          "related_acupoints": [
+            "CV4",
+            "KI3",
+            "ST36",
+            "CV6"
+          ]
+        },
+        {
+          "name": "但热不寒",
+          "value": "里热证",
+          "related_syndromes": [
+            "阳明经证",
+            "阳明腑证",
+            "气分实热证"
+          ],
+          "related_formulas": [
+            "F030",
+            "F031",
+            "F136"
+          ],
+          "related_acupoints": [
+            "LI11",
+            "ST44",
+            "GV14",
+            "ST36"
+          ]
+        },
+        {
+          "name": "往来寒热",
+          "value": "半表半里证",
+          "related_syndromes": [
+            "少阳病证"
+          ],
+          "related_formulas": [
+            "F003"
+          ],
+          "related_acupoints": [
+            "GB34",
+            "GB20",
+            "LR3",
+            "TE5"
+          ]
+        },
+        {
+          "name": "潮热",
+          "value": "阳明腑实证或阴虚内热",
+          "related_syndromes": [
+            "阳明腑证",
+            "阴虚内热证"
+          ],
+          "related_formulas": [
+            "F031",
+            "F032",
+            "F106"
+          ],
+          "related_acupoints": [
+            "ST25",
+            "ST37",
+            "KI3",
+            "CV4"
+          ]
+        },
+        {
+          "name": "寒热往来定时发作",
+          "value": "疟疾或少阳证",
+          "related_syndromes": [
+            "少阳病证",
+            "疟疾"
+          ],
+          "related_formulas": [
+            "F003",
+            "F017"
+          ],
+          "related_acupoints": [
+            "GB34",
+            "GB20",
+            "LU7",
+            "LI4"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "汗",
+      "description": "二问汗",
+      "symptoms": [
+        {
+          "name": "自汗",
+          "value": "气虚或阳虚",
+          "related_syndromes": [
+            "表虚不固证",
+            "气虚证",
+            "阳虚证"
+          ],
+          "related_formulas": [
+            "F001",
+            "F104",
+            "F108"
+          ],
+          "related_acupoints": [
+            "LU7",
+            "ST36",
+            "CV6",
+            "BL13"
+          ]
+        },
+        {
+          "name": "盗汗",
+          "value": "阴虚内热",
+          "related_syndromes": [
+            "阴虚内热证",
+            "心血不足证"
+          ],
+          "related_formulas": [
+            "F106",
+            "F105"
+          ],
+          "related_acupoints": [
+            "KI6",
+            "HT7",
+            "KI3",
+            "CV4"
+          ]
+        },
+        {
+          "name": "无汗",
+          "value": "表实寒证",
+          "related_syndromes": [
+            "太阳伤寒证"
+          ],
+          "related_formulas": [
+            "F002"
+          ],
+          "related_acupoints": [
+            "LU7",
+            "BL12",
+            "BL13",
+            "DU14"
+          ]
+        },
+        {
+          "name": "大汗淋漓",
+          "value": "阳明热盛或亡阳",
+          "related_syndromes": [
+            "阳明经证",
+            "亡阳证"
+          ],
+          "related_formulas": [
+            "F136",
+            "F043"
+          ],
+          "related_acupoints": [
+            "LI11",
+            "CV4",
+            "KI7",
+            "ST44"
+          ]
+        },
+        {
+          "name": "头汗",
+          "value": "湿热郁蒸或上焦热盛",
+          "related_syndromes": [
+            "湿热郁蒸证",
+            "上焦热盛证"
+          ],
+          "related_formulas": [
+            "F003",
+            "F162"
+          ],
+          "related_acupoints": [
+            "GB20",
+            "DU20",
+            "LI11",
+            "CV12"
+          ]
+        },
+        {
+          "name": "半身汗出",
+          "value": "气血不和或中风先兆",
+          "related_syndromes": [
+            "气虚血瘀证",
+            "中风先兆证"
+          ],
+          "related_formulas": [
+            "F158",
+            "F179"
+          ],
+          "related_acupoints": [
+            "ST36",
+            "LI4",
+            "GB20",
+            "SP10"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "头身",
+      "description": "三问头身",
+      "symptoms": [
+        {
+          "name": "头痛",
+          "value": "外感或内伤",
+          "related_syndromes": [
+            "太阳头痛",
+            "少阳头痛",
+            "阳明头痛",
+            "厥阴头痛",
+            "血虚头痛",
+            "肝阳头痛"
+          ],
+          "related_formulas": [
+            "F002",
+            "F003",
+            "F153",
+            "F154",
+            "F166",
+            "F155"
+          ],
+          "related_acupoints": [
+            "GB20",
+            "BL10",
+            "DU20",
+            "LI4",
+            "LR3"
+          ]
+        },
+        {
+          "name": "头晕目眩",
+          "value": "肝阳上亢或气血不足或痰湿内阻",
+          "related_syndromes": [
+            "肝阳上亢证",
+            "气血两虚证",
+            "痰湿内阻证"
+          ],
+          "related_formulas": [
+            "F154",
+            "F126",
+            "F111",
+            "F114"
+          ],
+          "related_acupoints": [
+            "GB20",
+            "LR3",
+            "ST36",
+            "CV12",
+            "KI3"
+          ]
+        },
+        {
+          "name": "身重",
+          "value": "湿邪困表或脾虚湿盛",
+          "related_syndromes": [
+            "风湿表证",
+            "脾虚湿盛证"
+          ],
+          "related_formulas": [
+            "F108",
+            "F145",
+            "F162"
+          ],
+          "related_acupoints": [
+            "SP9",
+            "ST36",
+            "CV12",
+            "BL20"
+          ]
+        },
+        {
+          "name": "身痛",
+          "value": "外感风寒或气血不和或瘀血阻络",
+          "related_syndromes": [
+            "太阳伤寒证",
+            "痹证",
+            "瘀血阻络证"
+          ],
+          "related_formulas": [
+            "F002",
+            "F160",
+            "F159"
+          ],
+          "related_acupoints": [
+            "BL10",
+            "GB34",
+            "LI4",
+            "SP10"
+          ]
+        },
+        {
+          "name": "腰痛",
+          "value": "肾虚或寒湿或瘀血",
+          "related_syndromes": [
+            "肾阳虚证",
+            "寒湿腰痛证",
+            "瘀血腰痛证"
+          ],
+          "related_formulas": [
+            "F105",
+            "F160",
+            "F156"
+          ],
+          "related_acupoints": [
+            "BL23",
+            "BL40",
+            "KI3",
+            "CV4"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "二便",
+      "description": "四问二便",
+      "symptoms": [
+        {
+          "name": "小便频数",
+          "value": "肾阳虚或下焦虚寒",
+          "related_syndromes": [
+            "肾阳虚证",
+            "下焦虚寒证"
+          ],
+          "related_formulas": [
+            "F105",
+            "F164",
+            "F182"
+          ],
+          "related_acupoints": [
+            "KI3",
+            "CV4",
+            "BL23",
+            "SP6"
+          ]
+        },
+        {
+          "name": "小便不利",
+          "value": "水湿内停或肾阳虚",
+          "related_syndromes": [
+            "水饮内停证",
+            "肾阳虚证",
+            "湿热蕴结证"
+          ],
+          "related_formulas": [
+            "F114",
+            "F115",
+            "F164",
+            "F111"
+          ],
+          "related_acupoints": [
+            "SP9",
+            "KI3",
+            "CV4",
+            "CV6"
+          ]
+        },
+        {
+          "name": "大便秘结",
+          "value": "实热或阴虚或气虚",
+          "related_syndromes": [
+            "阳明腑实证",
+            "阴虚肠燥证",
+            "气虚便秘证"
+          ],
+          "related_formulas": [
+            "F031",
+            "F032",
+            "F187"
+          ],
+          "related_acupoints": [
+            "ST25",
+            "ST37",
+            "CV12",
+            "SP6"
+          ]
+        },
+        {
+          "name": "腹泻",
+          "value": "脾虚或湿热或寒湿",
+          "related_syndromes": [
+            "脾虚泄泻证",
+            "湿热痢疾证",
+            "寒湿泄泻证"
+          ],
+          "related_formulas": [
+            "F165",
+            "F143",
+            "F144"
+          ],
+          "related_acupoints": [
+            "CV12",
+            "ST36",
+            "SP9",
+            "CV6"
+          ]
+        },
+        {
+          "name": "便血",
+          "value": "脾不统血或肠道湿热",
+          "related_syndromes": [
+            "脾不统血证",
+            "肠道湿热证"
+          ],
+          "related_formulas": [
+            "F100",
+            "F101"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "BL20",
+            "ST36",
+            "CV12"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "饮食",
+      "description": "五问饮食",
+      "symptoms": [
+        {
+          "name": "不欲食",
+          "value": "脾胃虚弱或湿热蕴脾",
+          "related_syndromes": [
+            "脾胃虚弱证",
+            "湿热蕴脾证",
+            "少阳病证"
+          ],
+          "related_formulas": [
+            "F121",
+            "F122",
+            "F003",
+            "F145"
+          ],
+          "related_acupoints": [
+            "CV12",
+            "ST36",
+            "SP6",
+            "GB34"
+          ]
+        },
+        {
+          "name": "多食易饥",
+          "value": "胃热炽盛或消渴病",
+          "related_syndromes": [
+            "胃热炽盛证",
+            "消渴病"
+          ],
+          "related_formulas": [
+            "F136",
+            "F141",
+            "F173"
+          ],
+          "related_acupoints": [
+            "ST44",
+            "LI11",
+            "ST36",
+            "CV12"
+          ]
+        },
+        {
+          "name": "口渴多饮",
+          "value": "热盛伤津或阴虚内热",
+          "related_syndromes": [
+            "阳明经证",
+            "阴虚内热证",
+            "消渴病"
+          ],
+          "related_formulas": [
+            "F136",
+            "F137",
+            "F173"
+          ],
+          "related_acupoints": [
+            "LI11",
+            "ST44",
+            "KI3",
+            "CV4"
+          ]
+        },
+        {
+          "name": "口淡无味",
+          "value": "脾虚湿盛",
+          "related_syndromes": [
+            "脾虚湿盛证"
+          ],
+          "related_formulas": [
+            "F145",
+            "F122",
+            "F121"
+          ],
+          "related_acupoints": [
+            "CV12",
+            "ST36",
+            "SP9",
+            "BL20"
+          ]
+        },
+        {
+          "name": "口苦",
+          "value": "肝胆湿热或少阳郁热",
+          "related_syndromes": [
+            "少阳病证",
+            "肝胆湿热证"
+          ],
+          "related_formulas": [
+            "F003",
+            "F130",
+            "F129"
+          ],
+          "related_acupoints": [
+            "GB34",
+            "LR3",
+            "GB20",
+            "LI11"
+          ]
+        },
+        {
+          "name": "恶心呕吐",
+          "value": "胃气上逆或痰饮内停",
+          "related_syndromes": [
+            "痰饮内停证",
+            "肝胃不和证",
+            "胃虚寒饮证"
+          ],
+          "related_formulas": [
+            "F003",
+            "F166",
+            "F131",
+            "F093"
+          ],
+          "related_acupoints": [
+            "CV12",
+            "PC6",
+            "ST36",
+            "LR3"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "胸腹",
+      "description": "六问胸腹",
+      "symptoms": [
+        {
+          "name": "胸闷",
+          "value": "气滞或痰阻或胸阳不振",
+          "related_syndromes": [
+            "胸阳不振证",
+            "痰浊闭阻证",
+            "肝气郁结证"
+          ],
+          "related_formulas": [
+            "F076",
+            "F077",
+            "F078",
+            "F128"
+          ],
+          "related_acupoints": [
+            "CV17",
+            "PC6",
+            "LU7",
+            "CV12"
+          ]
+        },
+        {
+          "name": "胸痛",
+          "value": "瘀血或痰浊或寒凝",
+          "related_syndromes": [
+            "心血瘀阻证",
+            "胸阳不振证",
+            "寒凝心脉证"
+          ],
+          "related_formulas": [
+            "F156",
+            "F076",
+            "F084",
+            "F174"
+          ],
+          "related_acupoints": [
+            "CV17",
+            "PC6",
+            "CV14",
+            "BL15"
+          ]
+        },
+        {
+          "name": "心悸",
+          "value": "心血不足或心阳不振或水饮凌心",
+          "related_syndromes": [
+            "心血不足证",
+            "心阳不振证",
+            "水饮凌心证"
+          ],
+          "related_formulas": [
+            "F124",
+            "F174",
+            "F111"
+          ],
+          "related_acupoints": [
+            "HT7",
+            "CV14",
+            "PC6",
+            "KI6"
+          ]
+        },
+        {
+          "name": "腹胀",
+          "value": "气滞或食积或脾虚",
+          "related_syndromes": [
+            "脾虚气滞证",
+            "食积内停证",
+            "肝郁脾虚证"
+          ],
+          "related_formulas": [
+            "F145",
+            "F149",
+            "F128",
+            "F087"
+          ],
+          "related_acupoints": [
+            "CV12",
+            "ST25",
+            "ST36",
+            "CV10"
+          ]
+        },
+        {
+          "name": "腹痛",
+          "value": "寒凝或热结或血瘀或虚寒",
+          "related_syndromes": [
+            "中焦虚寒证",
+            "寒凝气滞证",
+            "瘀血腹痛证",
+            "湿热蕴结证"
+          ],
+          "related_formulas": [
+            "F167",
+            "F085",
+            "F156",
+            "F142"
+          ],
+          "related_acupoints": [
+            "CV12",
+            "ST25",
+            "ST36",
+            "CV4"
+          ]
+        },
+        {
+          "name": "胁痛",
+          "value": "肝气郁结或瘀血阻络",
+          "related_syndromes": [
+            "肝气郁结证",
+            "肝胆湿热证",
+            "瘀血阻络证"
+          ],
+          "related_formulas": [
+            "F128",
+            "F130",
+            "F156"
+          ],
+          "related_acupoints": [
+            "LR3",
+            "GB34",
+            "GB25",
+            "BL18"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "耳聋",
+      "description": "七问耳聋（含耳鸣）",
+      "symptoms": [
+        {
+          "name": "耳鸣",
+          "value": "肾虚或肝火或痰火",
+          "related_syndromes": [
+            "肾精亏虚证",
+            "肝火上炎证",
+            "痰火郁结证"
+          ],
+          "related_formulas": [
+            "F105",
+            "F130",
+            "F132"
+          ],
+          "related_acupoints": [
+            "GB2",
+            "KI3",
+            "LR3",
+            "SI19"
+          ]
+        },
+        {
+          "name": "耳聋",
+          "value": "少阳经病或肾虚",
+          "related_syndromes": [
+            "少阳病证",
+            "肾精亏虚证"
+          ],
+          "related_formulas": [
+            "F003",
+            "F105"
+          ],
+          "related_acupoints": [
+            "GB20",
+            "GB2",
+            "KI3",
+            "TE5"
+          ]
+        },
+        {
+          "name": "听力下降",
+          "value": "肾精不足或气血亏虚",
+          "related_syndromes": [
+            "肾精亏虚证",
+            "气血两虚证"
+          ],
+          "related_formulas": [
+            "F105",
+            "F126"
+          ],
+          "related_acupoints": [
+            "KI3",
+            "GB2",
+            "ST36",
+            "CV4"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "口渴",
+      "description": "八问口渴",
+      "symptoms": [
+        {
+          "name": "口渴欲饮",
+          "value": "热盛伤津或阴虚内热",
+          "related_syndromes": [
+            "阳明经证",
+            "阴虚内热证",
+            "消渴病"
+          ],
+          "related_formulas": [
+            "F136",
+            "F137",
+            "F173"
+          ],
+          "related_acupoints": [
+            "LI11",
+            "ST44",
+            "KI3",
+            "CV4"
+          ]
+        },
+        {
+          "name": "口渴不欲饮",
+          "value": "湿邪内停或瘀血内阻",
+          "related_syndromes": [
+            "湿温证",
+            "瘀血内阻证",
+            "痰饮内停证"
+          ],
+          "related_formulas": [
+            "F162",
+            "F156",
+            "F111"
+          ],
+          "related_acupoints": [
+            "SP9",
+            "SP10",
+            "CV12",
+            "ST36"
+          ]
+        },
+        {
+          "name": "口干夜甚",
+          "value": "阴虚内热",
+          "related_syndromes": [
+            "阴虚内热证",
+            "肺胃阴虚证"
+          ],
+          "related_formulas": [
+            "F106",
+            "F120",
+            "F137"
+          ],
+          "related_acupoints": [
+            "KI6",
+            "KI3",
+            "LU7",
+            "CV4"
+          ]
+        },
+        {
+          "name": "多饮多尿",
+          "value": "消渴病下消",
+          "related_syndromes": [
+            "消渴病"
+          ],
+          "related_formulas": [
+            "F105",
+            "F173"
+          ],
+          "related_acupoints": [
+            "KI3",
+            "ST36",
+            "SP6",
+            "CV4"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "睡眠",
+      "description": "九问睡眠",
+      "symptoms": [
+        {
+          "name": "失眠",
+          "value": "心脾两虚或心肾不交或肝火扰心或痰热内扰",
+          "related_syndromes": [
+            "心脾两虚证",
+            "心肾不交证",
+            "肝火扰心证",
+            "痰热内扰证"
+          ],
+          "related_formulas": [
+            "F124",
+            "F176",
+            "F106",
+            "F132"
+          ],
+          "related_acupoints": [
+            "HT7",
+            "KI6",
+            "PC6",
+            "CV4",
+            "LR3"
+          ]
+        },
+        {
+          "name": "嗜睡",
+          "value": "阳虚湿困或气血不足",
+          "related_syndromes": [
+            "脾虚湿盛证",
+            "阳气虚衰证",
+            "气血两虚证"
+          ],
+          "related_formulas": [
+            "F145",
+            "F164",
+            "F126"
+          ],
+          "related_acupoints": [
+            "CV12",
+            "ST36",
+            "CV6",
+            "SP9"
+          ]
+        },
+        {
+          "name": "多梦",
+          "value": "心火亢盛或心血不足",
+          "related_syndromes": [
+            "心火亢盛证",
+            "心血不足证"
+          ],
+          "related_formulas": [
+            "F101",
+            "F124",
+            "F106"
+          ],
+          "related_acupoints": [
+            "HT7",
+            "PC6",
+            "KI6",
+            "CV4"
+          ]
+        },
+        {
+          "name": "易醒",
+          "value": "心胆气虚或肝血不足",
+          "related_syndromes": [
+            "心胆气虚证",
+            "肝血不足证"
+          ],
+          "related_formulas": [
+            "F132",
+            "F106",
+            "F124"
+          ],
+          "related_acupoints": [
+            "HT7",
+            "GB20",
+            "LR3",
+            "PC6"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "妇女月经",
+      "description": "十问妇女（月经）",
+      "symptoms": [
+        {
+          "name": "月经先期",
+          "value": "血热或气虚",
+          "related_syndromes": [
+            "血热妄行证",
+            "气虚不固证"
+          ],
+          "related_formulas": [
+            "F129",
+            "F095",
+            "F104"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "SP10",
+            "LR3",
+            "CV4"
+          ]
+        },
+        {
+          "name": "月经后期",
+          "value": "血虚或寒凝",
+          "related_syndromes": [
+            "血虚寒凝证",
+            "肝郁气滞证"
+          ],
+          "related_formulas": [
+            "F147",
+            "F128",
+            "F185"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "CV4",
+            "KI3",
+            "ST36"
+          ]
+        },
+        {
+          "name": "痛经",
+          "value": "寒凝血瘀或气滞血瘀",
+          "related_syndromes": [
+            "寒凝血瘀证",
+            "气滞血瘀证"
+          ],
+          "related_formulas": [
+            "F184",
+            "F156",
+            "F147"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "SP8",
+            "CV4",
+            "LR3"
+          ]
+        },
+        {
+          "name": "月经量少",
+          "value": "血虚或肾虚",
+          "related_syndromes": [
+            "血虚证",
+            "肾精亏虚证"
+          ],
+          "related_formulas": [
+            "F125",
+            "F105",
+            "F185"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "SP10",
+            "KI3",
+            "CV4"
+          ]
+        },
+        {
+          "name": "月经量多",
+          "value": "血热或气虚不固或瘀血",
+          "related_syndromes": [
+            "血热妄行证",
+            "气虚不固证",
+            "瘀血阻滞证"
+          ],
+          "related_formulas": [
+            "F099",
+            "F134",
+            "F104"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "SP10",
+            "CV4",
+            "KI6"
+          ]
+        },
+        {
+          "name": "闭经",
+          "value": "血虚或气滞血瘀或寒凝",
+          "related_syndromes": [
+            "血虚证",
+            "气滞血瘀证",
+            "寒凝胞宫证"
+          ],
+          "related_formulas": [
+            "F125",
+            "F156",
+            "F147",
+            "F185"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "SP10",
+            "CV4",
+            "ST36"
+          ]
+        },
+        {
+          "name": "白带异常",
+          "value": "脾虚湿盛或湿热下注或肾虚",
+          "related_syndromes": [
+            "脾虚湿盛证",
+            "湿热下注证",
+            "肾阳虚证"
+          ],
+          "related_formulas": [
+            "F145",
+            "F130",
+            "F164"
+          ],
+          "related_acupoints": [
+            "SP6",
+            "SP9",
+            "CV4",
+            "ST36"
+          ]
+        },
+        {
+          "name": "不孕",
+          "value": "肾虚或宫寒或瘀血",
+          "related_syndromes": [
+            "肾阳虚证",
+            "宫寒证",
+            "瘀血阻滞证"
+          ],
+          "related_formulas": [
+            "F185",
+            "F147",
+            "F098"
+          ],
+          "related_acupoints": [
+            "CV4",
+            "KI3",
+            "SP6",
+            "CV6"
+          ]
+        }
+      ]
+    }
+  ],
+  "symptom_syndrome_mapping": [
+    {
+      "symptom": "发热恶寒",
+      "syndromes": [
+        "太阳中风证",
+        "太阳伤寒证"
+      ],
+      "rules": "有汗为中风用桂枝汤无汗为伤寒用麻黄汤",
+      "key_discriminators": "有汗无汗",
+      "formulas": [
+        "F001",
+        "F002"
+      ]
+    },
+    {
+      "symptom": "往来寒热",
+      "syndromes": [
+        "少阳病证"
+      ],
+      "rules": "往来寒热伴胸胁苦满心烦喜呕为少阳病用小柴胡汤和解",
+      "key_discriminators": "胸胁苦满心烦喜呕口苦",
+      "formulas": [
+        "F003"
+      ]
+    },
+    {
+      "symptom": "壮热大汗",
+      "syndromes": [
+        "阳明经证"
+      ],
+      "rules": "四大症状壮热大汗大渴脉洪大为阳明经证用白虎汤",
+      "key_discriminators": "大渴脉洪大",
+      "formulas": [
+        "F136"
+      ]
+    },
+    {
+      "symptom": "便秘腹痛",
+      "syndromes": [
+        "阳明腑证"
+      ],
+      "rules": "痞满燥实坚为阳明腑证用承气汤类",
+      "key_discriminators": "腹满痛拒按潮热谵语",
+      "formulas": [
+        "F031",
+        "F032",
+        "F033"
+      ]
+    },
+    {
+      "symptom": "腹痛呕吐",
+      "syndromes": [
+        "太阴病证",
+        "厥阴病证"
+      ],
+      "rules": "腹满而吐食不下自利为太阴病用理中汤消渴气上撞心为厥阴病用乌梅丸",
+      "key_discriminators": "口渴与否食则吐蛔",
+      "formulas": [
+        "F165",
+        "F051"
+      ]
+    },
+    {
+      "symptom": "四肢厥冷",
+      "syndromes": [
+        "少阴寒化证",
+        "厥阴病证",
+        "阳郁证"
+      ],
+      "rules": "脉微欲绝为少阴寒化用四逆汤脉弦为阳郁用四逆散寒热错杂为厥阴用乌梅丸",
+      "key_discriminators": "脉象舌象",
+      "formulas": [
+        "F043",
+        "F170",
+        "F051"
+      ]
+    },
+    {
+      "symptom": "心下痞满",
+      "syndromes": [
+        "寒热错杂痞证",
+        "水饮内停证"
+      ],
+      "rules": "呕吐肠鸣为寒热错杂用半夏泻心汤水饮内停用苓桂术甘汤",
+      "key_discriminators": "呕吐肠鸣与否舌苔黄腻与否",
+      "formulas": [
+        "F102",
+        "F111"
+      ]
+    },
+    {
+      "symptom": "咳嗽气喘",
+      "syndromes": [
+        "风寒束肺证",
+        "痰热壅肺证",
+        "肺肾两虚证"
+      ],
+      "rules": "喉中水鸡声为寒饮用射干麻黄汤痰黄稠为痰热用定喘汤久病肺肾两虚用苏子降气汤",
+      "key_discriminators": "痰色痰量病程",
+      "formulas": [
+        "F118",
+        "F152",
+        "F151"
+      ]
+    },
+    {
+      "symptom": "胸痹心痛",
+      "syndromes": [
+        "胸阳不振证",
+        "痰浊闭阻证",
+        "寒凝心脉证"
+      ],
+      "rules": "胸背痛短气用栝楼薤白白酒汤不得卧加半夏心中痞加枳实桂枝心痛彻背用乌头赤石脂丸",
+      "key_discriminators": "疼痛程度范围",
+      "formulas": [
+        "F076",
+        "F077",
+        "F078",
+        "F084"
+      ]
+    },
+    {
+      "symptom": "水肿",
+      "syndromes": [
+        "风水证",
+        "脾虚水停证",
+        "肾阳虚水泛证"
+      ],
+      "rules": "风水用越婢汤或防己黄芪汤脾虚水停用五苓散肾阳虚用真武汤",
+      "key_discriminators": "水肿部位病程脉象",
+      "formulas": [
+        "F109",
+        "F108",
+        "F114",
+        "F164"
+      ]
+    },
+    {
+      "symptom": "眩晕",
+      "syndromes": [
+        "肝阳上亢证",
+        "气血两虚证",
+        "痰饮内停证"
+      ],
+      "rules": "面红目赤脉弦有力为肝阳上亢用天麻钩藤饮气血不足用归脾汤痰饮用苓桂术甘汤",
+      "key_discriminators": "面色脉象舌苔",
+      "formulas": [
+        "F154",
+        "F124",
+        "F111"
+      ]
+    },
+    {
+      "symptom": "失眠",
+      "syndromes": [
+        "心脾两虚证",
+        "心肾不交证",
+        "肝火扰心证",
+        "痰热内扰证"
+      ],
+      "rules": "心脾两虚用归脾汤心肾不交用酸枣仁汤合交泰丸肝火用龙胆泻肝汤痰热用温胆汤",
+      "key_discriminators": "伴随症状舌象脉象",
+      "formulas": [
+        "F124",
+        "F176",
+        "F130",
+        "F132"
+      ]
+    },
+    {
+      "symptom": "黄疸",
+      "syndromes": [
+        "湿热黄疸证",
+        "寒湿黄疸证"
+      ],
+      "rules": "阳黄身黄鲜明用茵陈蒿汤阴黄身黄晦暗用茵陈术附汤",
+      "key_discriminators": "黄色鲜明与否",
+      "formulas": [
+        "F060",
+        "F061"
+      ]
+    },
+    {
+      "symptom": "痹证关节痛",
+      "syndromes": [
+        "风寒湿痹证",
+        "风湿热痹证",
+        "肝肾两虚痹证"
+      ],
+      "rules": "行痹用防风汤痛痹用乌头汤着痹用薏苡仁汤热痹用白虎加桂枝汤久痹用独活寄生汤",
+      "key_discriminators": "疼痛性质关节红肿与否病程",
+      "formulas": [
+        "F160",
+        "F177"
+      ]
+    },
+    {
+      "symptom": "下利",
+      "syndromes": [
+        "湿热痢疾证",
+        "寒湿泄泻证",
+        "脾虚泄泻证"
+      ],
+      "rules": "下利赤白里急后重为湿热痢用白头翁汤或芍药汤脾虚泄泻用理中汤",
+      "key_discriminators": "大便颜色里急后重与否",
+      "formulas": [
+        "F143",
+        "F142",
+        "F165"
+      ]
+    },
+    {
+      "symptom": "血证出血",
+      "syndromes": [
+        "血热妄行证",
+        "气虚不摄证",
+        "瘀血出血证"
+      ],
+      "rules": "实热出血用泻心汤或犀角地黄汤气虚出血用归脾汤脾不统血用黄土汤",
+      "key_discriminators": "出血颜色量多少舌象脉象",
+      "formulas": [
+        "F101",
+        "F134",
+        "F124",
+        "F100"
+      ]
+    }
+  ]
+}

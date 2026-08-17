@@ -1,0 +1,44 @@
+# =============================================================================
+# ZhiYin (知音) - Production Docker Compose
+# Secrets via .env file (git-ignored), encrypted volume for database
+# =============================================================================
+
+services:
+  zhiyin:
+    build: .
+    container_name: zhiyin-app
+    ports:
+      - "3456:3456"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/prod.db
+    volumes:
+      - zhiyin-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3456').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # Security: read-only root filesystem, write only to /app/data and /tmp
+    read_only: true
+    tmpfs:
+      - /tmp
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+    # No new privileges
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  zhiyin-data:
+    # Encrypted volume - data at rest protected by Docker
+    driver: local

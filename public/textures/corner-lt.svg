@@ -1,0 +1,16 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- 左上角花 — 如意云纹角饰，极淡墨色 -->
+  <g fill="none" stroke="rgba(92,26,0,0.08)" stroke-width="0.8" stroke-linecap="round">
+    <!-- 外框L型 -->
+    <path d="M2 2 L50 2 Q56 2 56 8 L56 30" />
+    <path d="M2 2 L2 50 Q2 56 8 56 L30 56" />
+    <!-- 内框回纹 -->
+    <path d="M8 8 L38 8 Q42 8 42 12 L42 24" />
+    <path d="M8 8 L8 38 Q8 42 12 42 L24 42" />
+    <!-- 如意云头 -->
+    <path d="M18 18 Q18 12 24 12 Q30 12 30 18 Q30 24 24 24 Q18 24 18 18Z" stroke-width="0.6" />
+    <!-- 云卷 -->
+    <path d="M10 28 Q10 24 14 24 Q18 24 18 28" stroke-width="0.5" />
+    <path d="M28 10 Q28 6 32 6 Q36 6 36 10" stroke-width="0.5" />
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- 右下角花 -->
+  <g fill="none" stroke="rgba(92,26,0,0.08)" stroke-width="0.8" stroke-linecap="round">
+    <path d="M118 118 L70 118 Q64 118 64 112 L64 90" />
+    <path d="M118 118 L118 70 Q118 64 112 64 L90 64" />
+    <path d="M112 112 L82 112 Q78 112 78 108 L78 96" />
+    <path d="M112 112 L112 82 Q112 78 108 78 L96 78" />
+    <path d="M102 102 Q102 96 96 96 Q90 96 90 102 Q90 108 96 108 Q102 108 102 102Z" stroke-width="0.6" />
+    <path d="M110 92 Q110 88 106 88 Q102 88 102 92" stroke-width="0.5" />
+    <path d="M92 110 Q92 114 88 114 Q84 114 84 110" stroke-width="0.5" />
+  </g>
+</svg>

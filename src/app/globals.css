@@ -1,0 +1,879 @@
+@import "tailwindcss";
+
+:root {
+  /* ═══ 宋韵宣纸色板 ═══ */
+  --xuan-paper: #f4ede0;          /* 宣纸底色 */
+  --xuan-warm: #f8f1e4;           /* 暖宣 */
+  --xuan-cool: #eef3ee;           /* 冷宣-淡绿 */
+  --ink-main: #1e2d26;            /* 浓墨 */
+  --ink-light: #3a5545;           /* 淡墨 */
+  --ink-wash: rgba(30, 45, 38, 0.08);  /* 墨晕 */
+  --ink-mist: rgba(30, 45, 38, 0.04);  /* 远山雾 */
+
+  /* 五行正色（宋瓷色系） */
+  --wood: #5d8a63;                /* 青瓷绿-木 */
+  --wood-deep: #3d6142;
+  --wood-50: #eef5ef;             /* 木行淡 */
+  --wood-100: #d4e8d6;
+  --wood-200: #aedbb3;
+  --wood-300: #82c78a;
+  --wood-400: #5d8a63;            /* = --wood */
+  --wood-500: #4d7653;
+  --wood-600: #3d6142;            /* = --wood-deep */
+  --wood-700: #2e4a32;
+  --wood-800: #1e3322;
+  --wood-900: #0f1a11;
+
+  --fire: #c26158;                /* 朱砂红-火 */
+  --fire-deep: #9c4440;
+  --fire-50: #fdf0ee;
+  --fire-100: #f8d9d6;
+  --fire-200: #f0b3ad;
+  --fire-300: #e58d85;
+  --fire-400: #c26158;            /* = --fire */
+  --fire-500: #ab534b;
+  --fire-600: #9c4440;            /* = --fire-deep */
+  --fire-700: #7a3532;
+  --fire-800: #592624;
+  --fire-900: #381816;
+
+  --earth: #c9a94f;               /* 暮金-土 */
+  --earth-deep: #a68b3a;
+  --earth-50: #fdf8e8;
+  --earth-100: #f9edd0;
+  --earth-200: #f0dba0;
+  --earth-300: #e5c870;
+  --earth-400: #c9a94f;           /* = --earth */
+  --earth-500: #b59844;
+  --earth-600: #a68b3a;           /* = --earth-deep */
+  --earth-700: #826c2d;
+  --earth-800: #5e4e20;
+  --earth-900: #3a3013;
+
+  --metal: #8fa6a0;               /* 月白银-金 */
+  --metal-deep: #6c8580;
+  --metal-50: #f0f4f3;
+  --metal-100: #dce6e4;
+  --metal-200: #b9ccc9;
+  --metal-300: #96b3af;
+  --metal-400: #8fa6a0;           /* = --metal */
+  --metal-500: #7d9690;
+  --metal-600: #6c8580;           /* = --metal-deep */
+  --metal-700: #536662;
+  --metal-800: #3a4744;
+  --metal-900: #212927;
+
+  --water: #5ba09a;               /* 天青-水 */
+  --water-deep: #3d7a75;
+  --water-50: #ecf6f5;
+  --water-100: #cfeae8;
+  --water-200: #9fd5d1;
+  --water-300: #70c0ba;
+  --water-400: #5ba09a;           /* = --water */
+  --water-500: #4d8d88;
+  --water-600: #3d7a75;           /* = --water-deep */
+  --water-700: #2e5e5a;
+  --water-800: #1f4140;
+  --water-900: #0f2322;
+
+  /* 修饰色 */
+  --rouge: #bf5a52;               /* 胭脂 */
+  --apricot: #e8b87a;             /* 杏黄 */
+  --jade: #7ec4b5;                /* 翠玉 */
+  --indigo: #4a6880;              /* 靛蓝 */
+  --ochre: #c28a5a;               /* 赭石 */
+
+  /* 宣纸墨色系 (替代 gray) */
+  --paper-50: #faf7f0;
+  --paper-100: #f4ede0;           /* = 纸底 */
+  --paper-200: #e8dfd0;
+  --paper-300: #d2c9b8;
+  --paper-400: #b5ab98;
+  --paper-500: #968c78;
+  --paper-600: #786f5e;
+  --paper-700: #5a5244;
+  --paper-800: #3a5545;           /* = 淡墨 */
+  --paper-900: #1e2d26;           /* = 浓墨 */
+
+  /* 毛玻璃 */
+  --glass-bg: rgba(255, 255, 255, 0.52);
+  --glass-border: rgba(255, 255, 255, 0.72);
+  --glass-blur: 24px;
+  --glass-glow: rgba(255, 255, 255, 0.15);
+
+  /* 圆角 */
+  --r-sm: 12px;
+  --r-md: 20px;
+  --r-lg: 32px;
+  --r-xl: 48px;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 12px rgba(30, 45, 38, 0.06);
+  --shadow-md: 0 8px 32px rgba(30, 45, 38, 0.10);
+  --shadow-lg: 0 24px 64px rgba(30, 45, 38, 0.14);
+  --shadow-glow: 0 0 24px rgba(93, 138, 99, 0.08);
+
+  /* 兼容旧变量 */
+  --background: #f4ede0;
+  --foreground: #1e2d26;
+  --primary: #5d8a63;
+  --primary-light: #eef3ee;
+  --accent: #c9a94f;
+
+  /* ═══ 刮痧·朱砂美学体系 ═══ */
+  --zhusha: #5C1A00;                /* 朱砂红（主色调） */
+  --zhusha-light: #8B2500;          /* 浅朱砂 */
+  --zhusha-bg: #3E1200;             /* 深朱砂背景 */
+  --gold: #C4A35A;                  /* 金色（边框/装饰） */
+  --gold-deep: #B8860B;             /* 深金 */
+  --gold-dim: rgba(196, 163, 90, 0.15);  /* 金色微光 */
+  --paper: #FDF8F0;                 /* 宣纸色 */
+  --paper-light: #F5EFE0;           /* 浅宣纸 */
+  --paper-old: #EDE4D3;             /* 旧宣纸 */
+  --ink: #2C1810;                   /* 墨色 */
+  --ink-light: #5C4033;             /* 淡墨/褐色 */
+  --herb: #228B22;                  /* 草药绿 */
+  --herb-light: #6e9e74;            /* 浅草药 */
+
+  /* ═══ 深空/夜间模式变量（六字诀、颂钵等深色页面用） ═══ */
+  --night-bg: #0a0a1a;
+  --night-bg-elevated: #12122a;
+  --night-surface: rgba(255, 255, 255, 0.06);
+  --night-surface-hover: rgba(255, 255, 255, 0.10);
+  --night-border: rgba(255, 255, 255, 0.08);
+  --night-border-hover: rgba(255, 255, 255, 0.15);
+  --night-text: rgba(255, 255, 255, 0.90);
+  --night-text-dim: rgba(255, 255, 255, 0.40);
+  --night-text-faint: rgba(255, 255, 255, 0.20);
+  --night-glow: rgba(196, 163, 90, 0.12);     /* 金色微光 */
+  --night-blur: 16px;
+}
+
+/* ═══ Tailwind 色阶重映射至五行疗愈色 ═══
+   原理：Tailwind v4 的 @theme inline 允许覆盖默认色阶，
+   将 gray→宣纸墨色, emerald→木行, amber→土行, red→火行,
+   purple/indigo→水行靛蓝, teal→水行天青, orange→赭石,
+   blue→水行, green→木行, yellow→土行暮金
+   这样页面中 ~880 处硬编码类名自动产生正确疗愈色，
+   无需逐个修改。 */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-accent: var(--accent);
+
+  /* gray → 宣纸墨色 (影响最广: 487处) */
+  --color-gray-50: var(--paper-50);
+  --color-gray-100: var(--paper-100);
+  --color-gray-200: var(--paper-200);
+  --color-gray-300: var(--paper-300);
+  --color-gray-400: var(--paper-400);
+  --color-gray-500: var(--paper-500);
+  --color-gray-600: var(--paper-600);
+  --color-gray-700: var(--paper-700);
+  --color-gray-800: var(--paper-800);
+  --color-gray-900: var(--paper-900);
+  --color-gray-950: #0f1810;
+
+  /* paper → 宣纸色阶 (显式语义名, 用于 bg-paper-200 等) */
+  --color-paper-50: var(--paper-50);
+  --color-paper-100: var(--paper-100);
+  --color-paper-200: var(--paper-200);
+  --color-paper-300: var(--paper-300);
+  --color-paper-400: var(--paper-400);
+  --color-paper-500: var(--paper-500);
+  --color-paper-600: var(--paper-600);
+  --color-paper-700: var(--paper-700);
+  --color-paper-800: var(--paper-800);
+  --color-paper-900: var(--paper-900);
+  --color-paper-light: var(--paper-light);
+  --color-paper-old: var(--paper-old);
+
+  /* emerald → 木行青瓷色 (148处) */
+  --color-emerald-50: var(--wood-50);
+  --color-emerald-100: var(--wood-100);
+  --color-emerald-200: var(--wood-200);
+  --color-emerald-300: var(--wood-300);
+  --color-emerald-400: var(--wood-400);
+  --color-emerald-500: var(--wood-500);
+  --color-emerald-600: var(--wood-600);
+  --color-emerald-700: var(--wood-700);
+  --color-emerald-800: var(--wood-800);
+  --color-emerald-900: var(--wood-900);
+  --color-emerald-950: #081208;
+
+  /* amber → 土行暮金色 (145处) */
+  --color-amber-50: var(--earth-50);
+  --color-amber-100: var(--earth-100);
+  --color-amber-200: var(--earth-200);
+  --color-amber-300: var(--earth-300);
+  --color-amber-400: var(--earth-400);
+  --color-amber-500: var(--earth-500);
+  --color-amber-600: var(--earth-600);
+  --color-amber-700: var(--earth-700);
+  --color-amber-800: var(--earth-800);
+  --color-amber-900: var(--earth-900);
+  --color-amber-950: #1d180a;
+
+  /* red → 火行朱砂色 (44处) */
+  --color-red-50: var(--fire-50);
+  --color-red-100: var(--fire-100);
+  --color-red-200: var(--fire-200);
+  --color-red-300: var(--fire-300);
+  --color-red-400: var(--fire-400);
+  --color-red-500: var(--fire-500);
+  --color-red-600: var(--fire-600);
+  --color-red-700: var(--fire-700);
+  --color-red-800: var(--fire-800);
+  --color-red-900: var(--fire-900);
+  --color-red-950: #2a0f0d;
+
+  /* purple → 水行靛蓝 (69处, 占卜冷色) */
+  --color-purple-50: #eef2f6;
+  --color-purple-100: #d5e0ea;
+  --color-purple-200: #a8c1d5;
+  --color-purple-300: #7ba2c0;
+  --color-purple-400: #5a8aaa;
+  --color-purple-500: #4a6880;    /* = --indigo 修饰色 */
+  --color-purple-600: #3a5268;
+  --color-purple-700: #2a3c50;
+  --color-purple-800: #1a2638;
+  --color-purple-900: #0a101f;
+  --color-purple-950: #050810;
+
+  /* indigo → 靛蓝修饰色 (37处, 与purple配对) */
+  --color-indigo-50: #eef2f6;
+  --color-indigo-100: #d5e0ea;
+  --color-indigo-200: #a8c1d5;
+  --color-indigo-300: #7ba2c0;
+  --color-indigo-400: #5a8aaa;
+  --color-indigo-500: #4a6880;
+  --color-indigo-600: #3a5268;
+  --color-indigo-700: #2a3c50;
+  --color-indigo-800: #1a2638;
+  --color-indigo-900: #0a101f;
+  --color-indigo-950: #050810;
+
+  /* teal → 水行天青色 (35处, 与emerald配对) */
+  --color-teal-50: var(--water-50);
+  --color-teal-100: var(--water-100);
+  --color-teal-200: var(--water-200);
+  --color-teal-300: var(--water-300);
+  --color-teal-400: var(--water-400);
+  --color-teal-500: var(--water-500);
+  --color-teal-600: var(--water-600);
+  --color-teal-700: var(--water-700);
+  --color-teal-800: var(--water-800);
+  --color-teal-900: var(--water-900);
+  --color-teal-950: #071211;
+
+  /* orange → 赭石暖色 (28处, 与amber配对) */
+  --color-orange-50: #fdf3e8;
+  --color-orange-100: #f8e2c8;
+  --color-orange-200: #f0c596;
+  --color-orange-300: #e5a964;
+  --color-orange-400: #c28a5a;     /* = --ochre 赭石 */
+  --color-orange-500: #a87a50;
+  --color-orange-600: #8e6a46;
+  --color-orange-700: #6e5236;
+  --color-orange-800: #4e3a26;
+  --color-orange-900: #2e2216;
+  --color-orange-950: #17110b;
+
+  /* blue → 水行天青偏蓝 (23处) */
+  --color-blue-50: var(--water-50);
+  --color-blue-100: var(--water-100);
+  --color-blue-200: var(--water-200);
+  --color-blue-300: var(--water-300);
+  --color-blue-400: var(--water-400);
+  --color-blue-500: var(--water-500);
+  --color-blue-600: var(--water-600);
+  --color-blue-700: var(--water-700);
+  --color-blue-800: var(--water-800);
+  --color-blue-900: var(--water-900);
+  --color-blue-950: #071211;
+
+  /* green → 木行色 (11处) */
+  --color-green-50: var(--wood-50);
+  --color-green-100: var(--wood-100);
+  --color-green-200: var(--wood-200);
+  --color-green-300: var(--wood-300);
+  --color-green-400: var(--wood-400);
+  --color-green-500: var(--wood-500);
+  --color-green-600: var(--wood-600);
+  --color-green-700: var(--wood-700);
+  --color-green-800: var(--wood-800);
+  --color-green-900: var(--wood-900);
+  --color-green-950: #081208;
+
+  /* yellow → 土行暮金色 (11处) */
+  --color-yellow-50: var(--earth-50);
+  --color-yellow-100: var(--earth-100);
+  --color-yellow-200: var(--earth-200);
+  --color-yellow-300: var(--earth-300);
+  --color-yellow-400: var(--earth-400);
+  --color-yellow-500: var(--earth-500);
+  --color-yellow-600: var(--earth-600);
+  --color-yellow-700: var(--earth-700);
+  --color-yellow-800: var(--earth-800);
+  --color-yellow-900: var(--earth-900);
+  --color-yellow-950: #1d180a;
+
+  /* violet → 脉轮紫 (6处) */
+  --color-violet-50: #f2eef6;
+  --color-violet-100: #ddd5ea;
+  --color-violet-200: #bbabd5;
+  --color-violet-300: #9981c0;
+  --color-violet-400: #7a5faa;
+  --color-violet-500: #5e4294;
+  --color-violet-600: #4a3478;
+  --color-violet-700: #36265c;
+  --color-violet-800: #221840;
+  --color-violet-900: #0e0a24;
+  --color-violet-950: #070512;
+
+  /* pink → 胭脂 (3处) */
+  --color-pink-50: var(--fire-50);
+  --color-pink-100: var(--fire-100);
+  --color-pink-200: var(--fire-200);
+  --color-pink-300: var(--fire-300);
+  --color-pink-400: var(--fire-400);
+  --color-pink-500: var(--fire-500);
+  --color-pink-600: var(--fire-600);
+  --color-pink-700: var(--fire-700);
+  --color-pink-800: var(--fire-800);
+  --color-pink-900: var(--fire-900);
+  --color-pink-950: #2a0f0d;
+
+  /* cyan → 天青 (2处) */
+  --color-cyan-50: var(--water-50);
+  --color-cyan-100: var(--water-100);
+  --color-cyan-200: var(--water-200);
+  --color-cyan-300: var(--water-300);
+  --color-cyan-400: var(--water-400);
+  --color-cyan-500: var(--water-500);
+  --color-cyan-600: var(--water-600);
+  --color-cyan-700: var(--water-700);
+  --color-cyan-800: var(--water-800);
+  --color-cyan-900: var(--water-900);
+  --color-cyan-950: #071211;
+
+  /* rose → 胭脂红 (1处) */
+  --color-rose-50: var(--fire-50);
+  --color-rose-100: var(--fire-100);
+  --color-rose-200: var(--fire-200);
+  --color-rose-300: var(--fire-300);
+  --color-rose-400: var(--fire-400);
+  --color-rose-500: var(--fire-500);
+  --color-rose-600: var(--fire-600);
+  --color-rose-700: var(--fire-700);
+  --color-rose-800: var(--fire-800);
+  --color-rose-900: var(--fire-900);
+  --color-rose-950: #2a0f0d;
+
+  /* slate → 月白银 (1处) */
+  --color-slate-50: var(--metal-50);
+  --color-slate-100: var(--metal-100);
+  --color-slate-200: var(--metal-200);
+  --color-slate-300: var(--metal-300);
+  --color-slate-400: var(--metal-400);
+  --color-slate-500: var(--metal-500);
+  --color-slate-600: var(--metal-600);
+  --color-slate-700: var(--metal-700);
+  --color-slate-800: var(--metal-800);
+  --color-slate-900: var(--metal-900);
+  --color-slate-950: #111816;
+
+  /* zinc 独立：3D经络页面暗色UI，保留原暗色调不变 */
+  /* 不重映射 zinc，meridian/page.tsx 的暗色UI应保持原有对比度 */
+}
+
+/* ═══ 全局基础 ═══ */
+body {
+  background: var(--xuan-paper);
+  color: var(--ink-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+/* 移动端安全区域 */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ink-wash); border-radius: 2px; }
+
+/* ═══ 纹理系统 ═══ */
+
+/* 宣纸纹理（全局微噪点） */
+.texture-paper {
+  position: relative;
+}
+.texture-paper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* 水墨晕染纹理（淡） */
+.texture-ink-wash {
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(93, 138, 99, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(91, 160, 154, 0.05) 0%, transparent 40%),
+    radial-gradient(ellipse at 60% 80%, rgba(201, 169, 79, 0.04) 0%, transparent 45%);
+}
+
+/* 云纹背景（辩证模块） */
+.pattern-clouds {
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='60' viewBox='0 0 120 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 40c0-8 6-14 14-14 3 0 6 1 8 3 2-5 7-9 13-9 8 0 15 7 15 15' fill='none' stroke='rgba(93,138,99,0.06)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 120px 60px;
+}
+
+/* 回字纹边框（宝典模块） */
+.pattern-meander {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='36' height='36' fill='none' stroke='rgba(201,169,79,0.08)' stroke-width='1'/%3E%3Crect x='8' y='8' width='24' height='24' fill='none' stroke='rgba(201,169,79,0.06)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* 卦象纹理（占卜模块） */
+.pattern-hexagram {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='30' viewBox='0 0 60 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='5' y1='8' x2='25' y2='8' stroke='rgba(74,104,128,0.07)' stroke-width='3'/%3E%3Cline x1='35' y1='8' x2='55' y2='8' stroke='rgba(74,104,128,0.07)' stroke-width='3'/%3E%3Cline x1='5' y1='18' x2='55' y2='18' stroke='rgba(74,104,128,0.07)' stroke-width='3'/%3E%3C/svg%3E");
+  background-size: 60px 30px;
+}
+
+/* 经络纹理（疗愈模块） */
+.pattern-meridian {
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='6' fill='none' stroke='rgba(194,97,88,0.06)' stroke-width='0.8'/%3E%3Cpath d='M40 34 C40 20 55 15 55 10' fill='none' stroke='rgba(194,97,88,0.04)' stroke-width='0.6'/%3E%3Ccircle cx='55' cy='10' r='2' fill='rgba(194,97,88,0.05)'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+/* ═══ 各模块专属背景 ═══ */
+
+/* 首页 — 山水渐变 + 晨雾 */
+.bg-home {
+  background:
+    radial-gradient(circle at 70% 15%, rgba(201, 169, 79, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 20% 70%, rgba(91, 160, 154, 0.10) 0%, transparent 35%),
+    radial-gradient(circle at 50% 90%, rgba(93, 138, 99, 0.08) 0%, transparent 30%),
+    linear-gradient(175deg, var(--xuan-warm) 0%, var(--xuan-cool) 45%, var(--xuan-paper) 100%);
+}
+
+/* 辩证 — 云气升腾 × 暖光中和 */
+.bg-diagnose {
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(93, 138, 99, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 85%, rgba(91, 160, 154, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(201, 169, 79, 0.04) 0%, transparent 60%),
+    linear-gradient(170deg, #f0ede5 0%, var(--xuan-paper) 60%, #f2ede4 100%);
+}
+
+/* 疗愈 — 丹炉暖意 + 山水楼台意象 */
+.bg-healing {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(194, 97, 88, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 25% 80%, rgba(201, 169, 79, 0.10) 0%, transparent 35%),
+    linear-gradient(160deg, #f5ece0 0%, var(--xuan-warm) 50%, #f0e8d8 100%);
+}
+
+/* ═══ 疗愈页面边框文化元素 ═══ */
+
+/* 角花边框包装器 — 四角如意纹，极淡墨色 */
+.border-culture {
+  position: relative;
+}
+.border-culture::before,
+.border-culture::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  opacity: 0.20;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.border-culture::before {
+  top: 8px;
+  left: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%235C1A00' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M4 4 L48 4 Q54 4 54 10 L54 32'/%3E%3Cpath d='M4 4 L4 48 Q4 54 10 54 L32 54'/%3E%3Cpath d='M12 12 L36 12 Q40 12 40 16 L40 28'/%3E%3Cpath d='M12 12 L12 36 Q12 40 16 40 L28 40'/%3E%3Ccircle cx='26' cy='26' r='6' stroke-width='0.8'/%3E%3Cpath d='M8 32 Q8 28 12 28 Q16 28 16 32' stroke-width='0.6'/%3E%3Cpath d='M32 8 Q32 4 36 4 Q40 4 40 8' stroke-width='0.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.border-culture::after {
+  bottom: 8px;
+  right: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%235C1A00' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M116 116 L72 116 Q66 116 66 110 L66 88'/%3E%3Cpath d='M116 116 L116 72 Q116 66 110 66 L88 66'/%3E%3Cpath d='M108 108 L84 108 Q80 108 80 104 L80 92'/%3E%3Cpath d='M108 108 L108 84 Q108 80 104 80 L92 80'/%3E%3Ccircle cx='94' cy='94' r='6' stroke-width='0.8'/%3E%3Cpath d='M112 88 Q112 92 108 92 Q104 92 104 88' stroke-width='0.6'/%3E%3Cpath d='M88 112 Q88 116 84 116 Q80 116 80 112' stroke-width='0.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 右上 + 左下角花 — 需要子元素实现 */
+.border-culture-tr,
+.border-culture-bl {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  opacity: 0.20;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.border-culture-tr {
+  top: 8px;
+  right: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%235C1A00' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M116 4 L72 4 Q66 4 66 10 L66 32'/%3E%3Cpath d='M116 4 L116 48 Q116 54 110 54 L88 54'/%3E%3Cpath d='M108 12 L84 12 Q80 12 80 16 L80 28'/%3E%3Cpath d='M108 12 L108 36 Q108 40 104 40 L92 40'/%3E%3Ccircle cx='94' cy='26' r='6' stroke-width='0.8'/%3E%3Cpath d='M112 32 Q112 28 108 28 Q104 28 104 32' stroke-width='0.6'/%3E%3Cpath d='M88 8 Q88 4 84 4 Q80 4 80 8' stroke-width='0.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.border-culture-bl {
+  bottom: 8px;
+  left: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%235C1A00' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M4 116 L48 116 Q54 116 54 110 L54 88'/%3E%3Cpath d='M4 116 L4 72 Q4 66 10 66 L32 66'/%3E%3Cpath d='M12 108 L36 108 Q40 108 40 104 L40 92'/%3E%3Cpath d='M12 108 L12 84 Q12 80 16 80 L28 80'/%3E%3Ccircle cx='26' cy='94' r='6' stroke-width='0.8'/%3E%3Cpath d='M8 88 Q8 92 12 92 Q16 92 16 88' stroke-width='0.6'/%3E%3Cpath d='M32 112 Q32 116 36 116 Q40 116 40 112' stroke-width='0.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 回纹连续边框 — 沿页面四边（疗愈个性化方案等关键卡片用） */
+.border-meander {
+  border: 1px solid rgba(201, 169, 79, 0.15);
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='40' height='4' viewBox='0 0 40 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 2 L6 2 L6 0 L12 0 L12 2 L18 2 L18 4 L24 4 L24 2 L30 2 L30 0 L36 0 L36 2 L40 2' fill='none' stroke='rgba(201,169,79,0.10)' stroke-width='0.8'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: top center;
+  background-size: 40px 4px;
+}
+
+/* 占卜 — 月白宣纸 × 靛蓝点缀 */
+.bg-divination {
+  background:
+    radial-gradient(circle at 70% 20%, rgba(74, 104, 128, 0.10) 0%, transparent 40%),
+    radial-gradient(circle at 20% 80%, rgba(94, 66, 148, 0.06) 0%, transparent 35%),
+    linear-gradient(175deg, #eeecf5 0%, #e8e5f0 50%, #eae6ee 100%);
+}
+
+/* 宝典 — 古籍竹简 */
+.bg-classics {
+  background:
+    radial-gradient(ellipse at 40% 20%, rgba(194, 138, 90, 0.10) 0%, transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(201, 169, 79, 0.08) 0%, transparent 35%),
+    linear-gradient(165deg, #f0e4cf 0%, var(--xuan-warm) 50%, #ece0c8 100%);
+}
+
+/* ═══ 毛玻璃卡 ═══ */
+.glass-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  background: linear-gradient(145deg, rgba(255,255,255,0.58), rgba(255,255,255,0.28));
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: transform 500ms cubic-bezier(.22,.61,.36,1), box-shadow 500ms ease;
+}
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border: 1px solid rgba(255,255,255,0.30);
+  pointer-events: none;
+}
+/* 内发光：右上角暖光晕 */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -20%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glass-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+.glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg), 0 0 32px rgba(93, 138, 99, 0.12);
+}
+.glass-card:active {
+  transform: translateY(-1px);
+  transition-duration: 150ms;
+}
+
+/* 毛玻璃（非卡片场景） */
+.glass {
+  background: linear-gradient(145deg, rgba(255,255,255,0.56), rgba(255,255,255,0.26));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+}
+
+/* ═══ 五行色彩 ═══ */
+.wuxing-wood { background: linear-gradient(135deg, var(--wood), var(--wood-deep)); }
+.wuxing-fire { background: linear-gradient(135deg, var(--fire), var(--fire-deep)); }
+.wuxing-earth { background: linear-gradient(135deg, var(--earth), var(--earth-deep)); }
+.wuxing-metal { background: linear-gradient(135deg, var(--metal), var(--metal-deep)); }
+.wuxing-water { background: linear-gradient(135deg, var(--water), var(--water-deep)); }
+
+/* ═══ 动画 ═══ */
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(1.5); opacity: 0; } }
+@keyframes card-breathe { 50% { filter: saturate(1.03) brightness(1.01); } }
+@keyframes float-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slide-up { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes energy-rise { from { height: 12%; opacity: 0.5; } }
+@keyframes plant-breathe { 50% { transform: translateY(-4px) scale(1.02); } }
+@keyframes petal-float { 50% { transform: translateY(-14px) rotate(30deg); opacity: 0.8; } }
+@keyframes pulse-wave { 0% { transform: scale(0.5); opacity: 0.6; } 100% { transform: scale(2); opacity: 0; } }
+@keyframes ink-spread { 0% { transform: scale(0); opacity: 0.6; } 100% { transform: scale(1); opacity: 0; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes slow-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes glow-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+
+.animate-float { animation: float 3.5s ease-in-out infinite; }
+.animate-pulse-ring { animation: pulse-ring 2s ease-out infinite; }
+.animate-breathe { animation: card-breathe 8s ease-in-out infinite; }
+.animate-float-in { animation: float-in 800ms cubic-bezier(.22,.61,.36,1) forwards; }
+.animate-plant-breathe { animation: plant-breathe 5s ease-in-out infinite; }
+.animate-slow-rotate { animation: slow-rotate 40s linear infinite; }
+.animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+
+/* 渐变文字 */
+.text-gradient {
+  background: linear-gradient(135deg, var(--wood), var(--water), var(--earth));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 光泽扫过效果 */
+.shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* 墨晕扩散装饰 */
+.ink-dot::after {
+  content: '';
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--ink-wash) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ═══ 分隔线 ═══ */
+.divider-ink {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ink-wash), transparent);
+}
+
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 79, 0.3), transparent);
+}
+
+/* 隐藏滚动条 */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ═══ 波纹渐变（东方旧版兼容） ═══ */
+.bg-oriental {
+  background:
+    radial-gradient(circle at 76% 18%, rgba(239, 196, 159, 0.36), transparent 28%),
+    radial-gradient(circle at 18% 78%, rgba(143, 200, 189, 0.24), transparent 30%),
+    linear-gradient(135deg, var(--xuan-warm) 0%, #f7f2e9 32%, var(--xuan-cool) 68%, #d8eee8 100%);
+}
+
+/* PWA 全屏 */
+@media all and (display-mode: standalone) {
+  body { -webkit-user-select: none; user-select: none; }
+  input, textarea, [contenteditable="true"] { -webkit-user-select: auto; user-select: auto; }
+}
+
+/* ═══ 深空/夜间模式专用类 ═══ */
+
+/* 深空背景 */
+.bg-deepspace {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(74, 104, 128, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 25% 80%, rgba(91, 160, 154, 0.06) 0%, transparent 35%),
+    linear-gradient(180deg, #0a0a1a 0%, #12122a 50%, #0a0a1a 100%);
+}
+
+/* 暗色毛玻璃面板 */
+.glass-dark {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--night-border);
+  border-radius: var(--r-lg);
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30), 0 0 24px rgba(196, 163, 90, 0.05);
+  backdrop-filter: blur(var(--night-blur));
+  -webkit-backdrop-filter: blur(var(--night-blur));
+  transition: transform 500ms cubic-bezier(.22,.61,.36,1), box-shadow 500ms ease;
+}
+.glass-dark::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border: 1px solid rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+.glass-dark::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -20%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,163,90,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.glass-dark:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 32px rgba(196, 163, 90, 0.08);
+}
+
+/* 暗色毛玻璃（非卡片） */
+.glass-dark-surface {
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  backdrop-filter: blur(var(--night-blur));
+  -webkit-backdrop-filter: blur(var(--night-blur));
+  border: 1px solid var(--night-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30);
+}
+
+/* 暗色分隔线 */
+.divider-night {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--night-border), transparent);
+}
+
+/* ═══════════════════════════════════════════════
+   古籍阅读器专用样式
+   ═══════════════════════════════════════════════ */
+
+/* 阅读器图标按钮 */
+.reader-icon-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--ink-light, #6b5d4d);
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.reader-icon-btn:hover {
+  background: rgba(139,69,19,0.1);
+  color: var(--accent, #8b4513);
+}
+
+/* 阅读器工具栏按钮 */
+.reader-toolbar-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--ink-light, #6b5d4d);
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.reader-toolbar-btn:hover {
+  background: rgba(139,69,19,0.1);
+  color: var(--accent, #8b4513);
+}
+.reader-toolbar-btn.active {
+  background: var(--accent, #8b4513);
+  color: #f5f0e8;
+}
+.reader-toolbar-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* 竖排文字模式 */
+.reader-text-body.vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  height: calc(100vh - 200px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  column-width: 32px;
+  column-gap: 32px;
+}
+
+/* 划线高亮 */
+.highlight-yellow { background: rgba(197,165,90,0.25); border-radius: 2px; padding: 0 2px; }
+.highlight-green { background: rgba(90,143,123,0.25); border-radius: 2px; padding: 0 2px; }
+.highlight-red { background: rgba(194,58,43,0.15); border-radius: 2px; padding: 0 2px; }
+
+/* 音乐播放器脉动动画 */
+.music-toggle.playing, .reader-toolbar-btn.playing {
+  animation: reader-pulse 2s infinite;
+}
+@keyframes reader-pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(139,69,19,0.3); }
+  50% { box-shadow: 0 4px 28px rgba(139,69,19,0.5); }
+}
+
+/* 阅读器侧边栏滚动条 */
+.reader-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.reader-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.reader-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(139,69,19,0.15);
+  border-radius: 2px;
+}
+
+/* 移动端适配：底部工具栏和音乐播放器位置 */
+@media (max-width: 768px) {
+  .reader-toolbar {
+    bottom: 16px !important;
+  }
+  .reader-text-body.vertical {
+    height: calc(100vh - 260px);
+  }
+}
+
+/* 打印时隐藏阅读器控制元素 */
+@media print {
+  .reader-header,
+  .reader-sidebar,
+  .reader-toolbar,
+  .music-player {
+    display: none !important;
+  }
+  .reader-text-body {
+    font-size: 14pt !important;
+  }
+}
+
+/* Accessibility: reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

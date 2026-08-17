@@ -1,0 +1,248 @@
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+/**
+ * useTTS — Edge TTS 增强版
+ *
+ * 优先 Edge TTS（高质量神经网络语音），单次失败仅当次回退到浏览器 speechSynthesis，
+ * 下次 speak 仍尝试 Edge TTS，不会永久关闭。
+ *
+ * 音色：
+ *   女声：zh-CN-XiaoxiaoNeural（晓晓）
+ *   男声：zh-CN-YunxiNeural（云希）
+ */
+export type VoiceGender = 'female' | 'male';
+export type VoiceSpeed = 'slow' | 'normal' | 'fast';
+
+interface UseTTSOptions {
+  defaultGender?: VoiceGender;
+  defaultSpeed?: VoiceSpeed;
+  pitch?: number;
+  volume?: number;
+  lang?: string;
+}
+
+interface UseTTSReturn {
+  speak: (text: string, rate?: number, pitch?: number) => void;
+  stop: () => void;
+  isSpeaking: () => boolean;
+  gender: VoiceGender;
+  setGender: (g: VoiceGender) => void;
+  speed: VoiceSpeed;
+  setSpeed: (s: VoiceSpeed) => void;
+  voicesReady: boolean;
+  usingEdgeTTS: boolean;
+}
+
+const EDGE_VOICE_MAP: Record<VoiceGender, string> = {
+  female: 'zh-CN-XiaoxiaoNeural',
+  male: 'zh-CN-YunxiNeural',
+};
+
+const FEMALE_KEYWORDS = ['yaoyao', 'huihui', 'xiaoxiao', 'xiaoyi', 'female'];
+const MALE_KEYWORDS = ['kangkang', 'yunxi', 'yunyang', 'yunjian', 'male'];
+
+const SPEED_MAP: Record<VoiceSpeed, number> = { slow: 0.5, normal: 0.75, fast: 1.0 };
+
+function clampRate(rate: number): number {
+  return Math.max(0.25, Math.min(4.0, rate));
+}
+
+export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
+  const {
+    defaultGender = 'female',
+    defaultSpeed = 'slow',
+    pitch: defaultPitch = 0.85,
+    volume = 0.9,
+    lang = 'zh-CN',
+  } = options;
+
+  const [gender, setGenderState] = useState<VoiceGender>(defaultGender);
+  const [speed, setSpeedState] = useState<VoiceSpeed>(defaultSpeed);
+  const [voicesReady, setVoicesReady] = useState(false);
+  const [usingEdgeTTS, setUsingEdgeTTS] = useState(true);
+
+  // 用 ref 保存所有可变值，避免 useCallback 依赖循环
+  const stateRef = useRef({ gender, speed, usingEdgeTTS, defaultPitch, volume, lang });
+  stateRef.current = { gender, speed, usingEdgeTTS, defaultPitch, volume, lang };
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const browserVoicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const speakingRef = useRef(false);
+
+  // 递增 speakId：每次新 speak 自增，旧 speak 的异步回调检查 id 是否过期
+  const speakIdRef = useRef(0);
+
+  // 初始化 Audio
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.volume = options.volume ?? 0.9;
+    }
+    return () => {
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ''; }
+    };
+  }, []);
+
+  // 加载浏览器语音列表
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      setVoicesReady(true);
+      return;
+    }
+    const loadVoices = () => {
+      const v = speechSynthesis.getVoices();
+      if (v.length > 0) { browserVoicesRef.current = v; setVoicesReady(true); }
+    };
+    loadVoices();
+    speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    const timer = setTimeout(loadVoices, 300);
+    return () => { speechSynthesis.removeEventListener('voiceschanged', loadVoices); clearTimeout(timer); };
+  }, []);
+
+  // 停止所有播放
+  const stop = useCallback(() => {
+    speakIdRef.current++; // 让所有进行中的异步回调失效
+
+    // 停止 Edge TTS Audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.removeAttribute('src');
+      audioRef.current.load(); // 释放资源
+    }
+
+    // 停止浏览器 speechSynthesis
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      speechSynthesis.cancel();
+    }
+
+    speakingRef.current = false;
+  }, []);
+
+  // 浏览器 SpeechSynthesis 回退
+  const speakBrowser = useCallback((text: string, rate: number, g: VoiceGender) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+
+    const s = stateRef.current;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = s.lang;
+    u.rate = rate;
+    u.pitch = s.defaultPitch;
+    u.volume = s.volume;
+
+    const voices = browserVoicesRef.current;
+    const keywords = g === 'male' ? MALE_KEYWORDS : FEMALE_KEYWORDS;
+    for (const kw of keywords) {
+      const found = voices.find(v => v.lang.startsWith('zh') && v.name.toLowerCase().includes(kw));
+      if (found) { u.voice = found; break; }
+    }
+    if (!u.voice) {
+      const zh = voices.find(v => v.lang.startsWith('zh'));
+      if (zh) u.voice = zh;
+    }
+
+    u.onend = () => { speakingRef.current = false; };
+    u.onerror = () => { speakingRef.current = false; };
+    speakingRef.current = true;
+    speechSynthesis.speak(u);
+  }, []);
+
+  // 对外 speak — 唯一入口
+  const speak = useCallback((text: string, rate?: number, _pitch?: number) => {
+    const s = stateRef.current;
+    const effectiveRate = rate ?? SPEED_MAP[s.speed];
+    const voiceName = EDGE_VOICE_MAP[s.gender];
+    const g = s.gender;
+
+    // 每次新 speak 都使旧异步回调失效
+    const myId = ++speakIdRef.current;
+
+    // 先停止之前的所有播放
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.removeAttribute('src');
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      speechSynthesis.cancel();
+    }
+
+    speakingRef.current = true;
+
+    // 异步请求 Edge TTS
+    (async () => {
+      try {
+        const response = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, voice: voiceName, speed: clampRate(effectiveRate) }),
+        });
+
+        // 检查是否已被更新的 speak 取代
+        if (speakIdRef.current !== myId) return;
+
+        const ct = response.headers.get('content-type') ?? '';
+        if (!response.ok || ct.includes('application/json')) {
+          // Edge TTS 本次失败，仅当次回退到浏览器语音
+          speakBrowser(text, effectiveRate, g);
+          return;
+        }
+
+        const audioBlob = await response.blob();
+        if (speakIdRef.current !== myId) return;
+
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = audioRef.current!;
+        audio.src = audioUrl;
+
+        audio.onended = () => {
+          if (speakIdRef.current === myId) speakingRef.current = false;
+          URL.revokeObjectURL(audioUrl);
+        };
+        audio.onerror = () => {
+          if (speakIdRef.current === myId) speakingRef.current = false;
+          URL.revokeObjectURL(audioUrl);
+        };
+
+        try {
+          await audio.play();
+        } catch (playErr: unknown) {
+          // play() 被中断（新的 speak 到来）— 正常，不需要 fallback
+          if (playErr instanceof DOMException && playErr.name === 'AbortError') return;
+          // 其他播放错误 → fallback
+          if (speakIdRef.current === myId) {
+            speakBrowser(text, effectiveRate, g);
+          }
+        }
+      } catch (err) {
+        // fetch 失败 → 仅当次回退
+        if (speakIdRef.current === myId) {
+          speakBrowser(text, effectiveRate, g);
+        }
+      }
+    })();
+  }, [speakBrowser]);
+
+  const isSpeaking = useCallback((): boolean => {
+    if (typeof window === 'undefined') return false;
+    if (audioRef.current && !audioRef.current.paused) return true;
+    if ('speechSynthesis' in window && speechSynthesis.speaking) return true;
+    return speakingRef.current;
+  }, []);
+
+  const setGender = useCallback((g: VoiceGender) => {
+    setGenderState(g);
+    // 切换音色时确保 Edge TTS 开启
+    setUsingEdgeTTS(true);
+  }, []);
+
+  const setSpeed = useCallback((s: VoiceSpeed) => {
+    setSpeedState(s);
+  }, []);
+
+  return { speak, stop, isSpeaking, gender, setGender, speed, setSpeed, voicesReady, usingEdgeTTS };
+}
+
+export default useTTS;
