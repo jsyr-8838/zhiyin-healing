@@ -1,8 +1,6 @@
 import { Suspense } from 'react';
 import MeridianClient from './MeridianClient';
 
-export const dynamic = 'force-dynamic';
-
 function MeridianFallback() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#faf5ee' }}>

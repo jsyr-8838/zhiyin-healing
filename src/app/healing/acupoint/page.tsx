@@ -1,8 +1,6 @@
 import { Suspense } from 'react';
 import AcupointClient from './AcupointClient';
 
-export const dynamic = 'force-dynamic';
-
 export default function AcupointPage() {
   return (
     <Suspense fallback={
