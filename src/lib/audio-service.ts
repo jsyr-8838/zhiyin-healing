@@ -140,43 +140,40 @@ let prescriptionTimerInterval: ReturnType<typeof setInterval> | null = null;
 function getAudioElement(): HTMLAudioElement {
   if (!audioElement) {
     audioElement = new Audio();
-    audioElement.crossOrigin = 'anonymous';
+    // 不设置 crossOrigin — 跨域音频无 CORS 响应头时，
+    // createMediaElementSource 会判定音频被"污染"导致静音。
+    // 直接用 <audio>.play() 播放，不经过 Web Audio 效果链。
     audioElement.loop = true; // 五音/颂钵无限循环
     audioElement.preload = 'auto';
   }
   return audioElement;
 }
 
-/** 确保 AudioContext + 效果链初始化（懒加载） */
-function ensureAudioContext(el: HTMLAudioElement): { analyser: AnalyserNode; gain: GainNode } {
-  if (audioContext && analyserNode && gainNode) {
-    if (audioContext.state === 'suspended') audioContext.resume();
-    return { analyser: analyserNode, gain: gainNode };
+/**
+ * 确保 AudioContext 初始化（懒加载）
+ *
+ * 不再使用 createMediaElementSource — 跨域音频无 CORS 头时会导致静音。
+ * 音频直接通过 <audio> 元素播放，音量由 el.volume 控制。
+ * AudioContext 仍保留用于双耳节拍振荡器和 LFO 调制（纯合成，不依赖音频源）。
+ * analyserNode 和 gainNode 保留引用以兼容 API，但不再连接到音频链路。
+ */
+function ensureAudioContext(_el: HTMLAudioElement): { analyser: AnalyserNode | null; gain: GainNode | null } {
+  if (!audioContext) {
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    audioContext = new Ctor();
   }
+  if (audioContext.state === 'suspended') audioContext.resume();
 
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  audioContext = ctx;
-
-  // MediaElementSource（只能创建一次）
-  if (!mediaElementSource) {
-    mediaElementSource = ctx.createMediaElementSource(el);
+  // 保留 analyser 和 gain 引用以兼容 API（可视化将显示空数据，可接受）
+  if (!analyserNode) {
+    analyserNode = audioContext.createAnalyser();
+    analyserNode.fftSize = 2048;
+    analyserNode.smoothingTimeConstant = 0.85;
   }
-
-  // Gain Node（音量 + 淡入淡出）
-  gainNode = ctx.createGain();
-  gainNode.gain.value = 1;
-
-  // Analyser Node（可视化）
-  analyserNode = ctx.createAnalyser();
-  analyserNode.fftSize = 2048;
-  analyserNode.smoothingTimeConstant = 0.85;
-
-  // 连接主链路: source -> gain -> analyser -> destination
-  mediaElementSource.connect(gainNode);
-  gainNode.connect(analyserNode);
-  analyserNode.connect(ctx.destination);
-
-  if (ctx.state === 'suspended') ctx.resume();
+  if (!gainNode) {
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = 1;
+  }
 
   return { analyser: analyserNode, gain: gainNode };
 }
@@ -249,23 +246,33 @@ function setupLFO(modValue: ModulationValue) {
   lfoGain = lfoG;
 }
 
-/** 淡入淡出 */
+/**
+ * 淡入淡出 — 使用 el.volume 控制（不依赖 Web Audio gainNode）
+ * targetGain: 0~1，直接映射到 audio.volume
+ */
 function fadeAudio(targetGain: number, durationSec: number = 2): Promise<void> {
   return new Promise((resolve) => {
-    if (!gainNode || !audioContext) { resolve(); return; }
+    const el = audioElement;
+    if (!el) { resolve(); return; }
 
     if (fadeInterval) {
       clearInterval(fadeInterval);
       fadeInterval = null;
     }
 
-    const ctx = audioContext;
-    const startGain = gainNode.gain.value;
-    const startTime = ctx.currentTime;
-    gainNode.gain.setValueAtTime(startGain, startTime);
-    gainNode.gain.linearRampToValueAtTime(targetGain, startTime + durationSec);
+    const startVol = el.volume;
+    const startTime = performance.now();
 
-    setTimeout(resolve, durationSec * 1000 + 50);
+    fadeInterval = setInterval(() => {
+      const elapsed = (performance.now() - startTime) / 1000;
+      const ratio = Math.min(1, elapsed / durationSec);
+      el.volume = startVol + (targetGain - startVol) * ratio;
+      if (ratio >= 1) {
+        clearInterval(fadeInterval!);
+        fadeInterval = null;
+        resolve();
+      }
+    }, 50);
   });
 }
 
@@ -407,7 +414,7 @@ export const useAudioService = create<AudioServiceState>()(
 
       play: (track: AudioTrack) => {
         const el = getAudioElement();
-        const { analyser, gain } = ensureAudioContext(el);
+        ensureAudioContext(el); // 初始化 AudioContext（用于双耳节拍/LFO）
 
         // 如果是同一首歌，只是 resume
         if (get().currentTrack?.id === track.id && get().isPlaying === false) {
@@ -418,13 +425,13 @@ export const useAudioService = create<AudioServiceState>()(
 
         // 切换歌曲
         el.src = track.src;
-        el.volume = get().isMuted ? 0 : get().volume;
+        const targetVol = get().isMuted ? 0 : get().volume;
+        el.volume = 0; // 从0开始淡入
         el.loop = true; // 五音/颂钵循环播放
 
-        // 淡入播放
-        gain.gain.setValueAtTime(0, audioContext!.currentTime);
+        // 直接播放（不经过 Web Audio 效果链，避免 CORS 问题）
         el.play().then(() => {
-          fadeAudio(1, 2);
+          fadeAudio(targetVol, 2); // 淡入到目标音量
         });
 
         set({

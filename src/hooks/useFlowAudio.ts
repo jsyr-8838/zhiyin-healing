@@ -197,110 +197,25 @@ export function useFlowAudio() {
    *  导引语音增强链
    * ================================================================ */
 
-  /** 初始化导引语音增强链（连接到 <audio> 元素的 MediaElementSource） */
+  /**
+   * 初始化导引语音增强链
+   *
+   * 不再使用 createMediaElementSource — 跨域音频无 CORS 响应头时会静音。
+   * 语音导引直接通过 <audio>.play() 播放，音量由 el.volume 控制。
+   * 保留接口以兼容组件调用，但为 no-op（仅确保 AudioContext 可用）。
+   */
   const initVoiceEnhance = useCallback((audioEl: HTMLAudioElement): GainNode | null => {
     const ctx = ensureContext();
     if (!ctx) return null;
-
-    // 已初始化则先断开旧链
-    if (voiceRef.current) {
-      try { voiceRef.current.masterGain.disconnect(); } catch { /* noop */ }
-    }
-
-    // 中频增强均衡器（人声清晰度核心：1-4kHz）
-    const eqMid = ctx.createBiquadFilter();
-    eqMid.type = 'peaking';
-    eqMid.frequency.setValueAtTime(2500, ctx.currentTime);
-    eqMid.Q.setValueAtTime(1.0, ctx.currentTime);
-    eqMid.gain.setValueAtTime(4.5, ctx.currentTime); // +4.5dB 人声增强
-
-    // 低频微提均衡器（温暖感：200-400Hz）
-    const eqLow = ctx.createBiquadFilter();
-    eqLow.type = 'peaking';
-    eqLow.frequency.setValueAtTime(280, ctx.currentTime);
-    eqLow.Q.setValueAtTime(0.8, ctx.currentTime);
-    eqLow.gain.setValueAtTime(2.0, ctx.currentTime); // +2dB 低频温暖
-
-    // 高频柔化（去除刺耳齿音 8kHz+）
-    const eqHi = ctx.createBiquadFilter();
-    eqHi.type = 'lowshelf';
-    eqHi.frequency.setValueAtTime(8000, ctx.currentTime);
-    eqHi.gain.setValueAtTime(-2.0, ctx.currentTime); // -2dB 高频柔化
-
-    // 动态压缩器（小声变大，大声不爆）
-    const compressor = ctx.createDynamicsCompressor();
-    compressor.threshold.setValueAtTime(-24, ctx.currentTime);  // -24dB 开始压缩
-    compressor.knee.setValueAtTime(12, ctx.currentTime);        // 12dB 软膝
-    compressor.ratio.setValueAtTime(3, ctx.currentTime);        // 3:1 压缩比
-    compressor.attack.setValueAtTime(0.003, ctx.currentTime);   // 3ms 快速响应
-    compressor.release.setValueAtTime(0.15, ctx.currentTime);  // 150ms 释放
-
-    // 混响（疗愈空间感）
-    const convolver = ctx.createConvolver();
-    const reverbGain = ctx.createGain();
-    const dryGain = ctx.createGain();
-
-    // 生成简易脉冲响应（模拟小厅堂混响，1.8s衰减）
-    const reverbLen = Math.floor(ctx.sampleRate * 1.8);
-    const impulse = ctx.createBuffer(2, reverbLen, ctx.sampleRate);
-    for (let ch = 0; ch < 2; ch++) {
-      const d = impulse.getChannelData(ch);
-      for (let i = 0; i < reverbLen; i++) {
-        // 早期反射 + 指数衰减
-        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.2);
-      }
-    }
-    convolver.buffer = impulse;
-
-    reverbGain.gain.setValueAtTime(0.12, ctx.currentTime); // 12% 湿信号
-    dryGain.gain.setValueAtTime(1.0, ctx.currentTime);     // 100% 干信号
-
-    // 导引语音总增益（确保声音够大）
-    const masterGain = ctx.createGain();
-    masterGain.gain.setValueAtTime(1.35, ctx.currentTime); // 提升35%基础音量
-
-    // 连接 <audio> → 增强链 → 输出
-    try {
-      const src = ctx.createMediaElementSource(audioEl);
-      src.connect(eqLow);
-    } catch {
-      // 可能已连接过（同一个<audio>只能createMediaElementSource一次）
-      // 尝试直接连接到已有链
-      try {
-        // 如果之前已连接，MediaElementSource还在，直接修改参数
-        if (voiceRef.current) {
-          return voiceRef.current.masterGain;
-        }
-      } catch { /* noop */ }
-      return null;
-    }
-
-    eqLow.connect(eqMid);
-    eqMid.connect(eqHi);
-    eqHi.connect(compressor);
-
-    // 干信号路径
-    compressor.connect(dryGain);
-    dryGain.connect(masterGain);
-
-    // 湿信号路径（混响）
-    compressor.connect(convolver);
-    convolver.connect(reverbGain);
-    reverbGain.connect(masterGain);
-
-    masterGain.connect(ctx.destination);
-
-    voiceRef.current = { eqMid, eqLow, compressor, convolver, reverbGain, dryGain, masterGain };
-
-    return masterGain;
+    // 不调用 createMediaElementSource，避免跨域音频静音
+    // 音频将直接通过 <audio> 元素播放
+    return null;
   }, [ensureContext]);
 
-  /** 更新导引语音音量 */
+  /** 更新导引语音音量 — 直接通过 el.volume 控制 */
   const setVoiceVolume = useCallback((volume: number) => {
-    const nodes = voiceRef.current;
-    if (!nodes) return;
-    // 音量映射：volume 0-100 → 1.0-1.8（基础1.35 + 额外提升）
-    nodes.masterGain.gain.setValueAtTime(0.8 + volume * 0.01, ctxRef.current?.currentTime ?? 0);
+    // 不再操作 voiceRef.current.masterGain（已废弃）
+    // 音量由组件直接设置 audioRef.current.volume
   }, []);
 
   /* ================================================================
