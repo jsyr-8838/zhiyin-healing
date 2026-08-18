@@ -158,10 +158,11 @@ function generatePresignedUrl(key: string): string {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   // Reconstruct file path from URL segments
-  const filePath = params.path.map(decodeURIComponent).join('/');
+  const { path: pathSegments } = await params;
+  const filePath = pathSegments.map(decodeURIComponent).join('/');
 
   if (!filePath) {
     return NextResponse.json(
@@ -191,7 +192,7 @@ export async function GET(
 
 export async function HEAD(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   return GET(request, { params });
 }
