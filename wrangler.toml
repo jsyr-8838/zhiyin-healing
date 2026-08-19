@@ -13,7 +13,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "zhiyin-db"
-database_id = "placeholder-will-be-created"
+database_id = "d44c1d6f-0ce5-4dc6-8d91-43eece14f5d6"
 
 # Observability
 [observability]
