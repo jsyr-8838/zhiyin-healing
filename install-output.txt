@@ -1,0 +1,16 @@
+﻿npm.cmd : npm warn EBADENGINE Unsupported engine {
+所在位置 行:19 字符: 1
++ & npm install --registry https://registry.npmmirror.com --no-audit -- ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn EBADENGINE Unsupported engine {:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm warn EBADENGINE   package: '@capacitor/cli@8.5.0',
+npm warn EBADENGINE   required: { node: '>=22.0.0' },
+npm warn EBADENGINE   current: { node: 'v20.18.0', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'eslint-visitor-keys@5.0.1',
+npm warn EBADENGINE   required: { node: '^20.19.0 || ^22.13.0 || >=24' },
+npm warn EBADENGINE   current: { node: 'v20.18.0', npm: '10.8.2' }
+npm warn EBADENGINE }

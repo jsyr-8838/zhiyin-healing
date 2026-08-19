@@ -1,0 +1,398 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id           String   @id @default(cuid())
+  nickname     String   @default("用户")
+  avatar       String   @default("")
+  vipLevel     String   @default("free") // free | pro
+  vipExpireAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // ── 体验者登录注册字段 ──
+  name         String?       // 真实姓名
+  gender       String?       // male | female | other
+  age          Int?          // 年龄
+  birthDate    String?       // 出生日期 YYYY-MM-DD
+  phone        String?       // 手机号（唯一）
+  phoneVerified Boolean @default(false) // 手机号是否已验证
+  passwordHash String?       // 密码哈希（备选登录方式）
+  role         String  @default("visitor") // visitor | registered | admin
+  lastLoginAt  DateTime?     // 最后登录时间
+
+  checkins      Checkin[]
+  assessments   Assessment[]
+  plans         HealthPlan[]
+  divinations   DivinationRecord[]
+  cultivation   Cultivation?
+  practiceLogs  PracticeLog[]
+  meridianProgs MeridianProgress[]
+
+  @@unique([phone])
+}
+
+// 每日健康打卡表
+model Checkin {
+  id         String   @id @default(cuid())
+  userId     String
+  date       String   // YYYY-MM-DD，同一用户每天只能打卡一次
+  sleepHours Float    // 睡眠时长（小时）
+  sleepScore Int      // 睡眠评分 0-100
+  bedtime    String   @default("") // 就寝时间 HH:mm
+  mood       Int      // 情绪 1-5
+  moodScore  Int      // 情绪评分 0-100
+  exercise   Int      // 运动量 1-5
+  exerciseScore Int   // 运动评分 0-100
+  diet       Int      // 饮食规律 1-5
+  dietScore  Int      // 饮食评分 0-100
+  healthScore Int     // 综合健康分 0-100
+  symptoms   String   @default("") // 不适症状，逗号分隔
+  note       String   @default("") // 备注
+  // 五行偏颇指标（由打卡数据推算）
+  woodTendency  Float    @default(0) // 木(肝)偏颇 0-1
+  fireTendency  Float    @default(0) // 火(心)偏颇 0-1
+  earthTendency Float    @default(0) // 土(脾)偏颇 0-1
+  metalTendency Float    @default(0) // 金(肺)偏颇 0-1
+  waterTendency Float    @default(0) // 水(肾)偏颇 0-1
+  // 疗愈完成记录
+  healingDone   String   @default("{}") // JSON: {liuzijue:true, wuyin:"jiao", ...}
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+// 九种体质测评记录表
+model Assessment {
+  id           String   @id @default(cuid())
+  userId       String
+  date         String   // YYYY-MM-DD
+  // 九种体质得分
+  pinghe       Int      @default(0) // 平和质
+  qixue        Int      @default(0) // 气虚质
+  yangxu       Int      @default(0) // 阳虚质
+  yinxu        Int      @default(0) // 阴虚质
+  tanshi       Int      @default(0) // 痰湿质
+  shire        Int      @default(0) // 湿热质
+  xueyu        Int      @default(0) // 血瘀质
+  qiyu         Int      @default(0) // 气郁质
+  tebing       Int      @default(0) // 特禀质
+  // 主导体质
+  primaryType  String   @default("") // 如 "平和质"、"气虚质"等
+  // 五音信息
+  dominantWuyin String  @default("") // jiao/zhi/gong/shang/yu
+  wuyinScores  String   @default("{}") // JSON: {jiao:0, zhi:0, ...}
+  // 建议
+  recommendation String @default("")
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+// 健康计划表（7天养生方案）
+model HealthPlan {
+  id          String   @id @default(cuid())
+  userId      String
+  startDate   String   // YYYY-MM-DD
+  endDate     String   // YYYY-MM-DD
+  planType    String   @default("weekly") // weekly | custom
+  constitution String  @default("") // 体质类型
+  content     String   // JSON: 完整计划内容
+  isActive    Boolean  @default(true)
+  // Dashboard 扩展
+  checkinCount   Int     @default(0)   // 计划期间打卡次数
+  completionRate Float   @default(0)   // 完成率 0-1
+  adjustments    String  @default("[]") // JSON: 每日动态调整记录
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 专家表（疗愈顾问管理）
+model Expert {
+  id          String   @id @default(cuid())
+  name        String                       // 姓名
+  title       String   @default("")        // 职称，如"资深疗愈顾问"
+  subtitle    String   @default("")        // 副标题，如"禅静国灸 · 北京事业部"
+  specialty   String   @default("")        // 专长，如"灸法调养 · 体质疏导"
+  tags        String   @default("[]")      // JSON: 标签数组
+  avatar      String   @default("")        // 头像路径，如 /images/experts/xxx.jpg
+  element     String   @default("earth")   // 五行: wood/fire/earth/metal/water
+  bio         String   @default("")        // 详细简介
+  services    String   @default("[]")      // JSON: [{name,duration,desc}]
+  wechatId    String   @default("")        // 微信号（用于拉起微信/生成二维码）
+  phone       String   @default("")        // 联系电话
+  sortOrder   Int      @default(0)         // 排序号，越小越靠前
+  isActive    Boolean  @default(true)      // 是否启用
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    Booking[]
+}
+
+// 预约记录表
+model Booking {
+  id          String   @id @default(cuid())
+  userId      String                       // 预约用户ID
+  expertId    String                       // 预约专家ID
+  service     String                       // 预约服务名称
+  name        String   @default("")        // 预约人姓名
+  phone       String   @default("")        // 预约人电话
+  preferredDate String @default("")        // 期望日期 YYYY-MM-DD
+  preferredTime  String @default("")        // 期望时段
+  note        String   @default("")        // 备注
+  status      String   @default("pending") // pending/confirmed/completed/cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  expert Expert @relation(fields: [expertId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expertId])
+  @@index([status])
+}
+
+// 占卜记录表（AI玄学占卜模块）
+model DivinationRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  // 占卜类型
+  method      String   // meihua | qimen | liuren | liuyao | zhouyi | bazi
+  methodLabel String   // 梅花易数 | 奇门遁甲 | 六壬 | 六爻 | 周易 | 八字
+  // 占卜输入
+  question    String   // 用户的问题
+  inputType   String   @default("text") // text | number | time
+  inputParams String   @default("{}") // JSON: 起卦参数（数字、时间等）
+  // 占卜结果
+  hexagram    String   @default("") // 卦象名称，如「乾为天」「水雷屯」
+  result      String   // AI解读全文
+  summary     String   @default("") // 一句话摘要
+  // 自适应学习
+  feedback    Int      @default(0) // 用户反馈：-1不准/0未评/1准
+  constitution String  @default("") // 占卜时的体质标签
+  // 元数据
+  date        String   // YYYY-MM-DD
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([userId, method])
+}
+
+// ═══════════════════════════════════════════
+// P1: 五行修为值 — 每用户一行，持久化修为进度
+// ═══════════════════════════════════════════
+model Cultivation {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  // 五行修为值 0-100
+  woodXiuWei   Int      @default(0)  // 木行修为
+  fireXiuWei   Int      @default(0)  // 火行修为
+  earthXiuWei  Int      @default(0)  // 土行修为
+  metalXiuWei  Int      @default(0)  // 金行修为
+  waterXiuWei  Int      @default(0)  // 水行修为
+  // 段位
+  rank         Int      @default(0)  // 0-6 段位索引
+  rankTitle    String   @default("闻道者")
+  // 统计
+  totalPractices  Int   @default(0)  // 累计功法次数
+  totalMinutes    Int   @default(0)  // 累计练习分钟
+  streakDays      Int   @default(0)  // 连续练习天数
+  lastPracticeAt  DateTime?          // 最后练习时间
+  // 元数据
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════
+// P0: 功法练习记录 — 每次完成一条
+// ═══════════════════════════════════════════
+model PracticeLog {
+  id           String   @id @default(cuid())
+  userId       String
+  date         String   // YYYY-MM-DD
+  // 功法类型
+  category     String   // liuzijue | wuyin | zhiYinZhiJing | meridian | acupointQuiz | breathing | songbo | moxa
+  subCategory  String   @default("") // 如 liuzijue 的字诀 id (xu/he/hu/si/chui/xi)
+  // 五行归属（用于修为计算）
+  element      String   // wood/fire/earth/metal/water
+  // 练习详情
+  durationSec  Int      @default(0)  // 持续秒数
+  cycles       Int      @default(0)  // 完成轮数
+  // 修为获得
+  xiuWeiGain   Int      @default(0)  // 本次获得修为值
+  // 附加数据
+  metadata     String   @default("{}") // JSON: 额外信息
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([userId, category])
+  @@index([userId, element])
+}
+
+// ═══════════════════════════════════════════
+// P2: 经络修行进度 — 每条经络一行
+// ═══════════════════════════════════════════
+model MeridianProgress {
+  id           String   @id @default(cuid())
+  userId       String
+  // 经络标识
+  meridianId   String   // lung | largeIntestine | stomach | spleen | heart | smallIntestine | bladder | kidney | pericardium | tripleEnergizer | gallbladder | liver
+  meridianName String   // 手太阴肺经 等
+  element      String   // wood/fire/earth/metal/water
+  // 贯通度 0-100
+  completion   Int      @default(0)
+  // 贡献来源统计
+  viewCount    Int      @default(0)  // 穴位查看次数
+  quizCorrect  Int      @default(0)  // 测验答对次数
+  quizTotal    Int      @default(0)  // 测验总次数
+  practiceCount Int     @default(0)  // 字诀练习次数
+  // 是否已贯通
+  isCompleted  Boolean  @default(false)
+  // 解锁状态（按子午流注顺序）
+  unlockedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, meridianId])
+  @@index([userId, element])
+  @@index([userId, isCompleted])
+}
+
+// ═══════════════════════════════════════════
+// 自我进化系统 — 知音 Evo Engine
+// ═══════════════════════════════════════════
+
+// 进化知识库 — 可被进化引擎扩充的疗愈知识
+model EvoKnowledge {
+  id           String   @id @default(cuid())
+  // 分类
+  domain       String   // constitution | wuyin | liuzijue | meridian | emotion | seasonal | tongue | divination | general
+  element      String   @default("") // wood/fire/earth/metal/water / 空
+  // 内容
+  title        String
+  content      String   // Markdown格式正文
+  source       String   @default("") // 来源：research | user_feedback | ai_generated | manual | ancient
+  sourceUrl     String   @default("")
+  // 版本与状态
+  version      Int      @default(1)
+  status       String   @default("draft") // draft | review | deployed | archived
+  // 质量评分
+  qualityScore Float    @default(0) // 0-100，基于用户反馈和交叉验证
+  usageCount   Int      @default(0) // 被引用次数
+  // 元数据
+  tags         String   @default("[]") // JSON: 标签数组
+  metadata     String   @default("{}") // JSON: 附加信息
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([domain, status])
+  @@index([element])
+  @@index([qualityScore])
+}
+
+// 进化日志 — 记录每次进化行为
+model EvoLog {
+  id           String   @id @default(cuid())
+  // 触发
+  triggerType  String   // scheduled | error_detected | feedback_threshold | manual
+  triggerDetail String  @default("") // JSON: 触发详情
+  // 执行
+  actionType   String   // prompt_optimize | content_generate | bug_fix | knowledge_expand | ui_adjust | config_update
+  actionDetail String   @default("") // JSON: 执行详情
+  targetModule String   @default("") // 目标模块
+  // 结果
+  status       String   @default("running") // running | success | failed | rolled_back
+  resultDetail String   @default("") // JSON: 结果详情
+  // 五行策略
+  strategy     String   @default("") // wood/fire/earth/metal/water
+  // 效果
+  beforeMetric Float    @default(0) // 执行前指标值
+  afterMetric  Float    @default(0) // 执行后指标值
+  improvement  Float    @default(0) // 改善百分比
+  // 时间
+  startedAt    DateTime @default(now())
+  completedAt  DateTime?
+  durationMs   Int      @default(0)
+
+  @@index([actionType, status])
+  @@index([triggerType])
+  @@index([startedAt])
+}
+
+// 进化提示词版本 — 跟踪提示词优化历史
+model EvoPromptVersion {
+  id            String   @id @default(cuid())
+  promptId      String                       // 提示词唯一标识（如 'ai-diagnosis', 'tongue-analysis'）
+  module        String                       // 所属模块
+  version       Int      @default(1)
+  // 内容
+  systemPrompt  String                       // 完整系统提示词
+  // 质量指标
+  avgScore      Float    @default(0)  // 平均用户评分 -1~1
+  sampleSize    Int      @default(0)  // 采样数量
+  hallucinationRate Float @default(0) // 幻觉率 0-1
+  // 状态
+  isActive      Boolean  @default(false)
+  deployedAt    DateTime?
+  rolledBackAt  DateTime?
+  createdAt     DateTime @default(now())
+
+  @@unique([promptId, version])
+  @@index([promptId, isActive])
+}
+
+// 进化自修复规则
+model EvoRepairRule {
+  id              String   @id @default(cuid())
+  errorFingerprint String  @unique               // 错误指纹hash
+  errorPattern    String                        // 匹配模式（regex或关键字）
+  repairAction    String                        // JSON: 修复动作描述
+  successCount    Int      @default(0)
+  failCount       Int      @default(0)
+  successRate     Float    @default(0)
+  maxRetries      Int      @default(3)
+  cooldownMs      Int      @default(60000)
+  lastExecutedAt  DateTime?
+  isEnabled       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// 进化调度 — 定时任务配置
+model EvoSchedule {
+  id            String   @id @default(cuid())
+  name          String                        // 任务名称
+  cronExpr      String                        // cron 表达式
+  actionType    String                        // 执行的动作类型
+  actionConfig  String   @default("{}")       // JSON: 动作配置
+  isEnabled     Boolean  @default(true)
+  lastRunAt     DateTime?
+  nextRunAt     DateTime?
+  runCount      Int      @default(0)
+  failCount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isEnabled, nextRunAt])
+}

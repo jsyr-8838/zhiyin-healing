@@ -1,0 +1,31 @@
+# =============================================================================
+# Docker Build Ignore - prevents sensitive files from entering the image
+# =============================================================================
+node_modules
+.next
+.git
+.gitignore
+.env*.local
+.env.production
+*.log
+.DS_Store
+README.md
+start.bat
+*.lnk
+# Keep prisma schema but not dev database
+prisma/dev.db
+prisma/dev.db-journal
+# Test files
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+# Documentation
+docs
+*.md

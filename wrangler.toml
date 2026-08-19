@@ -1,0 +1,24 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "zhiyin-healing"
+compatibility_date = "2025-09-25"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+main = ".open-next/worker.js"
+
+# Assets are served from the .open-next/assets directory
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# D1 Database binding (free, serverless SQLite)
+[[d1_databases]]
+binding = "DB"
+database_name = "zhiyin-db"
+database_id = "d44c1d6f-0ce5-4dc6-8d91-43eece14f5d6"
+
+# Observability
+[observability]
+enabled = true
+
+# Smart Placement
+[placement]
+mode = "smart"

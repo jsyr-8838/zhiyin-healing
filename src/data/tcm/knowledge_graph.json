@@ -1,0 +1,3436 @@
+{
+  "nodes": [
+    {
+      "id": "S001",
+      "name": "头痛",
+      "type": "symptom",
+      "description": "头部疼痛",
+      "category": "头身"
+    },
+    {
+      "id": "S002",
+      "name": "发热",
+      "type": "symptom",
+      "description": "体温升高",
+      "category": "寒热"
+    },
+    {
+      "id": "S003",
+      "name": "恶寒",
+      "type": "symptom",
+      "description": "怕冷",
+      "category": "寒热"
+    },
+    {
+      "id": "S004",
+      "name": "汗出",
+      "type": "symptom",
+      "description": "出汗",
+      "category": "汗"
+    },
+    {
+      "id": "S005",
+      "name": "身痛",
+      "type": "symptom",
+      "description": "身体疼痛",
+      "category": "头身"
+    },
+    {
+      "id": "S006",
+      "name": "腰痛",
+      "type": "symptom",
+      "description": "腰部疼痛",
+      "category": "头身"
+    },
+    {
+      "id": "S007",
+      "name": "骨节疼痛",
+      "type": "symptom",
+      "description": "关节疼痛",
+      "category": "头身"
+    },
+    {
+      "id": "S008",
+      "name": "气喘",
+      "type": "symptom",
+      "description": "呼吸急促",
+      "category": "胸腹"
+    },
+    {
+      "id": "S009",
+      "name": "咳嗽",
+      "type": "symptom",
+      "description": "咳嗽",
+      "category": "胸腹"
+    },
+    {
+      "id": "S010",
+      "name": "胸痛",
+      "type": "symptom",
+      "description": "胸部疼痛",
+      "category": "胸腹"
+    },
+    {
+      "id": "S011",
+      "name": "心下痞",
+      "type": "symptom",
+      "description": "胃脘部痞满",
+      "category": "胸腹"
+    },
+    {
+      "id": "S012",
+      "name": "腹痛",
+      "type": "symptom",
+      "description": "腹部疼痛",
+      "category": "胸腹"
+    },
+    {
+      "id": "S013",
+      "name": "呕吐",
+      "type": "symptom",
+      "description": "呕吐",
+      "category": "饮食"
+    },
+    {
+      "id": "S014",
+      "name": "下利",
+      "type": "symptom",
+      "description": "腹泻",
+      "category": "二便"
+    },
+    {
+      "id": "S015",
+      "name": "便秘",
+      "type": "symptom",
+      "description": "大便秘结",
+      "category": "二便"
+    },
+    {
+      "id": "S016",
+      "name": "小便不利",
+      "type": "symptom",
+      "description": "小便困难",
+      "category": "二便"
+    },
+    {
+      "id": "S017",
+      "name": "口渴",
+      "type": "symptom",
+      "description": "口渴",
+      "category": "口渴"
+    },
+    {
+      "id": "S018",
+      "name": "口苦",
+      "type": "symptom",
+      "description": "口苦",
+      "category": "饮食"
+    },
+    {
+      "id": "S019",
+      "name": "心烦",
+      "type": "symptom",
+      "description": "心烦",
+      "category": "胸腹"
+    },
+    {
+      "id": "S020",
+      "name": "失眠",
+      "type": "symptom",
+      "description": "失眠",
+      "category": "睡眠"
+    },
+    {
+      "id": "S021",
+      "name": "眩晕",
+      "type": "symptom",
+      "description": "头晕目眩",
+      "category": "头身"
+    },
+    {
+      "id": "S022",
+      "name": "水肿",
+      "type": "symptom",
+      "description": "水肿",
+      "category": "头身"
+    },
+    {
+      "id": "S023",
+      "name": "黄疸",
+      "type": "symptom",
+      "description": "黄疸",
+      "category": "头身"
+    },
+    {
+      "id": "S024",
+      "name": "衄血",
+      "type": "symptom",
+      "description": "鼻出血",
+      "category": "血证"
+    },
+    {
+      "id": "S025",
+      "name": "吐血",
+      "type": "symptom",
+      "description": "吐血",
+      "category": "血证"
+    },
+    {
+      "id": "S026",
+      "name": "便血",
+      "type": "symptom",
+      "description": "便血",
+      "category": "血证"
+    },
+    {
+      "id": "S027",
+      "name": "尿血",
+      "type": "symptom",
+      "description": "尿血",
+      "category": "血证"
+    },
+    {
+      "id": "S028",
+      "name": "月经不调",
+      "type": "symptom",
+      "description": "月经不调",
+      "category": "妇女"
+    },
+    {
+      "id": "S029",
+      "name": "痛经",
+      "type": "symptom",
+      "description": "痛经",
+      "category": "妇女"
+    },
+    {
+      "id": "S030",
+      "name": "崩漏",
+      "type": "symptom",
+      "description": "崩漏",
+      "category": "妇女"
+    },
+    {
+      "id": "SY001",
+      "name": "太阳中风证",
+      "type": "syndrome",
+      "description": "风伤卫卫气不固营气外泄",
+      "six_meridian": "太阳经"
+    },
+    {
+      "id": "SY002",
+      "name": "太阳伤寒证",
+      "type": "syndrome",
+      "description": "寒伤营营血凝滞",
+      "six_meridian": "太阳经"
+    },
+    {
+      "id": "SY003",
+      "name": "阳明经证",
+      "type": "syndrome",
+      "description": "阳明热盛邪在气分",
+      "six_meridian": "阳明经"
+    },
+    {
+      "id": "SY004",
+      "name": "阳明腑证",
+      "type": "syndrome",
+      "description": "阳明热结腑气不通",
+      "six_meridian": "阳明经"
+    },
+    {
+      "id": "SY005",
+      "name": "少阳病证",
+      "type": "syndrome",
+      "description": "邪在半表半里枢机不利",
+      "six_meridian": "少阳经"
+    },
+    {
+      "id": "SY006",
+      "name": "太阴病证",
+      "type": "syndrome",
+      "description": "脾阳虚寒寒湿内停",
+      "six_meridian": "太阴经"
+    },
+    {
+      "id": "SY007",
+      "name": "少阴寒化证",
+      "type": "syndrome",
+      "description": "心肾阳衰阴寒内盛",
+      "six_meridian": "少阴经"
+    },
+    {
+      "id": "SY008",
+      "name": "少阴热化证",
+      "type": "syndrome",
+      "description": "阴虚火旺心肾不交",
+      "six_meridian": "少阴经"
+    },
+    {
+      "id": "SY009",
+      "name": "厥阴病证",
+      "type": "syndrome",
+      "description": "寒热错杂阴阳交争",
+      "six_meridian": "厥阴经"
+    },
+    {
+      "id": "SY010",
+      "name": "肝郁脾虚证",
+      "type": "syndrome",
+      "description": "肝气郁结脾失健运",
+      "six_meridian": null
+    },
+    {
+      "id": "SY011",
+      "name": "心脾两虚证",
+      "type": "syndrome",
+      "description": "心血不足脾气虚弱",
+      "six_meridian": null
+    },
+    {
+      "id": "SY012",
+      "name": "气血两虚证",
+      "type": "syndrome",
+      "description": "气血亏虚",
+      "six_meridian": null
+    },
+    {
+      "id": "SY013",
+      "name": "痰饮内停证",
+      "type": "syndrome",
+      "description": "水饮内停",
+      "six_meridian": null
+    },
+    {
+      "id": "SY014",
+      "name": "瘀血阻络证",
+      "type": "syndrome",
+      "description": "瘀血阻滞经络",
+      "six_meridian": null
+    },
+    {
+      "id": "SY015",
+      "name": "肝阳上亢证",
+      "type": "syndrome",
+      "description": "肝阳上亢气血上逆",
+      "six_meridian": null
+    },
+    {
+      "id": "SY016",
+      "name": "肾阳虚证",
+      "type": "syndrome",
+      "description": "肾阳不足温煦失职",
+      "six_meridian": null
+    },
+    {
+      "id": "SY017",
+      "name": "阴虚内热证",
+      "type": "syndrome",
+      "description": "阴液亏虚虚热内生",
+      "six_meridian": null
+    },
+    {
+      "id": "SY018",
+      "name": "湿热蕴结证",
+      "type": "syndrome",
+      "description": "湿热蕴结",
+      "six_meridian": null
+    },
+    {
+      "id": "SY019",
+      "name": "胸阳不振证",
+      "type": "syndrome",
+      "description": "胸阳不振阴寒上乘",
+      "six_meridian": null
+    },
+    {
+      "id": "SY020",
+      "name": "肺热痰壅证",
+      "type": "syndrome",
+      "description": "肺热痰壅",
+      "six_meridian": null
+    },
+    {
+      "id": "SM001",
+      "name": "太阳经",
+      "type": "six_meridian",
+      "description": "太阳为一身之藩篱主一身之表",
+      "english_name": "Tai Yang"
+    },
+    {
+      "id": "SM002",
+      "name": "阳明经",
+      "type": "six_meridian",
+      "description": "阳明为多气多血之经主里主热",
+      "english_name": "Yang Ming"
+    },
+    {
+      "id": "SM003",
+      "name": "少阳经",
+      "type": "six_meridian",
+      "description": "少阳为半表半里之经主枢",
+      "english_name": "Shao Yang"
+    },
+    {
+      "id": "SM004",
+      "name": "太阴经",
+      "type": "six_meridian",
+      "description": "太阴为三阴之首主脾主运化",
+      "english_name": "Tai Yin"
+    },
+    {
+      "id": "SM005",
+      "name": "少阴经",
+      "type": "six_meridian",
+      "description": "少阴为心肾之本主水火",
+      "english_name": "Shao Yin"
+    },
+    {
+      "id": "SM006",
+      "name": "厥阴经",
+      "type": "six_meridian",
+      "description": "厥阴为阴尽阳生之经主肝主风",
+      "english_name": "Jue Yin"
+    },
+    {
+      "id": "H001",
+      "name": "桂枝",
+      "type": "herb",
+      "properties": "辛温解表温通经脉助阳化气",
+      "meridians": [
+        "LU",
+        "LI",
+        "HT",
+        "KI"
+      ]
+    },
+    {
+      "id": "H002",
+      "name": "麻黄",
+      "type": "herb",
+      "properties": "辛温发汗宣肺平喘利水消肿",
+      "meridians": [
+        "LU",
+        "BL"
+      ]
+    },
+    {
+      "id": "H003",
+      "name": "芍药",
+      "type": "herb",
+      "properties": "苦酸微寒养血柔肝缓急止痛",
+      "meridians": [
+        "LR",
+        "SP"
+      ]
+    },
+    {
+      "id": "H004",
+      "name": "甘草",
+      "type": "herb",
+      "properties": "甘平补脾益气清热解毒缓急止痛",
+      "meridians": [
+        "LU",
+        "ST",
+        "HT",
+        "KI"
+      ]
+    },
+    {
+      "id": "H005",
+      "name": "生姜",
+      "type": "herb",
+      "properties": "辛温发汗解表温中止呕",
+      "meridians": [
+        "LU",
+        "ST",
+        "SP"
+      ]
+    },
+    {
+      "id": "H006",
+      "name": "大枣",
+      "type": "herb",
+      "properties": "甘温补中益气养血安神",
+      "meridians": [
+        "ST",
+        "SP",
+        "HT"
+      ]
+    },
+    {
+      "id": "H007",
+      "name": "柴胡",
+      "type": "herb",
+      "properties": "苦辛微寒疏肝解郁升举阳气",
+      "meridians": [
+        "LR",
+        "GB"
+      ]
+    },
+    {
+      "id": "H008",
+      "name": "黄芩",
+      "type": "herb",
+      "properties": "苦寒清热燥湿泻火解毒",
+      "meridians": [
+        "LU",
+        "ST",
+        "GB",
+        "KI"
+      ]
+    },
+    {
+      "id": "H009",
+      "name": "半夏",
+      "type": "herb",
+      "properties": "辛温燥湿化痰降逆止呕",
+      "meridians": [
+        "LU",
+        "ST",
+        "SP"
+      ]
+    },
+    {
+      "id": "H010",
+      "name": "人参",
+      "type": "herb",
+      "properties": "甘微温大补元气补脾益肺生津安神",
+      "meridians": [
+        "LU",
+        "ST",
+        "HT",
+        "KI"
+      ]
+    },
+    {
+      "id": "H011",
+      "name": "附子",
+      "type": "herb",
+      "properties": "辛甘大热回阳救逆补火助阳散寒止痛",
+      "meridians": [
+        "HT",
+        "KI",
+        "SP"
+      ]
+    },
+    {
+      "id": "H012",
+      "name": "干姜",
+      "type": "herb",
+      "properties": "辛热温中散寒回阳通脉",
+      "meridians": [
+        "HT",
+        "LU",
+        "ST",
+        "KI"
+      ]
+    },
+    {
+      "id": "H013",
+      "name": "大黄",
+      "type": "herb",
+      "properties": "苦寒泻下攻积清热泻火凉血解毒",
+      "meridians": [
+        "ST",
+        "LI",
+        "HT",
+        "LR"
+      ]
+    },
+    {
+      "id": "H014",
+      "name": "芒硝",
+      "type": "herb",
+      "properties": "咸苦寒泻下软坚清热",
+      "meridians": [
+        "ST",
+        "LI"
+      ]
+    },
+    {
+      "id": "H015",
+      "name": "石膏",
+      "type": "herb",
+      "properties": "辛甘大寒清热泻火除烦止渴",
+      "meridians": [
+        "LU",
+        "ST"
+      ]
+    },
+    {
+      "id": "H016",
+      "name": "知母",
+      "type": "herb",
+      "properties": "苦甘寒清热泻火滋阴润燥",
+      "meridians": [
+        "LU",
+        "ST",
+        "KI"
+      ]
+    },
+    {
+      "id": "H017",
+      "name": "当归",
+      "type": "herb",
+      "properties": "甘辛温补血活血调经止痛",
+      "meridians": [
+        "LR",
+        "HT",
+        "SP"
+      ]
+    },
+    {
+      "id": "H018",
+      "name": "川芎",
+      "type": "herb",
+      "properties": "辛温活血行气祛风止痛",
+      "meridians": [
+        "LR",
+        "GB",
+        "PC"
+      ]
+    },
+    {
+      "id": "H019",
+      "name": "白术",
+      "type": "herb",
+      "properties": "苦甘温补气健脾燥湿利水",
+      "meridians": [
+        "SP",
+        "ST"
+      ]
+    },
+    {
+      "id": "H020",
+      "name": "茯苓",
+      "type": "herb",
+      "properties": "甘淡平健脾渗湿宁心安神",
+      "meridians": [
+        "SP",
+        "HT",
+        "KI"
+      ]
+    },
+    {
+      "id": "H021",
+      "name": "泽泻",
+      "type": "herb",
+      "properties": "甘淡寒利水渗湿泄热",
+      "meridians": [
+        "KI",
+        "BL"
+      ]
+    },
+    {
+      "id": "H022",
+      "name": "猪苓",
+      "type": "herb",
+      "properties": "甘淡平利水渗湿",
+      "meridians": [
+        "KI",
+        "BL"
+      ]
+    },
+    {
+      "id": "H023",
+      "name": "黄连",
+      "type": "herb",
+      "properties": "苦寒清热燥湿泻火解毒",
+      "meridians": [
+        "HT",
+        "ST",
+        "LR",
+        "KI"
+      ]
+    },
+    {
+      "id": "H024",
+      "name": "黄柏",
+      "type": "herb",
+      "properties": "苦寒清热燥湿泻火解毒",
+      "meridians": [
+        "KI",
+        "BL"
+      ]
+    },
+    {
+      "id": "H025",
+      "name": "栀子",
+      "type": "herb",
+      "properties": "苦寒泻火除烦清热利湿凉血解毒",
+      "meridians": [
+        "HT",
+        "LU",
+        "ST",
+        "KI"
+      ]
+    },
+    {
+      "id": "H026",
+      "name": "生地黄",
+      "type": "herb",
+      "properties": "甘苦寒清热凉血养阴生津",
+      "meridians": [
+        "HT",
+        "LR",
+        "KI"
+      ]
+    },
+    {
+      "id": "H027",
+      "name": "熟地黄",
+      "type": "herb",
+      "properties": "甘微温补血养阴益精填髓",
+      "meridians": [
+        "LR",
+        "KI"
+      ]
+    },
+    {
+      "id": "H028",
+      "name": "山茱萸",
+      "type": "herb",
+      "properties": "酸微温补益肝肾收敛固涩",
+      "meridians": [
+        "LR",
+        "KI"
+      ]
+    },
+    {
+      "id": "H029",
+      "name": "山药",
+      "type": "herb",
+      "properties": "甘平补脾养胃生津益肺补肾",
+      "meridians": [
+        "SP",
+        "LU",
+        "KI"
+      ]
+    },
+    {
+      "id": "H030",
+      "name": "牡丹皮",
+      "type": "herb",
+      "properties": "苦辛微寒清热凉血活血化瘀",
+      "meridians": [
+        "HT",
+        "LR",
+        "KI"
+      ]
+    },
+    {
+      "id": "M001",
+      "name": "肺经",
+      "type": "meridian",
+      "pinyin": "Fei Jing",
+      "english": "Lung Meridian",
+      "code": "LU"
+    },
+    {
+      "id": "M002",
+      "name": "大肠经",
+      "type": "meridian",
+      "pinyin": "Da Chang Jing",
+      "english": "Large Intestine Meridian",
+      "code": "LI"
+    },
+    {
+      "id": "M003",
+      "name": "胃经",
+      "type": "meridian",
+      "pinyin": "Wei Jing",
+      "english": "Stomach Meridian",
+      "code": "ST"
+    },
+    {
+      "id": "M004",
+      "name": "脾经",
+      "type": "meridian",
+      "pinyin": "Pi Jing",
+      "english": "Spleen Meridian",
+      "code": "SP"
+    },
+    {
+      "id": "M005",
+      "name": "心经",
+      "type": "meridian",
+      "pinyin": "Xin Jing",
+      "english": "Heart Meridian",
+      "code": "HT"
+    },
+    {
+      "id": "M006",
+      "name": "小肠经",
+      "type": "meridian",
+      "pinyin": "Xiao Chang Jing",
+      "english": "Small Intestine Meridian",
+      "code": "SI"
+    },
+    {
+      "id": "M007",
+      "name": "膀胱经",
+      "type": "meridian",
+      "pinyin": "Pang Guang Jing",
+      "english": "Bladder Meridian",
+      "code": "BL"
+    },
+    {
+      "id": "M008",
+      "name": "肾经",
+      "type": "meridian",
+      "pinyin": "Shen Jing",
+      "english": "Kidney Meridian",
+      "code": "KI"
+    },
+    {
+      "id": "M009",
+      "name": "心包经",
+      "type": "meridian",
+      "pinyin": "Xin Bao Jing",
+      "english": "Pericardium Meridian",
+      "code": "PC"
+    },
+    {
+      "id": "M010",
+      "name": "三焦经",
+      "type": "meridian",
+      "pinyin": "San Jiao Jing",
+      "english": "San Jiao Meridian",
+      "code": "TE"
+    },
+    {
+      "id": "M011",
+      "name": "胆经",
+      "type": "meridian",
+      "pinyin": "Dan Jing",
+      "english": "Gallbladder Meridian",
+      "code": "GB"
+    },
+    {
+      "id": "M012",
+      "name": "肝经",
+      "type": "meridian",
+      "pinyin": "Gan Jing",
+      "english": "Liver Meridian",
+      "code": "LR"
+    },
+    {
+      "id": "M013",
+      "name": "督脉",
+      "type": "meridian",
+      "pinyin": "Du Mai",
+      "english": "Governing Vessel",
+      "code": "GV"
+    },
+    {
+      "id": "M014",
+      "name": "任脉",
+      "type": "meridian",
+      "pinyin": "Ren Mai",
+      "english": "Conception Vessel",
+      "code": "CV"
+    },
+    {
+      "id": "A001",
+      "name": "合谷",
+      "type": "acupoint",
+      "code": "LI4",
+      "location": "手背第一二掌骨间",
+      "functions": "疏风解表镇痛"
+    },
+    {
+      "id": "A002",
+      "name": "列缺",
+      "type": "acupoint",
+      "code": "LU7",
+      "location": "前臂桡侧缘",
+      "functions": "宣肺利气通络"
+    },
+    {
+      "id": "A003",
+      "name": "曲池",
+      "type": "acupoint",
+      "code": "LI11",
+      "location": "肘横纹外侧端",
+      "functions": "清热解表"
+    },
+    {
+      "id": "A004",
+      "name": "足三里",
+      "type": "acupoint",
+      "code": "ST36",
+      "location": "小腿前外侧",
+      "functions": "调理脾胃补中益气"
+    },
+    {
+      "id": "A005",
+      "name": "中脘",
+      "type": "acupoint",
+      "code": "CV12",
+      "location": "上腹部前正中线",
+      "functions": "和胃健脾降逆利水"
+    },
+    {
+      "id": "A006",
+      "name": "关元",
+      "type": "acupoint",
+      "code": "CV4",
+      "location": "下腹部前正中线",
+      "functions": "培元固本温阳益气"
+    },
+    {
+      "id": "A007",
+      "name": "气海",
+      "type": "acupoint",
+      "code": "CV6",
+      "location": "下腹部前正中线",
+      "functions": "益气助阳调经固经"
+    },
+    {
+      "id": "A008",
+      "name": "三阴交",
+      "type": "acupoint",
+      "code": "SP6",
+      "location": "小腿内侧",
+      "functions": "健脾益气调补肝肾"
+    },
+    {
+      "id": "A009",
+      "name": "血海",
+      "type": "acupoint",
+      "code": "SP10",
+      "location": "大腿内侧",
+      "functions": "活血化瘀补血养血"
+    },
+    {
+      "id": "A010",
+      "name": "太冲",
+      "type": "acupoint",
+      "code": "LR3",
+      "location": "足背第一二跖骨间",
+      "functions": "平肝息风疏肝解郁"
+    },
+    {
+      "id": "A011",
+      "name": "太溪",
+      "type": "acupoint",
+      "code": "KI3",
+      "location": "足内侧内踝后方",
+      "functions": "滋补肾阴益肾壮阳"
+    },
+    {
+      "id": "A012",
+      "name": "神门",
+      "type": "acupoint",
+      "code": "HT7",
+      "location": "腕部腕掌侧横纹尺侧端",
+      "functions": "宁心安神"
+    },
+    {
+      "id": "A013",
+      "name": "内关",
+      "type": "acupoint",
+      "code": "PC6",
+      "location": "前臂掌侧",
+      "functions": "宁心安神理气止痛"
+    },
+    {
+      "id": "A014",
+      "name": "百会",
+      "type": "acupoint",
+      "code": "GV20",
+      "location": "头部前发际正中直上5寸",
+      "functions": "升阳举陷益气固脱"
+    },
+    {
+      "id": "A015",
+      "name": "风池",
+      "type": "acupoint",
+      "code": "GB20",
+      "location": "项部枕骨之下",
+      "functions": "疏风解表清头明目"
+    },
+    {
+      "id": "A016",
+      "name": "天柱",
+      "type": "acupoint",
+      "code": "BL10",
+      "location": "项部斜方肌外缘",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "A017",
+      "name": "大椎",
+      "type": "acupoint",
+      "code": "GV14",
+      "location": "后正中线上第七颈椎棘突下",
+      "functions": "清热解表"
+    },
+    {
+      "id": "A018",
+      "name": "肺俞",
+      "type": "acupoint",
+      "code": "BL13",
+      "location": "背部第三胸椎棘突下",
+      "functions": "调理肺气"
+    },
+    {
+      "id": "A019",
+      "name": "肾俞",
+      "type": "acupoint",
+      "code": "BL23",
+      "location": "腰部第二腰椎棘突下",
+      "functions": "补肾益气"
+    },
+    {
+      "id": "A020",
+      "name": "膻中",
+      "type": "acupoint",
+      "code": "CV17",
+      "location": "胸部前正中线",
+      "functions": "宽胸理气"
+    },
+    {
+      "id": "DA001",
+      "name": "灵骨",
+      "type": "dong_acupoint",
+      "location": "手背虎口处",
+      "functions": "疏风解表镇痛"
+    },
+    {
+      "id": "DA002",
+      "name": "大白",
+      "type": "dong_acupoint",
+      "location": "手背虎口处",
+      "functions": "疏风解表镇痛"
+    },
+    {
+      "id": "DA003",
+      "name": "重子",
+      "type": "dong_acupoint",
+      "location": "手掌第一掌骨桡侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "DA004",
+      "name": "重仙",
+      "type": "dong_acupoint",
+      "location": "手掌第一掌骨桡侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "DA005",
+      "name": "火主",
+      "type": "dong_acupoint",
+      "location": "手背第二掌骨尺侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "DA006",
+      "name": "火硬",
+      "type": "dong_acupoint",
+      "location": "手背第二掌骨尺侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "DA007",
+      "name": "水曲",
+      "type": "dong_acupoint",
+      "location": "手背第三掌骨桡侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "DA008",
+      "name": "水相",
+      "type": "dong_acupoint",
+      "location": "手背第三掌骨桡侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "DA009",
+      "name": "木火",
+      "type": "dong_acupoint",
+      "location": "手背第四掌骨尺侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "DA010",
+      "name": "土水",
+      "type": "dong_acupoint",
+      "location": "手背第五掌骨尺侧",
+      "functions": "疏风解表"
+    },
+    {
+      "id": "CT001",
+      "name": "伤寒论",
+      "type": "classic_text",
+      "author": "张仲景",
+      "dynasty": "东汉",
+      "description": "中医四大经典之一创立六经辨证体系"
+    },
+    {
+      "id": "CT002",
+      "name": "金匮要略",
+      "type": "classic_text",
+      "author": "张仲景",
+      "dynasty": "东汉",
+      "description": "中医四大经典之一论述杂病诊治"
+    },
+    {
+      "id": "CT003",
+      "name": "黄帝内经",
+      "type": "classic_text",
+      "author": "佚名",
+      "dynasty": "战国至秦汉",
+      "description": "中医理论奠基之作"
+    },
+    {
+      "id": "CT004",
+      "name": "神农本草经",
+      "type": "classic_text",
+      "author": "佚名",
+      "dynasty": "东汉",
+      "description": "现存最早的中药学专著"
+    },
+    {
+      "id": "CT005",
+      "name": "温病条辨",
+      "type": "classic_text",
+      "author": "吴鞠通",
+      "dynasty": "清代",
+      "description": "温病学代表作创立三焦辨证"
+    },
+    {
+      "id": "NC001",
+      "name": "桂枝汤注释",
+      "type": "ni_comment",
+      "formula_id": "F001",
+      "key_point": "桂枝汤为群方之祖调和营卫第一方"
+    },
+    {
+      "id": "NC002",
+      "name": "麻黄汤注释",
+      "type": "ni_comment",
+      "formula_id": "F002",
+      "key_point": "麻黄汤为发汗解表第一峻剂"
+    },
+    {
+      "id": "NC003",
+      "name": "小柴胡汤注释",
+      "type": "ni_comment",
+      "formula_id": "F003",
+      "key_point": "小柴胡汤为和解少阳之要方"
+    },
+    {
+      "id": "NC004",
+      "name": "白虎汤注释",
+      "type": "ni_comment",
+      "formula_id": "F136",
+      "key_point": "四大症状壮热大汗大渴脉洪大为使用白虎汤之标准"
+    },
+    {
+      "id": "NC005",
+      "name": "四逆汤注释",
+      "type": "ni_comment",
+      "formula_id": "F043",
+      "key_point": "四逆汤为回阳救逆之第一方"
+    },
+    {
+      "id": "NC006",
+      "name": "六经辨证总纲",
+      "type": "ni_comment",
+      "formula_id": null,
+      "key_point": "六经辨证为伤寒论之核心太阳为表阳明为里少阳为枢太阴为脾少阴为心肾厥阴为肝"
+    },
+    {
+      "id": "NC007",
+      "name": "病痰饮者当以温药和之",
+      "type": "ni_comment",
+      "formula_id": null,
+      "key_point": "痰饮之病机为阳虚不能化水治当以温药和之"
+    },
+    {
+      "id": "NC008",
+      "name": "治肝之法",
+      "type": "ni_comment",
+      "formula_id": null,
+      "key_point": "治肝当疏肝解郁养血柔肝不可一味攻伐"
+    },
+    {
+      "id": "NC009",
+      "name": "治脾之法",
+      "type": "ni_comment",
+      "formula_id": null,
+      "key_point": "治脾当健脾益气燥湿利湿不可一味滋腻"
+    },
+    {
+      "id": "NC010",
+      "name": "治肾之法",
+      "type": "ni_comment",
+      "formula_id": null,
+      "key_point": "治肾当补肾填精温阳化气不可一味攻伐"
+    },
+    {
+      "id": "F001",
+      "name": "桂枝汤",
+      "type": "formula",
+      "description": "群方之祖，调和营卫",
+      "source": "伤寒论",
+      "ingredients": "桂枝、芍药、甘草、生姜、大枣",
+      "indications": "太阳中风证"
+    },
+    {
+      "id": "F002",
+      "name": "麻黄汤",
+      "type": "formula",
+      "description": "辛温解表，太阳伤寒证主方",
+      "source": "伤寒论",
+      "ingredients": "麻黄、桂枝、杏仁、甘草",
+      "indications": "太阳伤寒证"
+    },
+    {
+      "id": "F003",
+      "name": "小柴胡汤",
+      "type": "formula",
+      "description": "和解少阳，少阳病主方",
+      "source": "伤寒论",
+      "ingredients": "柴胡、黄芩、半夏、人参、甘草、生姜、大枣",
+      "indications": "少阳病证"
+    },
+    {
+      "id": "F031",
+      "name": "大承气汤",
+      "type": "formula",
+      "description": "峻下热结，阳明腑实证主方",
+      "source": "伤寒论",
+      "ingredients": "大黄、芒硝、厚朴、枳实",
+      "indications": "阳明腑证"
+    },
+    {
+      "id": "F043",
+      "name": "四逆汤",
+      "type": "formula",
+      "description": "回阳救逆，少阴寒化证主方",
+      "source": "伤寒论",
+      "ingredients": "附子、干姜、甘草",
+      "indications": "少阴寒化证"
+    },
+    {
+      "id": "F051",
+      "name": "乌梅丸",
+      "type": "formula",
+      "description": "温脏安蛔，厥阴病主方",
+      "source": "伤寒论",
+      "ingredients": "乌梅、细辛、干姜、黄连、当归、附子、蜀椒、桂枝、人参、黄柏",
+      "indications": "厥阴病证"
+    },
+    {
+      "id": "F076",
+      "name": "瓜蒌薤白半夏汤",
+      "type": "formula",
+      "description": "通阳豁痰，胸痹主方",
+      "source": "金匮要略",
+      "ingredients": "瓜蒌、薤白、半夏、白酒",
+      "indications": "胸阳不振证"
+    },
+    {
+      "id": "F105",
+      "name": "肾气丸",
+      "type": "formula",
+      "description": "温补肾阳",
+      "source": "金匮要略",
+      "ingredients": "干地黄、山药、山茱萸、泽泻、茯苓、牡丹皮、桂枝、附子",
+      "indications": "肾阳虚证"
+    },
+    {
+      "id": "F106",
+      "name": "知柏地黄丸",
+      "type": "formula",
+      "description": "滋阴降火",
+      "source": "医方集解",
+      "ingredients": "熟地黄、山茱萸、山药、泽泻、茯苓、牡丹皮、知母、黄柏",
+      "indications": "阴虚内热证"
+    },
+    {
+      "id": "F111",
+      "name": "苓桂术甘汤",
+      "type": "formula",
+      "description": "温化痰饮",
+      "source": "伤寒论",
+      "ingredients": "茯苓、桂枝、白术、甘草",
+      "indications": "痰饮内停证"
+    },
+    {
+      "id": "F118",
+      "name": "麻杏石甘汤",
+      "type": "formula",
+      "description": "辛凉宣泄",
+      "source": "伤寒论",
+      "ingredients": "麻黄、杏仁、石膏、甘草",
+      "indications": "肺热痰壅证"
+    },
+    {
+      "id": "F124",
+      "name": "归脾汤",
+      "type": "formula",
+      "description": "益气补血健脾",
+      "source": "济生方",
+      "ingredients": "人参、白术、黄芪、当归、龙眼肉、酸枣仁、茯苓、远志、木香、甘草、生姜、大枣",
+      "indications": "心脾两虚证"
+    },
+    {
+      "id": "F126",
+      "name": "八珍汤",
+      "type": "formula",
+      "description": "气血双补",
+      "source": "正体类要",
+      "ingredients": "人参、白术、茯苓、甘草、当归、川芎、芍药、熟地黄",
+      "indications": "气血两虚证"
+    },
+    {
+      "id": "F128",
+      "name": "逍遥散",
+      "type": "formula",
+      "description": "疏肝解郁健脾",
+      "source": "太平惠民和剂局方",
+      "ingredients": "柴胡、当归、芍药、白术、茯苓、甘草、薄荷、生姜",
+      "indications": "肝郁脾虚证"
+    },
+    {
+      "id": "F130",
+      "name": "茵陈蒿汤",
+      "type": "formula",
+      "description": "清热利湿退黄",
+      "source": "伤寒论",
+      "ingredients": "茵陈蒿、栀子、大黄",
+      "indications": "湿热蕴结证"
+    },
+    {
+      "id": "F136",
+      "name": "白虎汤",
+      "type": "formula",
+      "description": "清热生津",
+      "source": "伤寒论",
+      "ingredients": "石膏、知母、甘草、粳米",
+      "indications": "阳明经证"
+    },
+    {
+      "id": "F154",
+      "name": "天麻钩藤饮",
+      "type": "formula",
+      "description": "平肝息风",
+      "source": "杂病证治新义",
+      "ingredients": "天麻、钩藤、石决明、栀子、黄芩、川牛膝、杜仲、益母草、桑寄生、夜交藤、朱茯神",
+      "indications": "肝阳上亢证"
+    },
+    {
+      "id": "F156",
+      "name": "血府逐瘀汤",
+      "type": "formula",
+      "description": "活血化瘀",
+      "source": "医林改错",
+      "ingredients": "桃仁、红花、当归、生地黄、川芎、赤芍、牛膝、桔梗、柴胡、枳壳、甘草",
+      "indications": "瘀血阻络证"
+    },
+    {
+      "id": "F165",
+      "name": "理中汤",
+      "type": "formula",
+      "description": "温中散寒",
+      "source": "伤寒论",
+      "ingredients": "人参、干姜、白术、甘草",
+      "indications": "太阴病证"
+    },
+    {
+      "id": "SC001",
+      "name": "上品·上药",
+      "type": "shennong_classic",
+      "description": "上品120种，养命以应天，无毒，久服轻身延年"
+    },
+    {
+      "id": "SC002",
+      "name": "中品·中药",
+      "type": "shennong_classic",
+      "description": "中品120种，养性以应人，无毒有毒，斟酌其宜"
+    },
+    {
+      "id": "SC003",
+      "name": "下品·下药",
+      "type": "shennong_classic",
+      "description": "下品125种，治病以应地，多毒，不可久服"
+    },
+    {
+      "id": "SC004",
+      "name": "君药",
+      "type": "shennong_classic",
+      "description": "方中之主药，针对主证"
+    },
+    {
+      "id": "SC005",
+      "name": "臣药",
+      "type": "shennong_classic",
+      "description": "辅助君药加强疗效"
+    },
+    {
+      "id": "SC006",
+      "name": "佐药",
+      "type": "shennong_classic",
+      "description": "协助君臣药治疗兼证或制约毒性"
+    },
+    {
+      "id": "SC007",
+      "name": "使药",
+      "type": "shennong_classic",
+      "description": "引经报使调和诸药"
+    },
+    {
+      "id": "SC008",
+      "name": "七情合和",
+      "type": "shennong_classic",
+      "description": "单行、相须、相使、相畏、相杀、相恶、相反"
+    },
+    {
+      "id": "SC009",
+      "name": "四气五味",
+      "type": "shennong_classic",
+      "description": "寒热温凉四气，酸苦甘辛咸五味"
+    },
+    {
+      "id": "SC010",
+      "name": "升降浮沉",
+      "type": "shennong_classic",
+      "description": "药物作用趋向"
+    },
+    {
+      "id": "SC011",
+      "name": "归经",
+      "type": "shennong_classic",
+      "description": "药物对特定脏腑经络的选择性作用"
+    },
+    {
+      "id": "SC012",
+      "name": "配伍禁忌",
+      "type": "shennong_classic",
+      "description": "十八反、十九畏、妊娠禁忌"
+    },
+    {
+      "id": "SC013",
+      "name": "伤寒论方药法",
+      "type": "shennong_classic",
+      "description": "张仲景方剂配伍规律"
+    },
+    {
+      "id": "SC014",
+      "name": "本草纲目分类",
+      "type": "shennong_classic",
+      "description": "李时珍本草分类法"
+    },
+    {
+      "id": "SC015",
+      "name": "倪师用药心法",
+      "type": "shennong_classic",
+      "description": "倪海厦临床用药经验总结"
+    }
+  ],
+  "edges": [
+    {
+      "source": "S001",
+      "target": "SY001",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S002",
+      "target": "SY001",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S003",
+      "target": "SY001",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S004",
+      "target": "SY001",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S001",
+      "target": "SY002",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S002",
+      "target": "SY002",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S003",
+      "target": "SY002",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S005",
+      "target": "SY002",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S002",
+      "target": "SY003",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S004",
+      "target": "SY003",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S017",
+      "target": "SY003",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S012",
+      "target": "SY004",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S015",
+      "target": "SY004",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S019",
+      "target": "SY004",
+      "type": "causes",
+      "weight": 0.8
+    },
+    {
+      "source": "S002",
+      "target": "SY005",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S018",
+      "target": "SY005",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S011",
+      "target": "SY005",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S012",
+      "target": "SY006",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S013",
+      "target": "SY006",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S014",
+      "target": "SY006",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S003",
+      "target": "SY007",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S014",
+      "target": "SY007",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S019",
+      "target": "SY008",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S020",
+      "target": "SY008",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S017",
+      "target": "SY008",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S017",
+      "target": "SY009",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S012",
+      "target": "SY009",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S011",
+      "target": "SY010",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S012",
+      "target": "SY010",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S020",
+      "target": "SY011",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S019",
+      "target": "SY011",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S005",
+      "target": "SY012",
+      "type": "causes",
+      "weight": 0.8
+    },
+    {
+      "source": "S021",
+      "target": "SY015",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S019",
+      "target": "SY015",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S022",
+      "target": "SY016",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S016",
+      "target": "SY016",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S017",
+      "target": "SY017",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S020",
+      "target": "SY017",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S023",
+      "target": "SY018",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S014",
+      "target": "SY018",
+      "type": "causes",
+      "weight": 0.9
+    },
+    {
+      "source": "S010",
+      "target": "SY019",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S008",
+      "target": "SY020",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "S009",
+      "target": "SY020",
+      "type": "causes",
+      "weight": 1.0
+    },
+    {
+      "source": "SY001",
+      "target": "SM001",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY002",
+      "target": "SM001",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY003",
+      "target": "SM002",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY004",
+      "target": "SM002",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY005",
+      "target": "SM003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY006",
+      "target": "SM004",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY007",
+      "target": "SM005",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY008",
+      "target": "SM005",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SY009",
+      "target": "SM006",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "F001",
+      "target": "SY001",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F002",
+      "target": "SY002",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F003",
+      "target": "SY005",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F136",
+      "target": "SY003",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F031",
+      "target": "SY004",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F165",
+      "target": "SY006",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F043",
+      "target": "SY007",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F051",
+      "target": "SY009",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F128",
+      "target": "SY010",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F124",
+      "target": "SY011",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F126",
+      "target": "SY012",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F111",
+      "target": "SY013",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F156",
+      "target": "SY014",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F154",
+      "target": "SY015",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F105",
+      "target": "SY016",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F106",
+      "target": "SY017",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F130",
+      "target": "SY018",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F076",
+      "target": "SY019",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "F118",
+      "target": "SY020",
+      "type": "treats",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "F001",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H003",
+      "target": "F001",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F001",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H005",
+      "target": "F001",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H006",
+      "target": "F001",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H002",
+      "target": "F002",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "F002",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F002",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H007",
+      "target": "F003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H008",
+      "target": "F003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H009",
+      "target": "F003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H010",
+      "target": "F003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H005",
+      "target": "F003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H006",
+      "target": "F003",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H015",
+      "target": "F136",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H016",
+      "target": "F136",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F136",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H011",
+      "target": "F043",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H012",
+      "target": "F043",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F043",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H013",
+      "target": "F031",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H014",
+      "target": "F031",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "F031",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F031",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H010",
+      "target": "F165",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H012",
+      "target": "F165",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F165",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "F165",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "M001",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "M002",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "M005",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "M008",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H002",
+      "target": "M001",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H002",
+      "target": "M007",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H003",
+      "target": "M012",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H003",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H007",
+      "target": "M012",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H007",
+      "target": "M011",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H011",
+      "target": "M005",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H011",
+      "target": "M008",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H011",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "M012",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "M005",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "M003",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "M005",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "M008",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A001",
+      "target": "M002",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A002",
+      "target": "M001",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A003",
+      "target": "M002",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A004",
+      "target": "M003",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A005",
+      "target": "M014",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A006",
+      "target": "M014",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A007",
+      "target": "M014",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A008",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A009",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A010",
+      "target": "M012",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A011",
+      "target": "M008",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A012",
+      "target": "M005",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A013",
+      "target": "M009",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A014",
+      "target": "M013",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A015",
+      "target": "M011",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A016",
+      "target": "M007",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A017",
+      "target": "M013",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A018",
+      "target": "M007",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A019",
+      "target": "M007",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "A020",
+      "target": "M014",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "F001",
+      "target": "A002",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F001",
+      "target": "A001",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F002",
+      "target": "A002",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F002",
+      "target": "A016",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F003",
+      "target": "A010",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F003",
+      "target": "A015",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F136",
+      "target": "A003",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F136",
+      "target": "A017",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F043",
+      "target": "A006",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F043",
+      "target": "A011",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F165",
+      "target": "A005",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F165",
+      "target": "A004",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F124",
+      "target": "A012",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F124",
+      "target": "A008",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F154",
+      "target": "A010",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F154",
+      "target": "A015",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F105",
+      "target": "A011",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F105",
+      "target": "A006",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "F001",
+      "target": "SY002",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F002",
+      "target": "SY001",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F136",
+      "target": "SY006",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F136",
+      "target": "SY007",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F043",
+      "target": "SY003",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F043",
+      "target": "SY008",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F130",
+      "target": "SY006",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F130",
+      "target": "SY007",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F156",
+      "target": "SY012",
+      "type": "contraindicated_with",
+      "weight": 1.0
+    },
+    {
+      "source": "F001",
+      "target": "CT001",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "F002",
+      "target": "CT001",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "F003",
+      "target": "CT001",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "F076",
+      "target": "CT002",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "F105",
+      "target": "CT002",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "F136",
+      "target": "CT001",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "F043",
+      "target": "CT001",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "NC001",
+      "target": "F001",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "NC002",
+      "target": "F002",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "NC003",
+      "target": "F003",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "NC004",
+      "target": "F136",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "NC005",
+      "target": "F043",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "NC006",
+      "target": "CT001",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "NC007",
+      "target": "F111",
+      "type": "indicates",
+      "weight": 1.0
+    },
+    {
+      "source": "H012",
+      "target": "F051",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H023",
+      "target": "F051",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "F051",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H011",
+      "target": "F051",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "F051",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H010",
+      "target": "F051",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H024",
+      "target": "F051",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H009",
+      "target": "F076",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H026",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H029",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H028",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H021",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H030",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H011",
+      "target": "F105",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H027",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H028",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H029",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H021",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H030",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H016",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H024",
+      "target": "F106",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "F111",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H001",
+      "target": "F111",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "F111",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F111",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H002",
+      "target": "F118",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H015",
+      "target": "F118",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F118",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H010",
+      "target": "F124",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "F124",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "F124",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "F124",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F124",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H005",
+      "target": "F124",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H006",
+      "target": "F124",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H010",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H018",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H003",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H027",
+      "target": "F126",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H007",
+      "target": "F128",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "F128",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H003",
+      "target": "F128",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H019",
+      "target": "F128",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H020",
+      "target": "F128",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F128",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H005",
+      "target": "F128",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H025",
+      "target": "F130",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H013",
+      "target": "F130",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H025",
+      "target": "F154",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H008",
+      "target": "F154",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H017",
+      "target": "F156",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H026",
+      "target": "F156",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H018",
+      "target": "F156",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H007",
+      "target": "F156",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H004",
+      "target": "F156",
+      "type": "belongs_to",
+      "weight": 1.0
+    },
+    {
+      "source": "H010",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H004",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H017",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H029",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H006",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H027",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H028",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H030",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H009",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H007",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H008",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H023",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H019",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H003",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H018",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H016",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H015",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H013",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H011",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H002",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H014",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H024",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H025",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "H012",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC004",
+      "target": "F001",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC004",
+      "target": "F002",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC004",
+      "target": "F003",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC004",
+      "target": "F031",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC004",
+      "target": "F136",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC005",
+      "target": "F001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC005",
+      "target": "F002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC005",
+      "target": "F003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC005",
+      "target": "F031",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC006",
+      "target": "F001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC006",
+      "target": "F003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC006",
+      "target": "F043",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC006",
+      "target": "F051",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC007",
+      "target": "F001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC007",
+      "target": "F002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC007",
+      "target": "F003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC007",
+      "target": "F128",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC008",
+      "target": "H001",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC008",
+      "target": "H002",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC008",
+      "target": "H011",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC008",
+      "target": "H013",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC009",
+      "target": "H001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC009",
+      "target": "H015",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC009",
+      "target": "H011",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC009",
+      "target": "H013",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC010",
+      "target": "H002",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC010",
+      "target": "H007",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC010",
+      "target": "H013",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC010",
+      "target": "H014",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC011",
+      "target": "M001",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC011",
+      "target": "M004",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC011",
+      "target": "M008",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC011",
+      "target": "M012",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC011",
+      "target": "H001",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC011",
+      "target": "H011",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC012",
+      "target": "CT004",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC012",
+      "target": "SC008",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC013",
+      "target": "CT001",
+      "type": "relates_to",
+      "weight": 1.0
+    },
+    {
+      "source": "SC013",
+      "target": "F001",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC013",
+      "target": "F002",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC013",
+      "target": "F003",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC013",
+      "target": "F043",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC013",
+      "target": "F136",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC014",
+      "target": "CT004",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC014",
+      "target": "SC001",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC014",
+      "target": "SC002",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC014",
+      "target": "SC003",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC015",
+      "target": "CT001",
+      "type": "relates_to",
+      "weight": 0.9
+    },
+    {
+      "source": "SC015",
+      "target": "SC013",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC015",
+      "target": "SC009",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC015",
+      "target": "SC011",
+      "type": "relates_to",
+      "weight": 0.8
+    },
+    {
+      "source": "SC015",
+      "target": "H001",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC015",
+      "target": "H011",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC015",
+      "target": "H002",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC015",
+      "target": "H013",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC001",
+      "target": "F001",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC001",
+      "target": "F105",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC001",
+      "target": "F106",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC001",
+      "target": "F124",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC001",
+      "target": "F126",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC001",
+      "target": "F128",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC003",
+      "target": "F002",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC003",
+      "target": "F031",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC003",
+      "target": "F043",
+      "type": "relates_to",
+      "weight": 0.7
+    },
+    {
+      "source": "SC003",
+      "target": "F130",
+      "type": "relates_to",
+      "weight": 0.7
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+declare module 'lunar-javascript' {
+  export class Solar {
+    static fromYmd(year: number, month: number, day: number): Solar;
+    getLunar(): Lunar;
+    getYear(): number;
+    getMonth(): number;
+    getDay(): number;
+  }
+
+  export class Lunar {
+    getYear(): number;
+    getMonth(): number;
+    getDay(): number;
+    getMonthInChinese(): string;
+    getDayInChinese(): string;
+  }
+
+  export class LunarYear {
+    static fromYear(year: number): LunarYear;
+    getLeapMonth(): number;
+  }
+}
