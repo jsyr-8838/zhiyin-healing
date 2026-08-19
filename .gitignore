@@ -60,6 +60,10 @@ public/textures/shanshui-*.jpg
 *.mp4
 *.docx
 
+# Cloudflare OpenNext build output
+.open-next/
+.dev.vars
+
 # Backup and temp files
 *.bak
 *.pre-v*
