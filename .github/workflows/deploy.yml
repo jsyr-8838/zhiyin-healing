@@ -53,9 +53,9 @@ jobs:
           B2_ENDPOINT: ${{ secrets.B2_ENDPOINT }}
 
       - name: Build OpenNext bundle
-        run: npx opennextjs-cloudflare build --skipNextBuild --noMinify
+        run: npx opennextjs-cloudflare build --skipNextBuild
         env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: "--max-old-space-size=8192"
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -69,6 +69,14 @@ jobs:
           B2_APP_KEY: ${{ secrets.B2_APP_KEY }}
           B2_BUCKET: ${{ secrets.B2_BUCKET }}
           B2_ENDPOINT: ${{ secrets.B2_ENDPOINT }}
+
+      - name: Remove unnecessary Prisma WASM engines
+        run: |
+          echo "Removing PostgreSQL and MySQL WASM engines (only SQLite is needed)..."
+          rm -f .open-next/server-functions/default/node_modules/@prisma/client/runtime/query_engine_bg.postgresql.wasm
+          rm -f .open-next/server-functions/default/node_modules/@prisma/client/runtime/query_engine_bg.mysql.wasm
+          echo "Remaining WASM files:"
+          find .open-next/server-functions/default -name "*.wasm" -exec ls -lh {} \;
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
