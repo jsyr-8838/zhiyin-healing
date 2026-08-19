@@ -11,6 +11,14 @@ jobs:
     name: Build and Deploy
     steps:
       - uses: actions/checkout@v4
+      - name: Setup swap space
+        run: |
+          sudo swapoff -a
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -23,6 +31,7 @@ jobs:
       - name: Build with OpenNext
         run: npx opennextjs-cloudflare build
         env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
