@@ -5,6 +5,9 @@ const nextConfig = {
   // Source .ts/.tsx files are NOT included in the standalone output
   output: "standalone",
 
+  // Required for Prisma + Cloudflare Workers
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
+
   // Skip type checking and ESLint during build (known type conflicts in NextAuth etc.)
   typescript: {
     ignoreBuildErrors: true,
@@ -65,3 +68,11 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+// Enable OpenNext Cloudflare dev bindings for local development
+const { initOpenNextCloudflareForDev } = require('@opennextjs/cloudflare');
+try {
+  initOpenNextCloudflareForDev();
+} catch (e) {
+  // Silently skip if @opennextjs/cloudflare is not installed (e.g. fresh checkout)
+}
