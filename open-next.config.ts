@@ -20,6 +20,10 @@ const config: OpenNextConfig = {
     "three",
     "@react-three/fiber",
     "@react-three/drei",
+    "taibu-core",
+    "lunar-javascript",
+    "lucide-react",
+    "zustand",
   ],
   middleware: {
     external: true,

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * 统一音频服务 — 全局 Zustand Store
  *

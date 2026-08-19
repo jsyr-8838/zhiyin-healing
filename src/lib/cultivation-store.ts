@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * 五行修为 Store — Zustand 持久化
  *

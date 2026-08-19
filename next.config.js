@@ -67,9 +67,12 @@ const nextConfig = {
 module.exports = nextConfig;
 
 // Enable OpenNext Cloudflare dev bindings for local development
-const { initOpenNextCloudflareForDev } = require('@opennextjs/cloudflare');
-try {
-  initOpenNextCloudflareForDev();
-} catch (e) {
-  // Silently skip if @opennextjs/cloudflare is not installed (e.g. fresh checkout)
-}
+// Use async import to support ESM
+(async () => {
+  try {
+    const { initOpenNextCloudflareForDev } = await import('@opennextjs/cloudflare');
+    initOpenNextCloudflareForDev();
+  } catch (e) {
+    // Silently skip if @opennextjs/cloudflare is not installed (e.g. fresh checkout)
+  }
+})();

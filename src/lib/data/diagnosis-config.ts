@@ -1,3 +1,5 @@
+'use client';
+
 import { ClipboardList, FlameKindling, Eye, Hand, ScanFace } from 'lucide-react';
 
 export type DiagnosisType = 'tongue' | 'face' | 'hand';
