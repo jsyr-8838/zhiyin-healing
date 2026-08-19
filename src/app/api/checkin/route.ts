@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId } from '@/lib/db';
 import { calcSleepScore, calcMoodScore, calcExerciseScore, calcDietScore, calcHealthScore, calcWuxingTendencies } from '@/lib/health-score';
 import { checkinPostSchema, checkinGetSchema, validateOrError } from '@/lib/validators';
 
@@ -24,27 +24,39 @@ export async function POST(request: NextRequest) {
     const wuxing = calcWuxingTendencies({ moodScore, sleepScore, dietScore, exerciseScore, symptoms });
 
     const today = new Date().toISOString().split('T')[0];
+    const createdAt = new Date().toISOString();
 
     // upsert: 同一天同用户只保留一条记录
-    const checkin = await prisma.checkin.upsert({
-      where: { userId_date: { userId, date: today } },
-      update: {
-        sleepHours, sleepScore, bedtime, mood, moodScore,
-        exercise, exerciseScore, diet, dietScore,
-        healthScore, symptoms, note,
-        woodTendency: wuxing.wood, fireTendency: wuxing.fire,
-        earthTendency: wuxing.earth, metalTendency: wuxing.metal,
-        waterTendency: wuxing.water,
-      },
-      create: {
-        userId, date: today, sleepHours, sleepScore, bedtime,
-        mood, moodScore, exercise, exerciseScore, diet, dietScore,
-        healthScore, symptoms, note,
-        woodTendency: wuxing.wood, fireTendency: wuxing.fire,
-        earthTendency: wuxing.earth, metalTendency: wuxing.metal,
-        waterTendency: wuxing.water,
-      },
-    });
+    const existing = await db.findOne<{ id: string }>(
+      'SELECT id FROM Checkin WHERE userId = ? AND date = ?',
+      [userId, today]
+    );
+
+    let checkin;
+    if (existing) {
+      await db.execute(
+        `UPDATE Checkin SET sleepHours = ?, sleepScore = ?, bedtime = ?, mood = ?, moodScore = ?,
+         exercise = ?, exerciseScore = ?, diet = ?, dietScore = ?, healthScore = ?, symptoms = ?, note = ?,
+         woodTendency = ?, fireTendency = ?, earthTendency = ?, metalTendency = ?, waterTendency = ?
+         WHERE userId = ? AND date = ?`,
+        [sleepHours, sleepScore, bedtime, mood, moodScore,
+         exercise, exerciseScore, diet, dietScore, healthScore, symptoms, note,
+         wuxing.wood, wuxing.fire, wuxing.earth, wuxing.metal, wuxing.water,
+         userId, today]
+      );
+      checkin = await db.findOne('SELECT * FROM Checkin WHERE userId = ? AND date = ?', [userId, today]);
+    } else {
+      await db.execute(
+        `INSERT INTO Checkin (id, userId, date, sleepHours, sleepScore, bedtime, mood, moodScore,
+         exercise, exerciseScore, diet, dietScore, healthScore, symptoms, note,
+         woodTendency, fireTendency, earthTendency, metalTendency, waterTendency, healingDone, createdAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [generateId(), userId, today, sleepHours, sleepScore, bedtime, mood, moodScore,
+         exercise, exerciseScore, diet, dietScore, healthScore, symptoms, note,
+         wuxing.wood, wuxing.fire, wuxing.earth, wuxing.metal, wuxing.water, '{}', createdAt]
+      );
+      checkin = await db.findOne('SELECT * FROM Checkin WHERE userId = ? AND date = ?', [userId, today]);
+    }
 
     return NextResponse.json({ checkin, scores: { sleepScore, moodScore, exerciseScore, dietScore, healthScore }, wuxing });
   } catch (error) {
@@ -70,17 +82,16 @@ export async function GET(request: NextRequest) {
     since.setDate(since.getDate() - days);
     const sinceStr = since.toISOString().split('T')[0];
 
-    const checkins = await prisma.checkin.findMany({
-      where: { userId, date: { gte: sinceStr } },
-      orderBy: { date: 'desc' },
-    });
+    const checkins = await db.findAll(
+      'SELECT * FROM Checkin WHERE userId = ? AND date >= ? ORDER BY date DESC',
+      [userId, sinceStr]
+    );
 
     // 连续打卡天数（高效算法）
-    const allDates = await prisma.checkin.findMany({
-      where: { userId },
-      select: { date: true },
-      orderBy: { date: 'desc' },
-    });
+    const allDates = await db.findAll<{ date: string }>(
+      'SELECT date FROM Checkin WHERE userId = ? ORDER BY date DESC',
+      [userId]
+    );
     const dateSet = new Set(allDates.map(c => c.date));
     let streak = 0;
     for (let i = 0; i <= days + 1; i++) {
@@ -97,13 +108,14 @@ export async function GET(request: NextRequest) {
     }
 
     const avgHealthScore = checkins.length > 0
-      ? Math.round(checkins.reduce((sum, c) => sum + c.healthScore, 0) / checkins.length)
+      ? Math.round(checkins.reduce((sum, c) => sum + (c.healthScore as number), 0) / checkins.length)
       : 0;
 
     const today = new Date().toISOString().split('T')[0];
-    const todayCheckin = await prisma.checkin.findUnique({
-      where: { userId_date: { userId, date: today } },
-    });
+    const todayCheckin = await db.findOne(
+      'SELECT * FROM Checkin WHERE userId = ? AND date = ?',
+      [userId, today]
+    );
 
     return NextResponse.json({
       checkins, streak, avgHealthScore, todayCheckin,

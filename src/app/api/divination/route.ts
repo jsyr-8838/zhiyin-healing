@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DIVINATION_SYSTEM_PROMPT } from '@/lib/divination-data';
 import { loadPromptWithFallback, PROMPT_IDS } from '@/lib/evo/prompt-loader';
 import { divine, DIVINATION_METHODS_V2, type DivinationMethod, type DivineResult } from '@/lib/taibu-adapter';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { divinationPostSchema, divinationGetSchema, divinationFeedbackSchema, validateOrError } from '@/lib/validators';
 
 // 术数方法名映射
@@ -71,15 +71,14 @@ export async function POST(request: NextRequest) {
 
     // 历史知几记录（自适应学习）
     try {
-      const recentRecords = await prisma.divinationRecord.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      });
+      const recentRecords = await db.findAll(
+        'SELECT * FROM DivinationRecord WHERE userId = ? ORDER BY createdAt DESC LIMIT 5',
+        [userId]
+      );
       if (recentRecords.length > 0) {
         contextInfo += `【近期知几历史】\n`;
-        recentRecords.forEach((r, i) => {
-          contextInfo += `- ${r.date} ${r.methodLabel}：问"${r.question.slice(0, 30)}"→${r.hexagram || '未排盘'}${r.feedback === 1 ? '（反馈：准）' : r.feedback === -1 ? '（反馈：不准）' : ''}\n`;
+        recentRecords.forEach((r: Record<string, unknown>, i: number) => {
+          contextInfo += `- ${r.date} ${r.methodLabel}：问"${(r.question as string).slice(0, 30)}"→${r.hexagram || '未排盘'}${r.feedback === 1 ? '（反馈：准）' : r.feedback === -1 ? '（反馈：不准）' : ''}\n`;
         });
         contextInfo += `\n请参考近期知几记录的连续性，给出更有针对性的解读。如近期多次问同类型问题，说明用户对此事特别关注，应给出更明确的指引。\n`;
       }
@@ -164,23 +163,21 @@ ${contextInfo ? contextInfo : ''}
     }
 
     // 5. 存入数据库
-    let savedRecord;
+    let savedRecordId: string | undefined;
     try {
-      savedRecord = await prisma.divinationRecord.create({
-        data: {
-          userId,
-          method,
-          methodLabel: METHOD_LABELS[method],
-          question,
-          inputType: method === 'bazi' ? 'time' : method === 'meihua' ? 'number' : 'text',
-          inputParams: JSON.stringify(inputParams),
-          hexagram: divinationResult.hexagramName,
-          result: aiContent,
-          summary: aiContent.split('\n').find((l) => l.includes('吉凶提示') || l.includes('总结'))?.slice(0, 100) || '',
-          constitution: profile?.dominant || '',
-          date: new Date().toISOString().split('T')[0],
-        },
-      });
+      const id = generateId();
+      const ts = now();
+      await db.execute(
+        `INSERT INTO DivinationRecord (id, userId, method, methodLabel, question, inputType, inputParams, hexagram, result, summary, feedback, constitution, date, createdAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`,
+        [id, userId, method, METHOD_LABELS[method], question,
+         method === 'bazi' ? 'time' : method === 'meihua' ? 'number' : 'text',
+         JSON.stringify(inputParams), divinationResult.hexagramName, aiContent,
+         aiContent.split('\n').find((l) => l.includes('吉凶提示') || l.includes('总结'))?.slice(0, 100) || '',
+         profile?.dominant || '',
+         new Date().toISOString().split('T')[0], ts]
+      );
+      savedRecordId = id;
     } catch {
       // 数据库不可用跳过保存
     }
@@ -191,7 +188,7 @@ ${contextInfo ? contextInfo : ''}
       hexagramData: divinationResult.hexagramData,
       movingLine: divinationResult.movingLine,
       extraInfo: divinationResult.extraInfo,
-      recordId: savedRecord?.id,
+      recordId: savedRecordId,
     });
   } catch (error) {
     console.error('Divination API error:', error);
@@ -215,27 +212,30 @@ export async function GET(request: NextRequest) {
 
     const { userId, method, limit } = validation.data;
 
-    const where: { userId: string; method?: string } = { userId };
-    if (method) where.method = method;
-
-    const records = await prisma.divinationRecord.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-    });
+    let records;
+    if (method) {
+      records = await db.findAll(
+        'SELECT * FROM DivinationRecord WHERE userId = ? AND method = ? ORDER BY createdAt DESC LIMIT ?',
+        [userId, method, limit]
+      );
+    } else {
+      records = await db.findAll(
+        'SELECT * FROM DivinationRecord WHERE userId = ? ORDER BY createdAt DESC LIMIT ?',
+        [userId, limit]
+      );
+    }
 
     // 统计
-    const stats = await prisma.divinationRecord.aggregate({
-      where: { userId },
-      _count: true,
-      _avg: { feedback: true },
-    });
+    const statsResult = await db.findOne<{ count: number; avgFeedback: number }>(
+      'SELECT COUNT(*) as count, AVG(feedback) as avgFeedback FROM DivinationRecord WHERE userId = ?',
+      [userId]
+    );
 
     return NextResponse.json({
       records,
       stats: {
-        total: stats._count,
-        avgFeedback: stats._avg.feedback || 0,
+        total: statsResult?.count ?? 0,
+        avgFeedback: statsResult?.avgFeedback ?? 0,
       },
     });
   } catch (error) {
@@ -255,18 +255,19 @@ export async function PATCH(request: NextRequest) {
 
     const { id, userId, feedback } = validation.data;
 
-    const record = await prisma.divinationRecord.findFirst({
-      where: { id, userId },
-    });
+    const record = await db.findOne(
+      'SELECT id FROM DivinationRecord WHERE id = ? AND userId = ?',
+      [id, userId]
+    );
 
     if (!record) {
       return NextResponse.json({ error: '记录不存在' }, { status: 404 });
     }
 
-    await prisma.divinationRecord.update({
-      where: { id },
-      data: { feedback },
-    });
+    await db.execute(
+      'UPDATE DivinationRecord SET feedback = ? WHERE id = ?',
+      [feedback, id]
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

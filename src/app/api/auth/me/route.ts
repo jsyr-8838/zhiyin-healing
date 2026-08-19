@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 /**
  * GET /api/auth/me — 获取当前用户信息
@@ -16,23 +16,23 @@ export async function GET() {
       return NextResponse.json({ authenticated: false });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        nickname: true,
-        name: true,
-        avatar: true,
-        phone: true,
-        phoneVerified: true,
-        gender: true,
-        age: true,
-        role: true,
-        vipLevel: true,
-        createdAt: true,
-        lastLoginAt: true,
-      },
-    });
+    const user = await db.findOne<{
+      id: string;
+      nickname: string;
+      name: string | null;
+      avatar: string;
+      phone: string | null;
+      phoneVerified: number;
+      gender: string | null;
+      age: number | null;
+      role: string;
+      vipLevel: string;
+      createdAt: string;
+      lastLoginAt: string | null;
+    }>(
+      `SELECT id, nickname, name, avatar, phone, phoneVerified, gender, age, role, vipLevel, createdAt, lastLoginAt FROM User WHERE id = ?`,
+      [userId]
+    );
 
     if (!user) {
       return NextResponse.json({ authenticated: false });
@@ -41,6 +41,7 @@ export async function GET() {
     return NextResponse.json({
       authenticated: true,
       ...user,
+      phoneVerified: !!user.phoneVerified,
       isRegistered: user.role === 'registered' || user.role === 'admin',
     });
   } catch (err) {

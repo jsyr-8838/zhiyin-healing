@@ -5,7 +5,7 @@
  * DELETE /api/experts/[id] - 删除专家
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET(
   _request: NextRequest,
@@ -13,7 +13,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const expert = await prisma.expert.findUnique({ where: { id } });
+    const expert = await db.findOne<{ id: string; tags: string; services: string; [k: string]: unknown }>(
+      'SELECT * FROM Expert WHERE id = ?',
+      [id]
+    );
 
     if (!expert) {
       return NextResponse.json({ error: '专家不存在' }, { status: 404 });
@@ -24,6 +27,7 @@ export async function GET(
         ...expert,
         tags: JSON.parse(expert.tags || '[]'),
         services: JSON.parse(expert.services || '[]'),
+        isActive: !!expert.isActive,
       },
     });
   } catch (error) {
@@ -40,24 +44,54 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    const data: Record<string, unknown> = {};
-    const scalarFields = ['name', 'title', 'subtitle', 'specialty', 'avatar', 'element', 'bio', 'wechatId', 'phone', 'sortOrder', 'isActive'] as const;
+    const fields: string[] = [];
+    const values: unknown[] = [];
+    const scalarFields = ['name', 'title', 'subtitle', 'specialty', 'avatar', 'element', 'bio', 'wechatId', 'phone', 'sortOrder'];
     for (const f of scalarFields) {
-      if (body[f] !== undefined) data[f] = body[f];
+      if (body[f] !== undefined) {
+        fields.push(`${f} = ?`);
+        values.push(body[f]);
+      }
     }
-    if (body.tags !== undefined) data.tags = JSON.stringify(body.tags);
-    if (body.services !== undefined) data.services = JSON.stringify(body.services);
+    if (body.isActive !== undefined) {
+      fields.push('isActive = ?');
+      values.push(body.isActive ? 1 : 0);
+    }
+    if (body.tags !== undefined) {
+      fields.push('tags = ?');
+      values.push(JSON.stringify(body.tags));
+    }
+    if (body.services !== undefined) {
+      fields.push('services = ?');
+      values.push(JSON.stringify(body.services));
+    }
 
-    const expert = await prisma.expert.update({
-      where: { id },
-      data,
-    });
+    if (fields.length > 0) {
+      const ts = new Date().toISOString();
+      fields.push('updatedAt = ?');
+      values.push(ts);
+      values.push(id);
+      await db.execute(
+        `UPDATE Expert SET ${fields.join(', ')} WHERE id = ?`,
+        values
+      );
+    }
+
+    const expert = await db.findOne<{ tags: string; services: string; isActive: number; [k: string]: unknown }>(
+      'SELECT * FROM Expert WHERE id = ?',
+      [id]
+    );
+
+    if (!expert) {
+      return NextResponse.json({ error: '专家不存在' }, { status: 404 });
+    }
 
     return NextResponse.json({
       expert: {
         ...expert,
         tags: JSON.parse(expert.tags || '[]'),
         services: JSON.parse(expert.services || '[]'),
+        isActive: !!expert.isActive,
       },
     });
   } catch (error) {
@@ -72,7 +106,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.expert.delete({ where: { id } });
+    await db.execute('DELETE FROM Expert WHERE id = ?', [id]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[experts/id] DELETE error:', error);

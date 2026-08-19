@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { calculateRank } from '@/lib/rank-system';
 import type { XiuWeiValues } from '@/lib/cultivation-engine';
 
@@ -13,53 +13,69 @@ export async function GET(request: NextRequest) {
     }
 
     // 获取或创建修为记录
-    let cultivation = await prisma.cultivation.findUnique({ where: { userId } });
+    let cultivation = await db.findOne<{
+      id: string; userId: string; woodXiuWei: number; fireXiuWei: number;
+      earthXiuWei: number; metalXiuWei: number; waterXiuWei: number;
+      rank: number; rankTitle: string; totalPractices: number; totalMinutes: number;
+      streakDays: number; lastPracticeAt: string | null; createdAt: string; updatedAt: string;
+    }>('SELECT * FROM Cultivation WHERE userId = ?', [userId]);
+
     if (!cultivation) {
-      cultivation = await prisma.cultivation.create({
-        data: { userId },
-      });
+      const id = generateId();
+      const ts = now();
+      await db.execute(
+        `INSERT INTO Cultivation (id, userId, woodXiuWei, fireXiuWei, earthXiuWei, metalXiuWei, waterXiuWei, rank, rankTitle, totalPractices, totalMinutes, streakDays, lastPracticeAt, createdAt, updatedAt)
+         VALUES (?, ?, 0, 0, 0, 0, 0, 0, '闻道者', 0, 0, 0, NULL, ?, ?)`,
+        [id, userId, ts, ts]
+      );
+      cultivation = await db.findOne<typeof cultivation>('SELECT * FROM Cultivation WHERE userId = ?', [userId]);
     }
 
     // 获取近期功法记录（7天内）
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentLogs = await prisma.practiceLog.findMany({
-      where: { userId, createdAt: { gte: sevenDaysAgo } },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
-    });
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString();
+    const recentLogs = await db.findAll(
+      'SELECT * FROM PracticeLog WHERE userId = ? AND createdAt >= ? ORDER BY createdAt DESC LIMIT 50',
+      [userId, sevenDaysAgoStr]
+    );
 
     // 获取经络进度
-    const meridianProgs = await prisma.meridianProgress.findMany({
-      where: { userId },
-    });
+    const meridianProgs = await db.findAll<{ isCompleted: number }>(
+      'SELECT * FROM MeridianProgress WHERE userId = ?',
+      [userId]
+    );
 
     // 统计诊断记录数
-    const diagnosisCount = await prisma.assessment.count({ where: { userId } });
+    const countResult = await db.findOne<{ count: number }>(
+      'SELECT COUNT(*) as count FROM Assessment WHERE userId = ?',
+      [userId]
+    );
+    const diagnosisCount = countResult?.count ?? 0;
 
     // 计算段位
     const xiuwei: XiuWeiValues = {
-      wood: cultivation.woodXiuWei,
-      fire: cultivation.fireXiuWei,
-      earth: cultivation.earthXiuWei,
-      metal: cultivation.metalXiuWei,
-      water: cultivation.waterXiuWei,
+      wood: cultivation!.woodXiuWei,
+      fire: cultivation!.fireXiuWei,
+      earth: cultivation!.earthXiuWei,
+      metal: cultivation!.metalXiuWei,
+      water: cultivation!.waterXiuWei,
     };
     const rankResult = calculateRank(xiuwei, {
-      totalPractices: cultivation.totalPractices,
-      streakDays: cultivation.streakDays,
+      totalPractices: cultivation!.totalPractices,
+      streakDays: cultivation!.streakDays,
       completedMeridians: meridianProgs.filter(m => m.isCompleted).length,
       diagnosisCount,
     });
 
     // 今日完成统计
     const today = new Date().toISOString().slice(0, 10);
-    const todayLogs = recentLogs.filter(l => l.date === today);
-    const todayCompleted = [...new Set(todayLogs.map(l => l.category))];
+    const todayLogs = recentLogs.filter((l: Record<string, unknown>) => l.date === today);
+    const todayCompleted = [...new Set(todayLogs.map((l: Record<string, unknown>) => l.category))];
 
     // 连续天数计算
-    const lastPracticeDate = cultivation.lastPracticeAt;
-    let streakDays = cultivation.streakDays;
+    const lastPracticeDate = cultivation!.lastPracticeAt;
+    let streakDays = cultivation!.streakDays;
     if (lastPracticeDate) {
       const lastDate = new Date(lastPracticeDate).toISOString().slice(0, 10);
       const yesterday = new Date();
@@ -104,11 +120,17 @@ export async function PUT(request: NextRequest) {
     };
 
     // 统计诊断记录数
-    const diagnosisCount = await prisma.assessment.count({ where: { userId } });
+    const countResult = await db.findOne<{ count: number }>(
+      'SELECT COUNT(*) as count FROM Assessment WHERE userId = ?',
+      [userId]
+    );
+    const diagnosisCount = countResult?.count ?? 0;
 
     // 自动计算段位
-    const cultivation = await prisma.cultivation.findUnique({ where: { userId } });
-    const totalPractices = cultivation?.totalPractices ?? 0;
+    const existing = await db.findOne<{ totalPractices: number }>(
+      'SELECT totalPractices FROM Cultivation WHERE userId = ?', [userId]
+    );
+    const totalPractices = existing?.totalPractices ?? 0;
     const rankResult = calculateRank(xiuwei, {
       totalPractices,
       streakDays: streakDays ?? 0,
@@ -116,31 +138,29 @@ export async function PUT(request: NextRequest) {
       diagnosisCount,
     });
 
-    const updated = await prisma.cultivation.upsert({
-      where: { userId },
-      update: {
-        woodXiuWei: xiuwei.wood,
-        fireXiuWei: xiuwei.fire,
-        earthXiuWei: xiuwei.earth,
-        metalXiuWei: xiuwei.metal,
-        waterXiuWei: xiuwei.water,
-        rank: rankResult.index,
-        rankTitle: rankResult.title,
-        streakDays: streakDays ?? 0,
-        updatedAt: new Date(),
-      },
-      create: {
-        userId,
-        woodXiuWei: xiuwei.wood,
-        fireXiuWei: xiuwei.fire,
-        earthXiuWei: xiuwei.earth,
-        metalXiuWei: xiuwei.metal,
-        waterXiuWei: xiuwei.water,
-        rank: rankResult.index,
-        rankTitle: rankResult.title,
-        streakDays: streakDays ?? 0,
-      },
-    });
+    const ts = now();
+    const existingRow = await db.findOne<{ id: string }>('SELECT id FROM Cultivation WHERE userId = ?', [userId]);
+
+    let updated;
+    if (existingRow) {
+      await db.execute(
+        `UPDATE Cultivation SET woodXiuWei = ?, fireXiuWei = ?, earthXiuWei = ?, metalXiuWei = ?, waterXiuWei = ?,
+         rank = ?, rankTitle = ?, streakDays = ?, updatedAt = ? WHERE userId = ?`,
+        [xiuwei.wood, xiuwei.fire, xiuwei.earth, xiuwei.metal, xiuwei.water,
+         rankResult.index, rankResult.title, streakDays ?? 0, ts, userId]
+      );
+      updated = await db.findOne('SELECT * FROM Cultivation WHERE userId = ?', [userId]);
+    } else {
+      const id = generateId();
+      await db.execute(
+        `INSERT INTO Cultivation (id, userId, woodXiuWei, fireXiuWei, earthXiuWei, metalXiuWei, waterXiuWei,
+         rank, rankTitle, totalPractices, totalMinutes, streakDays, lastPracticeAt, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, NULL, ?, ?)`,
+        [id, userId, xiuwei.wood, xiuwei.fire, xiuwei.earth, xiuwei.metal, xiuwei.water,
+         rankResult.index, rankResult.title, streakDays ?? 0, ts, ts]
+      );
+      updated = await db.findOne('SELECT * FROM Cultivation WHERE userId = ?', [userId]);
+    }
 
     return NextResponse.json({ cultivation: updated, rank: rankResult });
   } catch (error) {

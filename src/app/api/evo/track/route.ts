@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { z } from 'zod';
 
 // 行为埋点上报 schema
@@ -22,16 +22,17 @@ export async function POST(request: NextRequest) {
     const event = trackEventSchema.parse(body);
 
     // 存储为进化日志（感知层数据入口）
-    await prisma.evoLog.create({
-      data: {
-        triggerType: event.eventType === 'error' ? 'error_detected'
+    const id = generateId();
+    const ts = now();
+    await db.execute(
+      `INSERT INTO EvoLog (id, triggerType, triggerDetail, actionType, actionDetail, targetModule, status, strategy, beforeMetric, afterMetric, improvement, startedAt, completedAt, durationMs)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        id,
+        event.eventType === 'error' ? 'error_detected'
           : event.eventType === 'feedback' ? 'feedback_threshold'
           : 'manual',
-        actionType: `${event.module}:${event.action}`,
-        actionDetail: JSON.stringify(event.detail || {}),
-        targetModule: event.module,
-        strategy: '', // 埋点不直接分配策略，由分析层后续决定
-        triggerDetail: JSON.stringify({
+        JSON.stringify({
           userId: event.userId,
           sessionId: event.sessionId,
           duration: event.duration,
@@ -39,9 +40,19 @@ export async function POST(request: NextRequest) {
           errorFingerprint: event.errorFingerprint,
           timestamp: Date.now(),
         }),
-        status: 'success',
-      },
-    });
+        `${event.module}:${event.action}`,
+        JSON.stringify(event.detail || {}),
+        event.module,
+        'success',
+        '', // 埋点不直接分配策略，由分析层后续决定
+        0,
+        0,
+        0,
+        ts,
+        ts,
+        0,
+      ]
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

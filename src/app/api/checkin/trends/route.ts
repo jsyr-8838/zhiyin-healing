@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import { userIdSchema } from '@/lib/validators';
 
 // GET /api/checkin/trends?userId=xxx&metric=healthScore&days=30
@@ -22,15 +22,14 @@ export async function GET(request: NextRequest) {
     since.setDate(since.getDate() - validDays);
     const sinceStr = since.toISOString().split('T')[0];
 
-    const checkins = await prisma.checkin.findMany({
-      where: { userId, date: { gte: sinceStr } },
-      select: { date: true, [validMetric]: true },
-      orderBy: { date: 'asc' },
-    });
+    const checkins = await db.findAll<{ date: string; [k: string]: unknown }>(
+      `SELECT date, ${validMetric} FROM Checkin WHERE userId = ? AND date >= ? ORDER BY date ASC`,
+      [userId, sinceStr]
+    );
 
     const data = checkins.map(c => ({
       date: c.date,
-      value: (c as Record<string, unknown>)[validMetric] as number,
+      value: c[validMetric] as number,
     }));
 
     const average = data.length > 0

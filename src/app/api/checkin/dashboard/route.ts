@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import { userIdSchema } from '@/lib/validators';
 import { calcStreakDays, analyzeWeeklyTendency, healthScoreToLevel } from '@/lib/health-score';
 
@@ -17,17 +17,16 @@ export async function GET(request: NextRequest) {
     since30.setDate(since30.getDate() - 30);
     const since30Str = since30.toISOString().split('T')[0];
 
-    const recentCheckins = await prisma.checkin.findMany({
-      where: { userId, date: { gte: since30Str } },
-      orderBy: { date: 'desc' },
-    });
+    const recentCheckins = await db.findAll(
+      'SELECT * FROM Checkin WHERE userId = ? AND date >= ? ORDER BY date DESC',
+      [userId, since30Str]
+    );
 
     // 2. 所有打卡日期（for streak 计算）
-    const allDates = await prisma.checkin.findMany({
-      where: { userId },
-      select: { date: true },
-      orderBy: { date: 'desc' },
-    });
+    const allDates = await db.findAll<{ date: string }>(
+      'SELECT date FROM Checkin WHERE userId = ? ORDER BY date DESC',
+      [userId]
+    );
     const dateStrings = allDates.map(c => c.date);
 
     // 3. Streak 计算
@@ -57,35 +56,35 @@ export async function GET(request: NextRequest) {
     const thisMonthDays = dateStrings.filter(d => d >= monthStartStr).length;
 
     // 5. 月度统计
-    const monthCheckins = recentCheckins.filter(c => c.date >= monthStartStr);
+    const monthCheckins = recentCheckins.filter((c: Record<string, unknown>) => (c.date as string) >= monthStartStr);
     const avgHealthScore = monthCheckins.length > 0
-      ? Math.round(monthCheckins.reduce((s, c) => s + c.healthScore, 0) / monthCheckins.length) : 0;
+      ? Math.round(monthCheckins.reduce((s, c) => s + (c.healthScore as number), 0) / monthCheckins.length) : 0;
     const avgSleepScore = monthCheckins.length > 0
-      ? Math.round(monthCheckins.reduce((s, c) => s + c.sleepScore, 0) / monthCheckins.length) : 0;
+      ? Math.round(monthCheckins.reduce((s, c) => s + (c.sleepScore as number), 0) / monthCheckins.length) : 0;
     const avgMoodScore = monthCheckins.length > 0
-      ? Math.round(monthCheckins.reduce((s, c) => s + c.moodScore, 0) / monthCheckins.length) : 0;
+      ? Math.round(monthCheckins.reduce((s, c) => s + (c.moodScore as number), 0) / monthCheckins.length) : 0;
     const avgExerciseScore = monthCheckins.length > 0
-      ? Math.round(monthCheckins.reduce((s, c) => s + c.exerciseScore, 0) / monthCheckins.length) : 0;
+      ? Math.round(monthCheckins.reduce((s, c) => s + (c.exerciseScore as number), 0) / monthCheckins.length) : 0;
     const avgDietScore = monthCheckins.length > 0
-      ? Math.round(monthCheckins.reduce((s, c) => s + c.dietScore, 0) / monthCheckins.length) : 0;
+      ? Math.round(monthCheckins.reduce((s, c) => s + (c.dietScore as number), 0) / monthCheckins.length) : 0;
 
     // 6. 五行偏颇趋势（近7天）
     const since7 = new Date();
     since7.setDate(since7.getDate() - 7);
     const since7Str = since7.toISOString().split('T')[0];
-    const recent7 = recentCheckins.filter(c => c.date >= since7Str);
-    const weeklyTendencies = analyzeWeeklyTendency(recent7.map(c => ({
-      moodScore: c.moodScore, sleepScore: c.sleepScore,
-      dietScore: c.dietScore, exerciseScore: c.exerciseScore,
-      symptoms: c.symptoms,
+    const recent7 = recentCheckins.filter((c: Record<string, unknown>) => (c.date as string) >= since7Str);
+    const weeklyTendencies = analyzeWeeklyTendency(recent7.map((c: Record<string, unknown>) => ({
+      moodScore: c.moodScore as number, sleepScore: c.sleepScore as number,
+      dietScore: c.dietScore as number, exerciseScore: c.exerciseScore as number,
+      symptoms: c.symptoms as string,
     })));
     // 聚合偏颇
     const wuxingAvg = recent7.length > 0 ? {
-      wood: Math.round(recent7.reduce((s, c) => s + c.woodTendency, 0) / recent7.length * 100) / 100,
-      fire: Math.round(recent7.reduce((s, c) => s + c.fireTendency, 0) / recent7.length * 100) / 100,
-      earth: Math.round(recent7.reduce((s, c) => s + c.earthTendency, 0) / recent7.length * 100) / 100,
-      metal: Math.round(recent7.reduce((s, c) => s + c.metalTendency, 0) / recent7.length * 100) / 100,
-      water: Math.round(recent7.reduce((s, c) => s + c.waterTendency, 0) / recent7.length * 100) / 100,
+      wood: Math.round(recent7.reduce((s, c) => s + (c.woodTendency as number), 0) / recent7.length * 100) / 100,
+      fire: Math.round(recent7.reduce((s, c) => s + (c.fireTendency as number), 0) / recent7.length * 100) / 100,
+      earth: Math.round(recent7.reduce((s, c) => s + (c.earthTendency as number), 0) / recent7.length * 100) / 100,
+      metal: Math.round(recent7.reduce((s, c) => s + (c.metalTendency as number), 0) / recent7.length * 100) / 100,
+      water: Math.round(recent7.reduce((s, c) => s + (c.waterTendency as number), 0) / recent7.length * 100) / 100,
     } : { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
 
     // 7. 推荐引擎
@@ -145,19 +144,20 @@ export async function GET(request: NextRequest) {
       .map(t => ({ ...RECOMMENDATIONS[t.element], pattern: t.pattern, score: t.score }));
 
     // 8. 健康计划
-    const healthPlan = await prisma.healthPlan.findFirst({
-      where: { userId, isActive: true },
-    });
+    const healthPlan = await db.findOne<{ isActive: number; startDate: string; endDate: string; completionRate: number }>(
+      'SELECT isActive, startDate, endDate, completionRate FROM HealthPlan WHERE userId = ? AND isActive = 1 ORDER BY createdAt DESC LIMIT 1',
+      [userId]
+    );
 
     // 9. 最近打卡转换为 summary
-    const recentSummary = recentCheckins.map(c => ({
+    const recentSummary = recentCheckins.map((c: Record<string, unknown>) => ({
       date: c.date,
       healthScore: c.healthScore,
       sleepScore: c.sleepScore,
       moodScore: c.moodScore,
       exerciseScore: c.exerciseScore,
       dietScore: c.dietScore,
-      level: healthScoreToLevel(c.healthScore),
+      level: healthScoreToLevel(c.healthScore as number),
       woodTendency: c.woodTendency,
       fireTendency: c.fireTendency,
       earthTendency: c.earthTendency,
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
       weeklyTendencies,
       recommendations,
       healthPlan: healthPlan ? {
-        active: healthPlan.isActive,
+        active: !!healthPlan.isActive,
         startDate: healthPlan.startDate,
         endDate: healthPlan.endDate,
         completionRate: healthPlan.completionRate,

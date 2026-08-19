@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DIAGNOSIS_SYSTEM_PROMPT } from '@/lib/tcm-data';
 import { MASTER_NI_PROMPT, getCurrentSolarTermHealth, FOOD_THERAPY_PROMPT } from '@/lib/solar-terms-health';
 import { loadPromptWithFallback, PROMPT_IDS } from '@/lib/evo/prompt-loader';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import { getHealthLevel, getHealthAdvice } from '@/lib/health-score';
 import { diagnosisPostSchema, validateOrError } from '@/lib/validators';
 import { getPrescriptionsForConstitution, CONSTITUTION_PRESCRIPTIONS, searchPrescriptions, type ConstitutionKey } from '@/lib/jiuliao-data';
@@ -91,36 +91,34 @@ export async function POST(request: NextRequest) {
     // 2. 打卡数据（如果提供了userId）
     if (userId) {
       try {
-        const today = new Date().toISOString().split('T')[0];
         const since = new Date();
         since.setDate(since.getDate() - 7);
         const sinceStr = since.toISOString().split('T')[0];
 
-        const recentCheckins = await prisma.checkin.findMany({
-          where: { userId, date: { gte: sinceStr } },
-          orderBy: { date: 'desc' },
-          take: 7,
-        });
+        const recentCheckins = await db.findAll(
+          'SELECT * FROM Checkin WHERE userId = ? AND date >= ? ORDER BY date DESC LIMIT 7',
+          [userId, sinceStr]
+        );
 
         if (recentCheckins.length > 0) {
           healthContext += `【最近7天健康打卡数据】\n`;
-          recentCheckins.forEach((c) => {
-            const level = getHealthLevel(c.healthScore);
+          recentCheckins.forEach((c: Record<string, unknown>) => {
+            const level = getHealthLevel(c.healthScore as number);
             healthContext += `- ${c.date}: 综合${c.healthScore}分(${level.label})，睡眠${c.sleepScore}(${c.sleepHours}h)·情绪${c.moodScore}·运动${c.exerciseScore}·饮食${c.dietScore}`;
             if (c.symptoms) healthContext += `，症状：${c.symptoms}`;
             healthContext += '\n';
           });
 
-          const latest = recentCheckins[0];
+          const latest = recentCheckins[0] as Record<string, number>;
           const advice = getHealthAdvice(latest.sleepScore, latest.moodScore, latest.exerciseScore, latest.dietScore);
           healthContext += `【系统建议】${advice.join('；')}\n`;
         }
 
         // 3. 体质测评数据
-        const latestAssessment = await prisma.assessment.findFirst({
-          where: { userId },
-          orderBy: { date: 'desc' },
-        });
+        const latestAssessment = await db.findOne<{ primaryType: string; dominantWuyin: string }>(
+          'SELECT primaryType, dominantWuyin FROM Assessment WHERE userId = ? ORDER BY date DESC LIMIT 1',
+          [userId]
+        );
         if (latestAssessment) {
           healthContext += `【最新体质测评】主导体质：${latestAssessment.primaryType}，主导五音：${latestAssessment.dominantWuyin}\n`;
         }

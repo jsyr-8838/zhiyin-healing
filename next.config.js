@@ -5,9 +5,6 @@ const nextConfig = {
   // Source .ts/.tsx files are NOT included in the standalone output
   output: "standalone",
 
-  // Required for Prisma + Cloudflare Workers
-  serverExternalPackages: ["@prisma/client", ".prisma/client"],
-
   // Skip type checking and ESLint during build (known type conflicts in NextAuth etc.)
   typescript: {
     ignoreBuildErrors: true,

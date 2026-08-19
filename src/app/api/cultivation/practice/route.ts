@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { calcXiuWeiGain, type XiuWeiSource, liuzijueIdToElement } from '@/lib/cultivation-engine';
+import { db, generateId, now } from '@/lib/db';
+import { calcXiuWeiGain, type XiuWeiSource } from '@/lib/cultivation-engine';
 import { calculateRank } from '@/lib/rank-system';
 import type { XiuWeiValues } from '@/lib/cultivation-engine';
 
@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const today = new Date().toISOString().slice(0, 10);
+    const ts = now();
 
     // 计算修为获得
     const source: XiuWeiSource = {
@@ -26,30 +27,39 @@ export async function POST(request: NextRequest) {
     const gain = calcXiuWeiGain(source);
 
     // 写入功法记录
-    const log = await prisma.practiceLog.create({
-      data: {
-        userId,
-        date: today,
-        category,
-        subCategory: subCategory || '',
-        element,
-        durationSec: durationSec || 0,
-        cycles: cycles || 0,
-        xiuWeiGain: gain,
-        metadata: metadata ? JSON.stringify(metadata) : '{}',
-      },
-    });
+    const logId = generateId();
+    await db.execute(
+      `INSERT INTO PracticeLog (id, userId, date, category, subCategory, element, durationSec, cycles, xiuWeiGain, metadata, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [logId, userId, today, category, subCategory || '', element,
+       durationSec || 0, cycles || 0, gain,
+       metadata ? JSON.stringify(metadata) : '{}', ts]
+    );
 
     // 更新修为值
-    const cultivation = await prisma.cultivation.findUnique({ where: { userId } });
-    const prev = cultivation || await prisma.cultivation.create({ data: { userId } });
+    let prev = await db.findOne<{
+      id: string; woodXiuWei: number; fireXiuWei: number; earthXiuWei: number;
+      metalXiuWei: number; waterXiuWei: number; totalPractices: number;
+      totalMinutes: number; streakDays: number; lastPracticeAt: string | null;
+    }>('SELECT * FROM Cultivation WHERE userId = ?', [userId]);
+
+    if (!prev) {
+      const cultId = generateId();
+      const tsNow = now();
+      await db.execute(
+        `INSERT INTO Cultivation (id, userId, woodXiuWei, fireXiuWei, earthXiuWei, metalXiuWei, waterXiuWei, rank, rankTitle, totalPractices, totalMinutes, streakDays, lastPracticeAt, createdAt, updatedAt)
+         VALUES (?, ?, 0, 0, 0, 0, 0, 0, '闻道者', 0, 0, 0, NULL, ?, ?)`,
+        [cultId, userId, tsNow, tsNow]
+      );
+      prev = await db.findOne<typeof prev>('SELECT * FROM Cultivation WHERE userId = ?', [userId]);
+    }
 
     const xiuwei: XiuWeiValues = {
-      wood: prev.woodXiuWei,
-      fire: prev.fireXiuWei,
-      earth: prev.earthXiuWei,
-      metal: prev.metalXiuWei,
-      water: prev.waterXiuWei,
+      wood: prev!.woodXiuWei,
+      fire: prev!.fireXiuWei,
+      earth: prev!.earthXiuWei,
+      metal: prev!.metalXiuWei,
+      water: prev!.waterXiuWei,
     };
 
     // 增加对应行的修为
@@ -62,12 +72,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 连续天数计算
-    const now = new Date();
-    const yesterday = new Date(now);
+    const nowDate = new Date();
+    const yesterday = new Date(nowDate);
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().slice(0, 10);
-    const lastDate = prev.lastPracticeAt?.toISOString().slice(0, 10) ?? '';
-    let streakDays = prev.streakDays;
+    const lastDate = prev!.lastPracticeAt ? new Date(prev!.lastPracticeAt).toISOString().slice(0, 10) : '';
+    let streakDays = prev!.streakDays;
     if (lastDate === yesterdayStr) {
       streakDays += 1;
     } else if (lastDate !== today) {
@@ -75,33 +85,34 @@ export async function POST(request: NextRequest) {
     }
 
     // 统计诊断记录数
-    const diagnosisCount = await prisma.assessment.count({ where: { userId } });
+    const countResult = await db.findOne<{ count: number }>(
+      'SELECT COUNT(*) as count FROM Assessment WHERE userId = ?',
+      [userId]
+    );
+    const diagnosisCount = countResult?.count ?? 0;
 
     // 段位计算
     const rankResult = calculateRank(xiuwei, {
-      totalPractices: prev.totalPractices + 1,
+      totalPractices: prev!.totalPractices + 1,
       streakDays,
       completedMeridians: 0,
       diagnosisCount,
     });
 
     // 更新 DB
-    const updated = await prisma.cultivation.update({
-      where: { userId },
-      data: {
-        woodXiuWei: xiuwei.wood,
-        fireXiuWei: xiuwei.fire,
-        earthXiuWei: xiuwei.earth,
-        metalXiuWei: xiuwei.metal,
-        waterXiuWei: xiuwei.water,
-        rank: rankResult.index,
-        rankTitle: rankResult.title,
-        totalPractices: prev.totalPractices + 1,
-        totalMinutes: prev.totalMinutes + Math.round((durationSec || 0) / 60),
-        streakDays,
-        lastPracticeAt: now,
-      },
-    });
+    const updatedTs = now();
+    await db.execute(
+      `UPDATE Cultivation SET woodXiuWei = ?, fireXiuWei = ?, earthXiuWei = ?, metalXiuWei = ?, waterXiuWei = ?,
+       rank = ?, rankTitle = ?, totalPractices = ?, totalMinutes = ?, streakDays = ?, lastPracticeAt = ?, updatedAt = ?
+       WHERE userId = ?`,
+      [xiuwei.wood, xiuwei.fire, xiuwei.earth, xiuwei.metal, xiuwei.water,
+       rankResult.index, rankResult.title,
+       prev!.totalPractices + 1,
+       prev!.totalMinutes + Math.round((durationSec || 0) / 60),
+       streakDays, nowDate.toISOString(), updatedTs, userId]
+    );
+
+    const log = await db.findOne('SELECT * FROM PracticeLog WHERE id = ?', [logId]);
 
     return NextResponse.json({
       log,
@@ -128,14 +139,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '缺少 userId' }, { status: 400 });
     }
 
-    const where: { userId: string; date?: string } = { userId };
-    if (date) where.date = date;
-
-    const logs = await prisma.practiceLog.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+    let logs;
+    if (date) {
+      logs = await db.findAll(
+        'SELECT * FROM PracticeLog WHERE userId = ? AND date = ? ORDER BY createdAt DESC LIMIT 100',
+        [userId, date]
+      );
+    } else {
+      logs = await db.findAll(
+        'SELECT * FROM PracticeLog WHERE userId = ? ORDER BY createdAt DESC LIMIT 100',
+        [userId]
+      );
+    }
 
     return NextResponse.json({ logs });
   } catch (error) {

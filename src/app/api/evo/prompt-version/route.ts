@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { z } from 'zod';
 
 const promptVersionSchema = z.object({
@@ -19,36 +19,32 @@ export async function POST(request: NextRequest) {
     const params = promptVersionSchema.parse(body);
 
     // 获取当前最大版本号
-    const latest = await prisma.evoPromptVersion.findFirst({
-      where: { promptId: params.promptId },
-      orderBy: { version: 'desc' },
-      select: { version: true },
-    });
+    const latest = await db.findOne<{ version: number }>(
+      'SELECT version FROM EvoPromptVersion WHERE promptId = ? ORDER BY version DESC LIMIT 1',
+      [params.promptId]
+    );
     const nextVersion = (latest?.version || 0) + 1;
 
     // 如果设为活跃，先将同 promptId 的其他版本设为非活跃
     if (params.isActive) {
-      await prisma.evoPromptVersion.updateMany({
-        where: { promptId: params.promptId, isActive: true },
-        data: { isActive: false },
-      });
+      await db.execute(
+        'UPDATE EvoPromptVersion SET isActive = 0 WHERE promptId = ? AND isActive = 1',
+        [params.promptId]
+      );
     }
 
-    const entry = await prisma.evoPromptVersion.create({
-      data: {
-        promptId: params.promptId,
-        module: params.module,
-        version: nextVersion,
-        systemPrompt: params.systemPrompt,
-        avgScore: params.avgScore || 0,
-        sampleSize: params.sampleSize || 0,
-        hallucinationRate: params.hallucinationRate || 0,
-        isActive: params.isActive || false,
-        deployedAt: params.isActive ? new Date() : null,
-      },
-    });
+    const id = generateId();
+    const ts = now();
+    await db.execute(
+      `INSERT INTO EvoPromptVersion (id, promptId, module, version, systemPrompt, avgScore, sampleSize, hallucinationRate, isActive, deployedAt, rolledBackAt, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)`,
+      [id, params.promptId, params.module, nextVersion, params.systemPrompt,
+       params.avgScore || 0, params.sampleSize || 0, params.hallucinationRate || 0,
+       params.isActive ? 1 : 0,
+       params.isActive ? ts : null, ts]
+    );
 
-    return NextResponse.json({ id: entry.id, version: nextVersion, success: true });
+    return NextResponse.json({ id, version: nextVersion, success: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: '参数验证失败', details: error.issues }, { status: 400 });
@@ -66,18 +62,24 @@ export async function GET(request: NextRequest) {
     const moduleFilter = searchParams.get('module');
     const activeOnly = searchParams.get('active') === 'true';
 
-    const where: Record<string, unknown> = {};
-    if (promptId) where.promptId = promptId;
-    if (moduleFilter) where.module = moduleFilter;
-    if (activeOnly) where.isActive = true;
+    let sql = 'SELECT * FROM EvoPromptVersion WHERE 1=1';
+    const params: unknown[] = [];
+    if (promptId) { sql += ' AND promptId = ?'; params.push(promptId); }
+    if (moduleFilter) { sql += ' AND module = ?'; params.push(moduleFilter); }
+    if (activeOnly) { sql += ' AND isActive = 1'; }
+    sql += ' ORDER BY version DESC LIMIT 20';
 
-    const versions = await prisma.evoPromptVersion.findMany({
-      where,
-      orderBy: { version: 'desc' },
-      take: 20,
-    });
+    const versions = await db.findAll(sql, params);
 
-    return NextResponse.json(versions);
+    // Normalize boolean fields
+    const normalized = versions.map((v: Record<string, unknown>) => ({
+      ...v,
+      isActive: !!v.isActive,
+      deployedAt: v.deployedAt || null,
+      rolledBackAt: v.rolledBackAt || null,
+    }));
+
+    return NextResponse.json(normalized);
   } catch (error) {
     console.error('[Evo PromptVersion GET] Error:', error);
     return NextResponse.json({ error: '查询提示词版本失败' }, { status: 500 });

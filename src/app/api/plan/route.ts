@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { planPostSchema, validateOrError } from '@/lib/validators';
 
 // 九种体质对应养生方案（静态匹配，移植自LingSuHealth）
@@ -146,10 +146,10 @@ export async function POST(request: NextRequest) {
 
     // 如果没传体质，从数据库查
     if (!constitution) {
-      const latestAssessment = await prisma.assessment.findFirst({
-        where: { userId },
-        orderBy: { date: 'desc' },
-      });
+      const latestAssessment = await db.findOne<{ primaryType: string }>(
+        'SELECT primaryType FROM Assessment WHERE userId = ? ORDER BY date DESC LIMIT 1',
+        [userId]
+      );
       if (latestAssessment) {
         constitutionType = latestAssessment.primaryType as typeof constitutionType;
       }
@@ -162,10 +162,10 @@ export async function POST(request: NextRequest) {
     since.setDate(since.getDate() - 7);
     const sinceStr = since.toISOString().split('T')[0];
 
-    const recentCheckins = await prisma.checkin.findMany({
-      where: { userId, date: { gte: sinceStr } },
-      orderBy: { date: 'desc' },
-    });
+    const recentCheckins = await db.findAll(
+      'SELECT * FROM Checkin WHERE userId = ? AND date >= ? ORDER BY date DESC',
+      [userId, sinceStr]
+    );
 
     // 生成7天计划
     const startDate = new Date();
@@ -183,15 +183,16 @@ export async function POST(request: NextRequest) {
 
       // 根据昨日打卡数据动态调整
       const yesterdayCheckin = recentCheckins.find(
-        (c) => c.date === new Date(d.getTime() - 86400000).toISOString().split('T')[0]
+        (c: Record<string, unknown>) => c.date === new Date(d.getTime() - 86400000).toISOString().split('T')[0]
       );
 
       let adjustments: string[] = [];
       if (yesterdayCheckin) {
-        if (yesterdayCheckin.sleepScore < 60) adjustments.push('昨日睡眠不足，今早点睡');
-        if (yesterdayCheckin.moodScore < 60) adjustments.push('情绪偏低，多听角音疏肝');
-        if (yesterdayCheckin.exerciseScore < 60) adjustments.push('运动不足，增加活动量');
-        if (yesterdayCheckin.dietScore < 60) adjustments.push('饮食不规律，注意定时定量');
+        const yc = yesterdayCheckin as Record<string, number>;
+        if (yc.sleepScore < 60) adjustments.push('昨日睡眠不足，今早点睡');
+        if (yc.moodScore < 60) adjustments.push('情绪偏低，多听角音疏肝');
+        if (yc.exerciseScore < 60) adjustments.push('运动不足，增加活动量');
+        if (yc.dietScore < 60) adjustments.push('饮食不规律，注意定时定量');
       }
 
       weeklyPlan.push({
@@ -211,27 +212,26 @@ export async function POST(request: NextRequest) {
       template: planTemplate,
       weeklyPlan,
       recentAvgScore: recentCheckins.length > 0
-        ? Math.round(recentCheckins.reduce((s, c) => s + c.healthScore, 0) / recentCheckins.length)
+        ? Math.round(recentCheckins.reduce((s: number, c: Record<string, number>) => s + c.healthScore, 0) / recentCheckins.length)
         : null,
     });
 
     // 将之前的计划标记为非活跃
-    await prisma.healthPlan.updateMany({
-      where: { userId, isActive: true },
-      data: { isActive: false },
-    });
+    await db.execute(
+      'UPDATE HealthPlan SET isActive = 0 WHERE userId = ? AND isActive = 1',
+      [userId]
+    );
 
-    const plan = await prisma.healthPlan.create({
-      data: {
-        userId,
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
-        planType: 'weekly',
-        constitution: constitutionType,
-        content: planContent,
-        isActive: true,
-      },
-    });
+    const id = generateId();
+    const ts = now();
+    await db.execute(
+      `INSERT INTO HealthPlan (id, userId, startDate, endDate, planType, constitution, content, isActive, checkinCount, completionRate, adjustments, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, '[]', ?, ?)`,
+      [id, userId, startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0],
+       'weekly', constitutionType, planContent, 1, ts, ts]
+    );
+
+    const plan = await db.findOne('SELECT * FROM HealthPlan WHERE id = ?', [id]);
 
     return NextResponse.json({
       plan,
@@ -255,17 +255,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '缺少userId或格式错误' }, { status: 400 });
     }
 
-    const plan = await prisma.healthPlan.findFirst({
-      where: { userId, isActive: true },
-      orderBy: { createdAt: 'desc' },
-    });
+    const plan = await db.findOne<{ content: string; isActive: number; [k: string]: unknown }>(
+      'SELECT * FROM HealthPlan WHERE userId = ? AND isActive = 1 ORDER BY createdAt DESC LIMIT 1',
+      [userId]
+    );
 
     if (!plan) {
       return NextResponse.json({ plan: null });
     }
 
     const content = JSON.parse(plan.content);
-    return NextResponse.json({ plan, ...content });
+    return NextResponse.json({
+      plan: { ...plan, isActive: !!plan.isActive },
+      ...content,
+    });
   } catch (error) {
     console.error('Plan GET error:', error);
     return NextResponse.json({ error: '获取计划失败' }, { status: 500 });

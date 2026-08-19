@@ -4,7 +4,7 @@
  * GET  /api/bookings - 获取预约列表（管理后台）
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { bookingCreateSchema, validateOrError } from '@/lib/validators';
 
 // 创建预约
@@ -17,20 +17,16 @@ export async function POST(request: NextRequest) {
     }
     const body = validated.data;
 
-    const booking = await prisma.booking.create({
-      data: {
-        userId: body.userId,
-        expertId: body.expertId,
-        service: body.service,
-        name: body.name,
-        phone: body.phone,
-        preferredDate: body.preferredDate,
-        preferredTime: body.preferredTime,
-        note: body.note,
-        status: 'pending',
-      },
-    });
+    const id = generateId();
+    const ts = now();
+    await db.execute(
+      `INSERT INTO Booking (id, userId, expertId, service, name, phone, preferredDate, preferredTime, note, status, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, body.userId, body.expertId, body.service, body.name, body.phone,
+       body.preferredDate, body.preferredTime, body.note, 'pending', ts, ts]
+    );
 
+    const booking = await db.findOne('SELECT * FROM Booking WHERE id = ?', [id]);
     return NextResponse.json({ booking });
   } catch (error) {
     console.error('[bookings] POST error:', error);
@@ -46,18 +42,27 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const userId = searchParams.get('userId');
 
-    const where: Record<string, unknown> = {};
-    if (expertId) where.expertId = expertId;
-    if (status) where.status = status;
-    if (userId) where.userId = userId;
+    let sql = `SELECT b.*, e.name as expertName, e.title as expertTitle, e.avatar as expertAvatar
+               FROM Booking b LEFT JOIN Expert e ON b.expertId = e.id WHERE 1=1`;
+    const params: unknown[] = [];
+    if (expertId) { sql += ' AND b.expertId = ?'; params.push(expertId); }
+    if (status) { sql += ' AND b.status = ?'; params.push(status); }
+    if (userId) { sql += ' AND b.userId = ?'; params.push(userId); }
+    sql += ' ORDER BY b.createdAt DESC';
 
-    const bookings = await prisma.booking.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: { expert: { select: { name: true, title: true, avatar: true } } },
-    });
+    const bookings = await db.findAll(sql, params);
 
-    return NextResponse.json({ bookings });
+    // 转换为含 expert 的结构
+    const result = bookings.map((b: Record<string, unknown>) => ({
+      ...b,
+      expert: b.expertName ? {
+        name: b.expertName,
+        title: b.expertTitle,
+        avatar: b.expertAvatar,
+      } : null,
+    }));
+
+    return NextResponse.json({ bookings: result });
   } catch (error) {
     console.error('[bookings] GET error:', error);
     return NextResponse.json({ error: '获取预约列表失败' }, { status: 500 });

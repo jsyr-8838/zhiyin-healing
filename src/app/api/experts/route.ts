@@ -5,7 +5,7 @@
  * POST   /api/experts       - 创建专家
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 
 // 获取专家列表
 export async function GET(request: NextRequest) {
@@ -13,18 +13,26 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const showAll = searchParams.get('all') === '1';
 
-    const experts = await prisma.expert.findMany({
-      where: showAll ? {} : { isActive: true },
-      orderBy: { sortOrder: 'asc' },
-      include: { _count: { select: { bookings: true } } },
-    });
+    let experts;
+    if (showAll) {
+      experts = await db.findAll(
+        `SELECT e.*, (SELECT COUNT(*) FROM Booking b WHERE b.expertId = e.id) as bookingCount
+         FROM Expert e ORDER BY e.sortOrder ASC`
+      );
+    } else {
+      experts = await db.findAll(
+        `SELECT e.*, (SELECT COUNT(*) FROM Booking b WHERE b.expertId = e.id) as bookingCount
+         FROM Expert e WHERE e.isActive = 1 ORDER BY e.sortOrder ASC`
+      );
+    }
 
     // 解析 JSON 字段
-    const result = experts.map((e) => ({
+    const result = experts.map((e: Record<string, unknown>) => ({
       ...e,
-      tags: JSON.parse(e.tags || '[]'),
-      services: JSON.parse(e.services || '[]'),
-      bookingCount: e._count.bookings,
+      tags: JSON.parse((e.tags as string) || '[]'),
+      services: JSON.parse((e.services as string) || '[]'),
+      isActive: !!e.isActive,
+      bookingCount: e.bookingCount,
     }));
 
     return NextResponse.json({ experts: result });
@@ -39,25 +47,40 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const expert = await prisma.expert.create({
-      data: {
-        name: body.name || '',
-        title: body.title || '',
-        subtitle: body.subtitle || '',
-        specialty: body.specialty || '',
-        tags: JSON.stringify(body.tags || []),
-        avatar: body.avatar || '',
-        element: body.element || 'earth',
-        bio: body.bio || '',
-        services: JSON.stringify(body.services || []),
-        wechatId: body.wechatId || '',
-        phone: body.phone || '',
-        sortOrder: body.sortOrder ?? 0,
-        isActive: body.isActive ?? true,
+    const id = generateId();
+    const ts = now();
+    await db.execute(
+      `INSERT INTO Expert (id, name, title, subtitle, specialty, tags, avatar, element, bio, services, wechatId, phone, sortOrder, isActive, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        id,
+        body.name || '',
+        body.title || '',
+        body.subtitle || '',
+        body.specialty || '',
+        JSON.stringify(body.tags || []),
+        body.avatar || '',
+        body.element || 'earth',
+        body.bio || '',
+        JSON.stringify(body.services || []),
+        body.wechatId || '',
+        body.phone || '',
+        body.sortOrder ?? 0,
+        body.isActive !== false ? 1 : 0,
+        ts,
+        ts,
+      ]
+    );
+
+    const expert = await db.findOne('SELECT * FROM Expert WHERE id = ?', [id]);
+    return NextResponse.json({
+      expert: {
+        ...expert,
+        tags: JSON.parse((expert?.tags as string) || '[]'),
+        services: JSON.parse((expert?.services as string) || '[]'),
+        isActive: !!expert?.isActive,
       },
     });
-
-    return NextResponse.json({ expert });
   } catch (error) {
     console.error('[experts] POST error:', error);
     return NextResponse.json({ error: '创建专家失败' }, { status: 500 });

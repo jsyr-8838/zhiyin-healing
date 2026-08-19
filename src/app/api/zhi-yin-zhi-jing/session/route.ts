@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import type { FlowModeId } from '@/lib/zhi-yin-zhi-jing-data';
 
 /**
@@ -33,8 +33,6 @@ export async function POST(request: NextRequest) {
       durationSec,
       moodBefore,
       moodAfter,
-      bpmBefore,
-      bpmAfter,
     } = body as {
       userId: string;
       modeId: FlowModeId;
@@ -59,9 +57,10 @@ export async function POST(request: NextRequest) {
     const today = new Date().toISOString().split('T')[0];
 
     // 读取今日打卡
-    const existing = await prisma.checkin.findUnique({
-      where: { userId_date: { userId, date: today } },
-    });
+    const existing = await db.findOne<{ healingDone: string; mood: number; moodScore: number }>(
+      'SELECT healingDone, mood, moodScore FROM Checkin WHERE userId = ? AND date = ?',
+      [userId, today]
+    );
 
     // 解析现有 healingDone JSON
     let healingDone: Record<string, unknown> = {};
@@ -95,50 +94,38 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       // 更新现有打卡
-      const updated = await prisma.checkin.update({
-        where: { userId_date: { userId, date: today } },
-        data: {
-          healingDone: JSON.stringify(healingDone),
-          mood: updatedMood,
-          moodScore: updatedMoodScore,
-        },
-      });
+      await db.execute(
+        'UPDATE Checkin SET healingDone = ?, mood = ?, moodScore = ? WHERE userId = ? AND date = ?',
+        [JSON.stringify(healingDone), updatedMood, updatedMoodScore, userId, today]
+      );
       return NextResponse.json({
         ok: true,
         action: 'updated',
         checkin: {
-          mood: updated.mood,
-          moodScore: updated.moodScore,
+          mood: updatedMood,
+          moodScore: updatedMoodScore,
           healingDone: healingDone[zyKey],
         },
       });
     } else {
       // 创建最小打卡记录（只占位，等用户真正打卡时再补全）
-      const created = await prisma.checkin.create({
-        data: {
-          userId,
-          date: today,
-          sleepHours: 0,
-          sleepScore: 0,
-          bedtime: '',
-          mood: moodAfter,
-          moodScore: Math.min(100, Math.round((moodAfter - 1) * 25 + 20)),
-          exercise: 3,
-          exerciseScore: 60,
-          diet: 3,
-          dietScore: 60,
-          healthScore: 40,
-          symptoms: '',
-          note: `知音之境 · ${modeId} · ${Math.round(durationSec / 60)}分钟`,
-          healingDone: JSON.stringify(healingDone),
-        },
-      });
+      const id = generateId();
+      const ts = now();
+      await db.execute(
+        `INSERT INTO Checkin (id, userId, date, sleepHours, sleepScore, bedtime, mood, moodScore,
+         exercise, exerciseScore, diet, dietScore, healthScore, symptoms, note, healingDone, createdAt)
+         VALUES (?, ?, ?, 0, 0, '', ?, ?, 3, 60, 3, 60, 40, '', ?, ?, ?)`,
+        [id, userId, today, moodAfter,
+         Math.min(100, Math.round((moodAfter - 1) * 25 + 20)),
+         `知音之境 · ${modeId} · ${Math.round(durationSec / 60)}分钟`,
+         JSON.stringify(healingDone), ts]
+      );
       return NextResponse.json({
         ok: true,
         action: 'created',
         checkin: {
-          mood: created.mood,
-          moodScore: created.moodScore,
+          mood: moodAfter,
+          moodScore: Math.min(100, Math.round((moodAfter - 1) * 25 + 20)),
           healingDone: healingDone[zyKey],
         },
       });

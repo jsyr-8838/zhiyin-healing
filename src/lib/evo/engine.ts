@@ -10,7 +10,7 @@
  * - 每月知识扩充（2-4h）：深度调研、知识库更新、策略调整
  */
 
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 
 // ── 进化模块枚举 ──
 export type EvoModule = 
@@ -84,10 +84,9 @@ export class ZhiYinEvoEngine {
       details.push('每日自检启动');
 
       // 2. 扫描修复规则
-      const repairRules = await prisma.evoRepairRule.findMany({
-        where: { isEnabled: true },
-        orderBy: { successRate: 'desc' },
-      });
+      const repairRules = await db.findAll(
+        'SELECT * FROM EvoRepairRule WHERE isEnabled = 1 ORDER BY successRate DESC'
+      );
       details.push(`扫描到 ${repairRules.length} 条修复规则`);
 
       // 3. 检查系统健康指标
@@ -201,23 +200,22 @@ export class ZhiYinEvoEngine {
     try {
       details.push('每月知识扩充启动');
 
-      // 1. 统计知识库覆盖率
-      const knowledgeStats = await prisma.evoKnowledge.groupBy({
-        by: ['domain'],
-        _count: { id: true },
-        where: { status: 'deployed' },
-      });
-      details.push(`知识库: ${knowledgeStats.length} 个领域, ${knowledgeStats.reduce((s, d) => s + d._count.id, 0)} 条知识`);
+      // 1. 统计知识库覆盖率（替代 prisma.groupBy）
+      const knowledgeStats = await db.findAll<{ domain: string; count: number }>(
+        'SELECT domain, COUNT(*) as count FROM EvoKnowledge WHERE status = ? GROUP BY domain',
+        ['deployed']
+      );
+      details.push(`知识库: ${knowledgeStats.length} 个领域, ${knowledgeStats.reduce((s, d) => s + d.count, 0)} 条知识`);
 
       // 2. 识别低覆盖率领域
       const lowCoverageDomains = knowledgeStats
-        .filter(d => d._count.id < 10)
+        .filter(d => d.count < 10)
         .map(d => d.domain);
       details.push(`低覆盖率领域: ${lowCoverageDomains.join(', ') || '无'}`);
 
       // 3. 记录进化日志
       await this.createLog('scheduled', 'monthly_knowledge_expansion', 'water', {
-        knowledgeStats: knowledgeStats.map(d => ({ domain: d.domain, count: d._count.id })),
+        knowledgeStats: knowledgeStats.map(d => ({ domain: d.domain, count: d.count })),
         lowCoverageDomains,
       });
 
@@ -245,14 +243,17 @@ export class ZhiYinEvoEngine {
 
     // 检查数据库连接
     try {
-      await prisma.$queryRaw`SELECT 1`;
+      await db.findOne('SELECT 1 as ok');
       checks.push({ name: '数据库', status: 'ok', detail: '连接正常' });
     } catch {
       checks.push({ name: '数据库', status: 'error', detail: '连接失败' });
     }
 
     // 检查修复规则数
-    const repairRuleCount = await prisma.evoRepairRule.count({ where: { isEnabled: true } });
+    const repairCount = await db.findOne<{ count: number }>(
+      'SELECT COUNT(*) as count FROM EvoRepairRule WHERE isEnabled = 1'
+    );
+    const repairRuleCount = repairCount?.count ?? 0;
     checks.push({
       name: '修复规则',
       status: repairRuleCount > 0 ? 'ok' : 'warn',
@@ -260,9 +261,12 @@ export class ZhiYinEvoEngine {
     });
 
     // 检查进化日志近况
-    const recentLogs = await prisma.evoLog.count({
-      where: { startedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
-    });
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const recentCount = await db.findOne<{ count: number }>(
+      'SELECT COUNT(*) as count FROM EvoLog WHERE startedAt >= ?',
+      [since]
+    );
+    const recentLogs = recentCount?.count ?? 0;
     checks.push({
       name: '进化日志',
       status: recentLogs > 0 ? 'ok' : 'warn',
@@ -276,59 +280,59 @@ export class ZhiYinEvoEngine {
   private async collectBasicMetrics(): Promise<Record<string, number>> {
     const metrics: Record<string, number> = {};
 
-    // 用户数
-    metrics['total_users'] = await prisma.user.count();
+    // 使用 Promise.all 并发查询（替代多个 prisma.count）
+    const [
+      totalUsers,
+      registeredUsers,
+      totalCheckins,
+      totalPracticeLogs,
+      knowledgeEntries,
+      evoLogs,
+    ] = await Promise.all([
+      db.findOne<{ count: number }>('SELECT COUNT(*) as count FROM User'),
+      db.findOne<{ count: number }>("SELECT COUNT(*) as count FROM User WHERE role = 'registered'"),
+      db.findOne<{ count: number }>('SELECT COUNT(*) as count FROM Checkin'),
+      db.findOne<{ count: number }>('SELECT COUNT(*) as count FROM PracticeLog'),
+      db.findOne<{ count: number }>("SELECT COUNT(*) as count FROM EvoKnowledge WHERE status = 'deployed'"),
+      db.findOne<{ count: number }>('SELECT COUNT(*) as count FROM EvoLog'),
+    ]);
 
-    // 注册用户数
-    metrics['registered_users'] = await prisma.user.count({
-      where: { role: 'registered' },
-    });
-
-    // 打卡数
-    metrics['total_checkins'] = await prisma.checkin.count();
-
-    // 修为记录数
-    metrics['total_practice_logs'] = await prisma.practiceLog.count();
-
-    // 知识库条目数
-    metrics['knowledge_entries'] = await prisma.evoKnowledge.count({
-      where: { status: 'deployed' },
-    });
-
-    // 进化日志数
-    metrics['evo_logs'] = await prisma.evoLog.count();
+    metrics['total_users'] = totalUsers?.count ?? 0;
+    metrics['registered_users'] = registeredUsers?.count ?? 0;
+    metrics['total_checkins'] = totalCheckins?.count ?? 0;
+    metrics['total_practice_logs'] = totalPracticeLogs?.count ?? 0;
+    metrics['knowledge_entries'] = knowledgeEntries?.count ?? 0;
+    metrics['evo_logs'] = evoLogs?.count ?? 0;
 
     return metrics;
   }
 
   private async analyzePromptScores(): Promise<string[]> {
     // 查找平均分低于0的活跃提示词
-    const lowScore = await prisma.evoPromptVersion.findMany({
-      where: { isActive: true, avgScore: { lt: 0 } },
-      select: { promptId: true },
-    });
+    const lowScore = await db.findAll<{ promptId: string }>(
+      'SELECT promptId FROM EvoPromptVersion WHERE isActive = 1 AND avgScore < 0'
+    );
     return lowScore.map(p => p.promptId);
   }
 
   private async analyzeContentGaps(): Promise<string[]> {
-    // 查找覆盖度低于5的知识领域
-    const domainCounts = await prisma.evoKnowledge.groupBy({
-      by: ['domain'],
-      _count: { id: true },
-      where: { status: 'deployed' },
-    });
+    // 查找覆盖度低于5的知识领域（替代 prisma.groupBy）
+    const domainCounts = await db.findAll<{ domain: string; count: number }>(
+      'SELECT domain, COUNT(*) as count FROM EvoKnowledge WHERE status = ? GROUP BY domain',
+      ['deployed']
+    );
     return domainCounts
-      .filter(d => d._count.id < 5)
+      .filter(d => d.count < 5)
       .map(d => d.domain);
   }
 
   private async analyzeBehaviorPatterns(): Promise<string[]> {
     // 基于进化日志分析模式
-    const recentLogs = await prisma.evoLog.findMany({
-      where: { startedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
-      select: { actionType: true, status: true },
-      take: 100,
-    });
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const recentLogs = await db.findAll<{ actionType: string; status: string }>(
+      'SELECT actionType, status FROM EvoLog WHERE startedAt >= ? ORDER BY startedAt DESC LIMIT 100',
+      [since]
+    );
     
     const patterns: string[] = [];
     const failedActions = recentLogs.filter(l => l.status === 'failed');
@@ -340,11 +344,9 @@ export class ZhiYinEvoEngine {
 
   private async executeRepairRules(): Promise<{ success: number; failed: number }> {
     // 获取需要执行的修复规则
-    const rules = await prisma.evoRepairRule.findMany({
-      where: { isEnabled: true },
-      orderBy: { successRate: 'desc' },
-      take: 10,
-    });
+    const rules = await db.findAll<{ id: string }>(
+      'SELECT id FROM EvoRepairRule WHERE isEnabled = 1 ORDER BY successRate DESC LIMIT 10'
+    );
 
     let success = 0;
     let failed = 0;
@@ -352,10 +354,11 @@ export class ZhiYinEvoEngine {
     for (const rule of rules) {
       try {
         // 更新最后执行时间
-        await prisma.evoRepairRule.update({
-          where: { id: rule.id },
-          data: { lastExecutedAt: new Date() },
-        });
+        const ts = now();
+        await db.execute(
+          'UPDATE EvoRepairRule SET lastExecutedAt = ?, updatedAt = ? WHERE id = ?',
+          [ts, ts, rule.id]
+        );
         success++;
       } catch {
         failed++;
@@ -371,15 +374,14 @@ export class ZhiYinEvoEngine {
     strategy: string,
     detail?: Record<string, unknown>
   ): Promise<{ id: string }> {
-    return prisma.evoLog.create({
-      data: {
-        triggerType,
-        actionType,
-        strategy,
-        triggerDetail: detail ? JSON.stringify(detail) : '',
-        status: 'running',
-      },
-    });
+    const id = generateId();
+    const ts = now();
+    await db.execute(
+      `INSERT INTO EvoLog (id, triggerType, triggerDetail, actionType, actionDetail, targetModule, status, strategy, beforeMetric, afterMetric, improvement, startedAt, completedAt, durationMs)
+       VALUES (?, ?, ?, ?, '', '', 'running', ?, 0, 0, 0, ?, NULL, 0)`,
+      [id, triggerType, detail ? JSON.stringify(detail) : '', actionType, strategy, ts]
+    );
+    return { id };
   }
 
   private async completeLog(
@@ -387,15 +389,11 @@ export class ZhiYinEvoEngine {
     status: string,
     detail?: Record<string, unknown>
   ): Promise<void> {
-    await prisma.evoLog.update({
-      where: { id },
-      data: {
-        status,
-        resultDetail: detail ? JSON.stringify(detail) : '',
-        completedAt: new Date(),
-        durationMs: Date.now() - Number(id.split('_')[0] || Date.now()),
-      },
-    });
+    const ts = now();
+    await db.execute(
+      'UPDATE EvoLog SET status = ?, resultDetail = ?, completedAt = ?, durationMs = ? WHERE id = ?',
+      [status, detail ? JSON.stringify(detail) : '', ts, 0, id]
+    );
   }
 
   // ── 知识库操作 ──
@@ -412,18 +410,16 @@ export class ZhiYinEvoEngine {
     sourceUrl?: string;
     tags?: string[];
   }): Promise<string> {
-    const entry = await prisma.evoKnowledge.create({
-      data: {
-        domain: params.domain,
-        element: params.element || '',
-        title: params.title,
-        content: params.content,
-        source: params.source || 'ai_generated',
-        sourceUrl: params.sourceUrl || '',
-        tags: JSON.stringify(params.tags || []),
-      },
-    });
-    return entry.id;
+    const id = generateId();
+    const ts = now();
+    await db.execute(
+      `INSERT INTO EvoKnowledge (id, domain, element, title, content, source, sourceUrl, version, status, qualityScore, usageCount, tags, metadata, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'draft', 0, 0, ?, '{}', ?, ?)`,
+      [id, params.domain, params.element || '', params.title, params.content,
+       params.source || 'ai_generated', params.sourceUrl || '',
+       JSON.stringify(params.tags || []), ts, ts]
+    );
+    return id;
   }
 
   /**
@@ -435,15 +431,16 @@ export class ZhiYinEvoEngine {
     status?: string;
     limit?: number;
   }) {
-    return prisma.evoKnowledge.findMany({
-      where: {
-        domain: params.domain,
-        element: params.element,
-        status: params.status || 'deployed',
-      },
-      orderBy: { qualityScore: 'desc' },
-      take: params.limit || 20,
-    });
+    let sql = 'SELECT * FROM EvoKnowledge WHERE 1=1';
+    const values: unknown[] = [];
+    if (params.domain) { sql += ' AND domain = ?'; values.push(params.domain); }
+    if (params.element) { sql += ' AND element = ?'; values.push(params.element); }
+    sql += ' AND status = ?';
+    values.push(params.status || 'deployed');
+    sql += ' ORDER BY qualityScore DESC LIMIT ?';
+    values.push(params.limit || 20);
+
+    return db.findAll(sql, values);
   }
 
   /**
@@ -455,27 +452,36 @@ export class ZhiYinEvoEngine {
     knowledgeCount: number;
     promptVersions: number;
     repairRules: number;
-    recentLogs: { id: string; actionType: string; strategy: string; status: string; startedAt: Date }[];
+    recentLogs: { id: string; actionType: string; strategy: string; status: string; startedAt: string }[];
   }> {
-    const [totalLogs, successLogs, knowledgeCount, promptVersions, repairRules, recentLogs] = await Promise.all([
-      prisma.evoLog.count(),
-      prisma.evoLog.count({ where: { status: 'success' } }),
-      prisma.evoKnowledge.count({ where: { status: 'deployed' } }),
-      prisma.evoPromptVersion.count({ where: { isActive: true } }),
-      prisma.evoRepairRule.count({ where: { isEnabled: true } }),
-      prisma.evoLog.findMany({
-        orderBy: { startedAt: 'desc' },
-        take: 10,
-        select: { id: true, actionType: true, strategy: true, status: true, startedAt: true },
-      }),
+    // 使用 Promise.all 并发查询（替代 6 个 prisma 查询）
+    const [
+      totalLogsResult,
+      successLogsResult,
+      knowledgeCountResult,
+      promptVersionsResult,
+      repairRulesResult,
+      recentLogs,
+    ] = await Promise.all([
+      db.findOne<{ count: number }>('SELECT COUNT(*) as count FROM EvoLog'),
+      db.findOne<{ count: number }>("SELECT COUNT(*) as count FROM EvoLog WHERE status = 'success'"),
+      db.findOne<{ count: number }>("SELECT COUNT(*) as count FROM EvoKnowledge WHERE status = 'deployed'"),
+      db.findOne<{ count: number }>('SELECT COUNT(*) as count FROM EvoPromptVersion WHERE isActive = 1'),
+      db.findOne<{ count: number }>('SELECT COUNT(*) as count FROM EvoRepairRule WHERE isEnabled = 1'),
+      db.findAll<{ id: string; actionType: string; strategy: string; status: string; startedAt: string }>(
+        'SELECT id, actionType, strategy, status, startedAt FROM EvoLog ORDER BY startedAt DESC LIMIT 10'
+      ),
     ]);
+
+    const totalLogs = totalLogsResult?.count ?? 0;
+    const successLogs = successLogsResult?.count ?? 0;
 
     return {
       totalLogs,
       successRate: totalLogs > 0 ? Math.round((successLogs / totalLogs) * 100) : 0,
-      knowledgeCount,
-      promptVersions,
-      repairRules,
+      knowledgeCount: knowledgeCountResult?.count ?? 0,
+      promptVersions: promptVersionsResult?.count ?? 0,
+      repairRules: repairRulesResult?.count ?? 0,
       recentLogs,
     };
   }

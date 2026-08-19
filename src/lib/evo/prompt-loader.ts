@@ -5,7 +5,7 @@
  * 降级策略：数据库不可用时回退到代码中的硬编码常量
  */
 
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // ── 提示词 ID 常量 ──
 export const PROMPT_IDS = {
@@ -30,11 +30,10 @@ export async function loadActivePrompt(promptId: string): Promise<string | null>
   }
 
   try {
-    const version = await prisma.evoPromptVersion.findFirst({
-      where: { promptId, isActive: true },
-      orderBy: { version: 'desc' },
-      select: { systemPrompt: true, version: true },
-    });
+    const version = await db.findOne<{ systemPrompt: string; version: number }>(
+      'SELECT systemPrompt, version FROM EvoPromptVersion WHERE promptId = ? AND isActive = 1 ORDER BY version DESC LIMIT 1',
+      [promptId]
+    );
 
     if (version) {
       // 更新缓存

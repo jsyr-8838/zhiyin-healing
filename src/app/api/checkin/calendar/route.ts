@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import { userIdSchema } from '@/lib/validators';
 import { healthScoreToLevel } from '@/lib/health-score';
 
@@ -22,11 +22,10 @@ export async function GET(request: NextRequest) {
     const [y, m] = targetMonth.split('-').map(Number);
     const endDate = new Date(y, m, 0).toISOString().split('T')[0]; // 月份最后一天
 
-    const checkins = await prisma.checkin.findMany({
-      where: { userId, date: { gte: startDate, lte: endDate } },
-      select: { date: true, healthScore: true },
-      orderBy: { date: 'asc' },
-    });
+    const checkins = await db.findAll<{ date: string; healthScore: number }>(
+      `SELECT date, healthScore FROM Checkin WHERE userId = ? AND date >= ? AND date <= ? ORDER BY date ASC`,
+      [userId, startDate, endDate]
+    );
 
     // 生成当月所有日期
     const days: Array<{ date: string; level: 0|1|2|3|4; healthScore: number }> = [];

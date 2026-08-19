@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { assessmentPostSchema, validateOrError } from '@/lib/validators';
 
 export async function POST(request: NextRequest) {
@@ -13,22 +13,38 @@ export async function POST(request: NextRequest) {
 
     const today = new Date().toISOString().split('T')[0];
 
-    const assessment = await prisma.assessment.upsert({
-      where: { userId_date: { userId, date: today } },
-      update: {
-        pinghe: scores.pinghe, qixue: scores.qixue, yangxu: scores.yangxu,
-        yinxu: scores.yinxu, tanshi: scores.tanshi, shire: scores.shire,
-        xueyu: scores.xueyu, qiyu: scores.qiyu, tebing: scores.tebing,
-        primaryType, dominantWuyin, wuyinScores: JSON.stringify(wuyinScores), recommendation,
-      },
-      create: {
-        userId, date: today,
-        pinghe: scores.pinghe, qixue: scores.qixue, yangxu: scores.yangxu,
-        yinxu: scores.yinxu, tanshi: scores.tanshi, shire: scores.shire,
-        xueyu: scores.xueyu, qiyu: scores.qiyu, tebing: scores.tebing,
-        primaryType, dominantWuyin, wuyinScores: JSON.stringify(wuyinScores), recommendation,
-      },
-    });
+    // Check if record exists for today
+    const existing = await db.findOne<{ id: string }>(
+      'SELECT id FROM Assessment WHERE userId = ? AND date = ?',
+      [userId, today]
+    );
+
+    if (existing) {
+      await db.execute(
+        `UPDATE Assessment SET pinghe = ?, qixue = ?, yangxu = ?, yinxu = ?, tanshi = ?, shire = ?,
+         xueyu = ?, qiyu = ?, tebing = ?, primaryType = ?, dominantWuyin = ?, wuyinScores = ?, recommendation = ?
+         WHERE userId = ? AND date = ?`,
+        [scores.pinghe, scores.qixue, scores.yangxu, scores.yinxu, scores.tanshi, scores.shire,
+         scores.xueyu, scores.qiyu, scores.tebing, primaryType, dominantWuyin,
+         JSON.stringify(wuyinScores), recommendation, userId, today]
+      );
+    } else {
+      const id = generateId();
+      const ts = now();
+      await db.execute(
+        `INSERT INTO Assessment (id, userId, date, pinghe, qixue, yangxu, yinxu, tanshi, shire,
+         xueyu, qiyu, tebing, primaryType, dominantWuyin, wuyinScores, recommendation, createdAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, userId, today, scores.pinghe, scores.qixue, scores.yangxu, scores.yinxu,
+         scores.tanshi, scores.shire, scores.xueyu, scores.qiyu, scores.tebing,
+         primaryType, dominantWuyin, JSON.stringify(wuyinScores), recommendation, ts]
+      );
+    }
+
+    const assessment = await db.findOne(
+      'SELECT * FROM Assessment WHERE userId = ? AND date = ?',
+      [userId, today]
+    );
 
     return NextResponse.json({ assessment });
   } catch (error) {
@@ -45,10 +61,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '缺少userId或格式错误' }, { status: 400 });
     }
 
-    const latest = await prisma.assessment.findFirst({
-      where: { userId },
-      orderBy: { date: 'desc' },
-    });
+    const latest = await db.findOne(
+      'SELECT * FROM Assessment WHERE userId = ? ORDER BY date DESC LIMIT 1',
+      [userId]
+    );
 
     return NextResponse.json({ assessment: latest });
   } catch (error) {

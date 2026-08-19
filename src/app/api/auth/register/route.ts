@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCode } from '@/lib/phone-verify';
-import { prisma } from '@/lib/prisma';
+import { db, generateId, now } from '@/lib/db';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -27,7 +27,10 @@ export async function POST(request: NextRequest) {
     const { phone, code, name, gender, age, visitorId } = parsed.data;
 
     // 1. 先检查手机号是否已注册（避免浪费验证码）
-    const existing = await prisma.user.findUnique({ where: { phone } });
+    const existing = await db.findOne<{ id: string }>(
+      'SELECT id FROM User WHERE phone = ?',
+      [phone]
+    );
     if (existing) {
       return NextResponse.json({ error: '该手机号已注册，请直接登录' }, { status: 409 });
     }
@@ -39,44 +42,34 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. 创建用户（或升级访客账户）
-    let user;
+    const ts = now();
+    let user: { id: string; phone: string | null; name: string | null } | null = null;
 
     if (visitorId) {
       // 尝试将访客账户升级为注册用户
-      const visitor = await prisma.user.findUnique({ where: { id: visitorId } });
+      const visitor = await db.findOne<{ id: string; role: string; phone: string | null }>(
+        'SELECT id, role, phone FROM User WHERE id = ?',
+        [visitorId]
+      );
       if (visitor && visitor.role === 'visitor' && !visitor.phone) {
         // 迁移访客数据到注册账户
-        user = await prisma.user.update({
-          where: { id: visitorId },
-          data: {
-            phone,
-            phoneVerified: true,
-            name,
-            nickname: name,
-            gender,
-            age,
-            role: 'registered',
-            lastLoginAt: new Date(),
-          },
-        });
+        await db.execute(
+          `UPDATE User SET phone = ?, phoneVerified = 1, name = ?, nickname = ?, gender = ?, age = ?, role = 'registered', lastLoginAt = ?, updatedAt = ? WHERE id = ?`,
+          [phone, name, name, gender, age, ts, ts, visitorId]
+        );
+        user = { id: visitor.id, phone, name };
       }
     }
 
     if (!user) {
       // 新建注册用户
-      user = await prisma.user.create({
-        data: {
-          phone,
-          phoneVerified: true,
-          name,
-          nickname: name,
-          gender,
-          age,
-          role: 'registered',
-          vipLevel: 'pro',
-          lastLoginAt: new Date(),
-        },
-      });
+      const id = generateId();
+      await db.execute(
+        `INSERT INTO User (id, nickname, avatar, vipLevel, vipExpireAt, createdAt, updatedAt, name, gender, age, birthDate, phone, phoneVerified, passwordHash, role, lastLoginAt)
+         VALUES (?, ?, '', 'pro', NULL, ?, ?, ?, ?, ?, NULL, ?, 1, NULL, 'registered', ?, ?)`,
+        [id, name, ts, ts, name, gender, age, phone, ts, ts]
+      );
+      user = { id, phone, name };
     }
 
     return NextResponse.json({

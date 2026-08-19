@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCode } from '@/lib/phone-verify';
-import { prisma } from '@/lib/prisma';
+import { db, now } from '@/lib/db';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -28,16 +28,20 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. 查找用户
-    const user = await prisma.user.findUnique({ where: { phone } });
+    const user = await db.findOne<{ id: string; phone: string | null; name: string | null; nickname: string; role: string }>(
+      'SELECT id, phone, name, nickname, role FROM User WHERE phone = ?',
+      [phone]
+    );
     if (!user) {
       return NextResponse.json({ error: '该手机号未注册，请先注册' }, { status: 404 });
     }
 
     // 3. 更新登录时间
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    });
+    const ts = now();
+    await db.execute(
+      'UPDATE User SET lastLoginAt = ?, updatedAt = ? WHERE id = ?',
+      [ts, ts, user.id]
+    );
 
     return NextResponse.json({
       message: '登录成功',
