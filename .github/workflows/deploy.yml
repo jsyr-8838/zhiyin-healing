@@ -1,4 +1,5 @@
 name: Deploy to Cloudflare Workers
+
 on:
   push:
     branches: [main]
@@ -11,6 +12,7 @@ jobs:
     name: Build and Deploy
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup swap space
         run: |
           sudo swapoff -a
@@ -19,17 +21,21 @@ jobs:
           sudo mkswap /swapfile
           sudo swapon /swapfile
           free -h
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
+
       - name: Install dependencies
         run: npm ci
+
       - name: Generate Prisma client
         run: npx prisma generate
-      - name: Build with OpenNext
-        run: npx opennextjs-cloudflare build
+
+      - name: Build Next.js app
+        run: npm run build
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -45,6 +51,25 @@ jobs:
           B2_APP_KEY: ${{ secrets.B2_APP_KEY }}
           B2_BUCKET: ${{ secrets.B2_BUCKET }}
           B2_ENDPOINT: ${{ secrets.B2_ENDPOINT }}
+
+      - name: Build OpenNext bundle
+        run: npx opennextjs-cloudflare build --skipNextBuild --noMinify
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_BASE: ${{ secrets.LLM_API_BASE }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          VISION_MODEL: ${{ secrets.VISION_MODEL }}
+          JAMENDO_CLIENT_ID: ${{ secrets.JAMENDO_CLIENT_ID }}
+          NEXT_PUBLIC_COS_BASE_URL: /api/media
+          NEXT_PUBLIC_APP_NAME: ${{ secrets.NEXT_PUBLIC_APP_NAME }}
+          B2_KEY_ID: ${{ secrets.B2_KEY_ID }}
+          B2_APP_KEY: ${{ secrets.B2_APP_KEY }}
+          B2_BUCKET: ${{ secrets.B2_BUCKET }}
+          B2_ENDPOINT: ${{ secrets.B2_ENDPOINT }}
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
