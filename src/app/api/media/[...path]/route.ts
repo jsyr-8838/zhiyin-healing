@@ -108,7 +108,7 @@ export async function GET(
     // Encode each path segment individually to preserve / separators
     const encodedPath = filePath.split('/').map(seg => encodeURIComponent(seg)).join('/');
 
-    const downloadUrl = `${auth.downloadUrl}/${B2_BUCKET}/${encodedPath}?Authorization=${encodeURIComponent(auth.downloadAuthToken)}`;
+    const downloadUrl = `${auth.downloadUrl}/file/${B2_BUCKET}/${encodedPath}?Authorization=${encodeURIComponent(auth.downloadAuthToken)}`;
 
     // 302 redirect to the B2 download URL
     return NextResponse.redirect(downloadUrl, {
