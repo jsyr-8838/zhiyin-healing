@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as crypto from 'crypto';
 
 /**
  * B2 Media Proxy API Route
  *
- * Generates AWS Sig V4 presigned URLs for Backblaze B2 private bucket
- * and redirects the client (302) to the signed URL.
+ * Uses B2 native API download authorization (7-day token) to generate
+ * download URLs that redirect the client (302) to B2.
  *
- * The B2 download token is cached server-side and refreshed before expiry.
- * This avoids exposing B2 credentials to the client and keeps all media
- * accessible from China (B2 S3 endpoint is directly reachable, unlike
- * Cloudflare workers.dev which is blocked).
+ * Simpler and more reliable than AWS Sig V4 for filenames containing
+ * non-ASCII characters (Chinese acupoint names, etc.).
+ * The download token is cached server-side and refreshed before expiry.
  */
 
 // ── B2 Config ──────────────────────────────────────────────────────────────
 const B2_KEY_ID = process.env.B2_KEY_ID || '';
 const B2_APP_KEY = process.env.B2_APP_KEY || '';
 const B2_BUCKET = process.env.B2_BUCKET || 'zhiyin-media';
-const B2_ENDPOINT = process.env.B2_ENDPOINT || 'https://s3.us-east-005.backblazeb2.com';
-const B2_REGION = 'us-east-005';
 
 // ── Token Cache ─────────────────────────────────────────────────────────────
 interface CachedAuth {
@@ -87,73 +83,6 @@ async function getB2Auth(): Promise<CachedAuth> {
   return cachedAuth;
 }
 
-/**
- * Generate AWS Sig V4 presigned URL for B2 S3.
- * This avoids the extra API round-trip and supports Range requests natively.
- */
-function generatePresignedUrl(key: string): string {
-  const datetime = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  const dateStamp = datetime.substring(0, 8);
-
-  const canonicalUri = `/${B2_BUCKET}/${key}`;
-  const credentialScope = `${dateStamp}/${B2_REGION}/s3/aws4_request`;
-
-  const queryParams = new URLSearchParams({
-    'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
-    'X-Amz-Credential': `${B2_KEY_ID}/${credentialScope}`,
-    'X-Amz-Date': datetime,
-    'X-Amz-Expires': '86400', // 24 hours
-    'X-Amz-SignedHeaders': 'host',
-  });
-
-  // Canonical request
-  const canonicalHeaders = `host:${new URL(B2_ENDPOINT).hostname}\n`;
-  const signedHeaders = 'host';
-  const canonicalRequest = [
-    'GET',
-    canonicalUri,
-    queryParams.toString(),
-    canonicalHeaders,
-    signedHeaders,
-    'UNSIGNED-PAYLOAD',
-  ].join('\n');
-
-  // String to sign
-  const stringToSign = [
-    'AWS4-HMAC-SHA256',
-    datetime,
-    credentialScope,
-    crypto.createHash('sha256').update(canonicalRequest).digest('hex'),
-  ].join('\n');
-
-  // Signing key
-  const kDate = crypto
-    .createHmac('sha256', `AWS4${B2_APP_KEY}`)
-    .update(dateStamp)
-    .digest();
-  const kRegion = crypto
-    .createHmac('sha256', kDate)
-    .update(B2_REGION)
-    .digest();
-  const kService = crypto
-    .createHmac('sha256', kRegion)
-    .update('s3')
-    .digest();
-  const kSigning = crypto
-    .createHmac('sha256', kService)
-    .update('aws4_request')
-    .digest();
-
-  const signature = crypto
-    .createHmac('sha256', kSigning)
-    .update(stringToSign)
-    .digest('hex');
-
-  queryParams.set('X-Amz-Signature', signature);
-
-  return `${B2_ENDPOINT}${canonicalUri}?${queryParams.toString()}`;
-}
-
 // ── Route Handler ───────────────────────────────────────────────────────────
 
 export async function GET(
@@ -172,11 +101,17 @@ export async function GET(
   }
 
   try {
-    // Generate presigned URL (no API round-trip needed)
-    const presignedUrl = generatePresignedUrl(filePath);
+    // Get B2 download auth (cached for 6 days)
+    const auth = await getB2Auth();
 
-    // 302 redirect to the presigned B2 URL
-    return NextResponse.redirect(presignedUrl, {
+    // Build B2 download URL: downloadUrl/bucketName/fileName?Authorization=token
+    // Encode each path segment individually to preserve / separators
+    const encodedPath = filePath.split('/').map(seg => encodeURIComponent(seg)).join('/');
+
+    const downloadUrl = `${auth.downloadUrl}/${B2_BUCKET}/${encodedPath}?Authorization=${encodeURIComponent(auth.downloadAuthToken)}`;
+
+    // 302 redirect to the B2 download URL
+    return NextResponse.redirect(downloadUrl, {
       headers: {
         'Cache-Control': 'public, max-age=3600, immutable',
       },

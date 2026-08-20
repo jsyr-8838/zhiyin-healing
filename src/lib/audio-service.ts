@@ -25,6 +25,7 @@ import { FIVE_TONES_MAP, BINAURAL_MODES, MODULATIONS, BOWL_FREQUENCIES } from '.
 import { getFreqAudioURL, setupMediaSession, revokeAllCache } from './audio-engine';
 import { getDefaultTrackForTone, getTrackById, getBowlTrackById } from './healing-music-catalog';
 import type { HealingTrack, BowlTrack } from './healing-music-catalog';
+import { SyntheticAnalyser, type TrackFrequencies } from './synthetic-analyser';
 
 // ===== 类型 =====
 
@@ -129,6 +130,7 @@ let audioElement: HTMLAudioElement | null = null;
 let audioContext: AudioContext | null = null;
 let mediaElementSource: MediaElementAudioSourceNode | null = null;
 let analyserNode: AnalyserNode | null = null;
+let syntheticAnalyser: SyntheticAnalyser | null = null;
 let gainNode: GainNode | null = null;
 let mergerNode: ChannelMergerNode | null = null;
 let binauralOscLeft: OscillatorNode | null = null;
@@ -154,10 +156,12 @@ function getAudioElement(): HTMLAudioElement {
 /**
  * 确保 AudioContext 初始化（懒加载）
  *
- * 不再使用 createMediaElementSource — 跨域音频无 CORS 头时会导致静音。
- * 音频直接通过 <audio> 元素播放，音量由 el.volume 控制。
- * AudioContext 仍保留用于双耳节拍振荡器和 LFO 调制（纯合成，不依赖音频源）。
- * analyserNode 和 gainNode 保留引用以兼容 API，但不再连接到音频链路。
+ * 架构说明：
+ *   - 音频通过 <audio> 元素直接播放（避免跨域 CORS 静音问题）
+ *   - AudioContext 用于双耳节拍振荡器和 LFO 调制（纯合成，不依赖音频源）
+ *   - mergerNode 连接到 audioContext.destination 使双耳节拍可听
+ *   - SyntheticAnalyser 基于曲目频率生成逼真频谱数据，替代 AnalyserNode
+ *   - getAnalyserNode() 返回 SyntheticAnalyser 作为 AnalyserNode 类型（鸭子类型）
  */
 function ensureAudioContext(_el: HTMLAudioElement): { analyser: AnalyserNode | null; gain: GainNode | null } {
   if (!audioContext) {
@@ -166,15 +170,26 @@ function ensureAudioContext(_el: HTMLAudioElement): { analyser: AnalyserNode | n
   }
   if (audioContext.state === 'suspended') audioContext.resume();
 
-  // 保留 analyser 和 gain 引用以兼容 API（可视化将显示空数据，可接受）
-  if (!analyserNode) {
-    analyserNode = audioContext.createAnalyser();
-    analyserNode.fftSize = 2048;
-    analyserNode.smoothingTimeConstant = 0.85;
+  // 创建 mergerNode（双耳节拍需要：左右声道合并后输出）
+  if (!mergerNode) {
+    mergerNode = audioContext.createChannelMerger(2);
+    mergerNode.connect(audioContext.destination);
   }
+
+  // 创建 gainNode（LFO 调制目标）
   if (!gainNode) {
     gainNode = audioContext.createGain();
     gainNode.gain.value = 1;
+  }
+
+  // 初始化 SyntheticAnalyser（替代 AnalyserNode，提供逼真频谱数据）
+  if (!syntheticAnalyser) {
+    syntheticAnalyser = new SyntheticAnalyser();
+  }
+
+  // analyserNode 指向 syntheticAnalyser（鸭子类型兼容 AnalyserNode）
+  if (!analyserNode) {
+    analyserNode = syntheticAnalyser as unknown as AnalyserNode;
   }
 
   return { analyser: analyserNode, gain: gainNode };
@@ -375,6 +390,27 @@ export function createBowlTrack(freqValue: number, variantSrc?: string, catalogT
   return track;
 }
 
+// ===== 曲目频率提取（供 SyntheticAnalyser 使用） =====
+
+/**
+ * 从 AudioTrack 提取频率信息，驱动合成频谱可视化。
+ * 五音曲目：使用对应五音的主频/副频/泛音。
+ * 颂钵曲目：使用频率值生成主频/副频/泛音。
+ * 其他：使用默认 432Hz。
+ */
+function getTrackFrequencies(track: AudioTrack): TrackFrequencies {
+  if (track.toneKey) {
+    const tone = FIVE_TONES_MAP[track.toneKey];
+    if (tone) {
+      return { mainFreq: tone.mainFreq, subFreq: tone.subFreq, overtoneFreq: tone.overtoneFreq };
+    }
+  }
+  if (track.bowlFreq) {
+    return { mainFreq: track.bowlFreq, subFreq: track.bowlFreq * 1.5, overtoneFreq: track.bowlFreq * 2 };
+  }
+  return { mainFreq: 432, subFreq: 528, overtoneFreq: 852 };
+}
+
 // ===== Store =====
 
 export const useAudioService = create<AudioServiceState>()(
@@ -416,25 +452,48 @@ export const useAudioService = create<AudioServiceState>()(
 
       play: (track: AudioTrack) => {
         const el = getAudioElement();
-        ensureAudioContext(el); // 初始化 AudioContext（用于双耳节拍/LFO）
+        ensureAudioContext(el); // 初始化 AudioContext（用于双耳节拍/LFO/可视化）
 
-        // 如果是同一首歌，只是 resume
-        if (get().currentTrack?.id === track.id && get().isPlaying === false) {
-          el.play();
-          set({ isPlaying: true });
-          return;
+        // 更新 SyntheticAnalyser 的曲目频率（驱动可视化频谱）
+        if (syntheticAnalyser) {
+          const freqs = getTrackFrequencies(track);
+          syntheticAnalyser.setTrack(freqs);
+          syntheticAnalyser.setVolume(get().isMuted ? 0 : get().volume);
         }
 
-        // 切换歌曲
-        el.src = track.src;
-        const targetVol = get().isMuted ? 0 : get().volume;
-        el.volume = 0; // 从0开始淡入
-        el.loop = true; // 五音/颂钵循环播放
+  // 同一首歌且当前暂停 → resume
+  if (get().currentTrack?.id === track.id && get().isPlaying === false) {
+    syntheticAnalyser?.setPlaying(true);
+    el.play().catch(() => {});
+    set({ isPlaying: true });
+    return;
+  }
 
-        // 直接播放（不经过 Web Audio 效果链，避免 CORS 问题）
-        el.play().then(() => {
-          fadeAudio(targetVol, 2); // 淡入到目标音量
-        });
+  // ===== 切换歌曲 =====
+  // [FIX] 先清理旧 fade、暂停当前播放，避免 src 竞态导致 play() reject
+  if (fadeInterval) {
+    clearInterval(fadeInterval);
+    fadeInterval = null;
+  }
+  el.pause();
+
+  el.src = track.src;
+  el.load(); // [FIX] 显式触发加载
+  const targetVol = get().isMuted ? 0 : get().volume;
+  el.volume = 0; // 从0开始淡入
+  el.loop = true; // 五音/颂钵循环播放
+
+  // [FIX] play() 加 catch，失败时恢复音量并重试
+  el.play().then(() => {
+    fadeAudio(targetVol, 2); // 淡入到目标音量
+  }).catch((err) => {
+    console.warn('[audio-service] play() rejected, retrying:', err);
+    el.volume = targetVol;
+    el.play().then(() => fadeAudio(targetVol, 1)).catch(() => {
+      el.volume = targetVol;
+    });
+  });
+        syntheticAnalyser?.setPlaying(true);
 
         set({
           isPlaying: true,
@@ -466,11 +525,15 @@ export const useAudioService = create<AudioServiceState>()(
         if (!state.isPlaying) return;
         const el = getAudioElement();
 
-        // 淡出
-        fadeAudio(0, 1.5).then(() => {
-          el.pause();
-          set({ isPlaying: false });
-        });
+        syntheticAnalyser?.setPlaying(false);
+    // 淡出
+    fadeAudio(0, 1.5).then(() => {
+      el.pause();
+      set({ isPlaying: false });
+    }).catch(() => {
+      el.pause();
+      set({ isPlaying: false });
+    });
       },
 
       togglePlay: () => {
@@ -484,20 +547,29 @@ export const useAudioService = create<AudioServiceState>()(
 
       stop: () => {
         const el = getAudioElement();
+        syntheticAnalyser?.setPlaying(false);
         // 清理方案计时器
         if (prescriptionTimerInterval) {
           clearInterval(prescriptionTimerInterval);
           prescriptionTimerInterval = null;
         }
-        fadeAudio(0, 1).then(() => {
-          el.pause();
-          el.currentTime = 0;
-          set({ isPlaying: false, currentTime: 0, isTimerRunning: false });
-          if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-          }
-        });
+    fadeAudio(0, 1).then(() => {
+      el.pause();
+      el.currentTime = 0;
+      set({ isPlaying: false, currentTime: 0, isTimerRunning: false });
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }).catch(() => {
+      el.pause();
+      el.currentTime = 0;
+      set({ isPlaying: false, currentTime: 0, isTimerRunning: false });
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    });
       },
 
       setVolume: (v: number) => {
@@ -506,6 +578,7 @@ export const useAudioService = create<AudioServiceState>()(
         if (!get().isMuted) {
           el.volume = clamped;
         }
+        syntheticAnalyser?.setVolume(clamped);
         set({ volume: clamped });
       },
 
@@ -514,8 +587,10 @@ export const useAudioService = create<AudioServiceState>()(
         const el = getAudioElement();
         if (state.isMuted) {
           el.volume = state.volume;
+          syntheticAnalyser?.setVolume(state.volume);
         } else {
           el.volume = 0;
+          syntheticAnalyser?.setVolume(0);
         }
         set({ isMuted: !state.isMuted });
       },
@@ -697,6 +772,7 @@ export function cleanupAudioService() {
   audioContext = null;
   mediaElementSource = null;
   analyserNode = null;
+  syntheticAnalyser = null;
   gainNode = null;
   mergerNode = null;
   binauralOscLeft = null;
