@@ -23,7 +23,6 @@ const nextConfig = {
       'date-fns',
       'lodash-es',
     ],
-    optimizeCss: true,
   },
 
   // Image optimization
