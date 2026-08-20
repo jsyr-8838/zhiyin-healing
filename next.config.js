@@ -1,10 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable standalone output mode - produces minimal server bundle WITHOUT source code
-  // Docker deployment uses this: only .next/standalone + .next/static + public/ are copied
-  // Source .ts/.tsx files are NOT included in the standalone output
-  output: "standalone",
-
   // Skip type checking and ESLint during build (known type conflicts in NextAuth etc.)
   typescript: {
     ignoreBuildErrors: true,
@@ -65,14 +60,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-
-// Enable OpenNext Cloudflare dev bindings for local development
-// Use async import to support ESM
-(async () => {
-  try {
-    const { initOpenNextCloudflareForDev } = await import('@opennextjs/cloudflare');
-    initOpenNextCloudflareForDev();
-  } catch (e) {
-    // Silently skip if @opennextjs/cloudflare is not installed (e.g. fresh checkout)
-  }
-})();
