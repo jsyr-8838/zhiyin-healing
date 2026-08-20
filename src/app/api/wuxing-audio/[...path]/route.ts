@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as crypto from 'crypto';
 
 /**
  * Wuxing Audio Proxy API
@@ -7,86 +6,84 @@ import * as crypto from 'crypto';
  * Streams five-element audio files from Backblaze B2.
  * URL: /api/wuxing-audio/{element}/{filename}
  *
- * The element directory name is mapped to the B2 path:
- *   wood  → audio/wuxing/{filename}
- *   fire  → audio/wuxing/{filename}
- *   etc.
+ * Uses B2 native API download authorization (7-day token) to generate
+ * download URLs that redirect the client (302) to B2.
  *
- * Since all wuxing files are in a flat directory on B2 (audio/wuxing/),
- * the element is extracted from the URL for routing but the file lookup
- * uses the filename directly against B2.
+ * Simpler and more reliable than AWS Sig V4 for filenames containing
+ * non-ASCII characters.
  */
 
 const B2_KEY_ID = process.env.B2_KEY_ID || '';
 const B2_APP_KEY = process.env.B2_APP_KEY || '';
 const B2_BUCKET = process.env.B2_BUCKET || 'zhiyin-media';
-const B2_ENDPOINT = process.env.B2_ENDPOINT || 'https://s3.us-east-005.backblazeb2.com';
-const B2_REGION = 'us-east-005';
 const B2_PREFIX = 'audio/wuxing/';
 
 const ALLOWED_EXTENSIONS = new Set(['.mp3', '.wav', '.ogg', '.flac', '.m4a', '.aac']);
 const ALLOWED_SUBDIRS = new Set(['wood', 'fire', 'earth', 'metal', 'water']);
 
-// ── B2 Presigned URL Generation ──────────────────────────────────────────────
+// ── Token Cache ─────────────────────────────────────────────────────────────
+interface CachedAuth {
+  apiUrl: string;
+  downloadUrl: string;
+  authToken: string;
+  downloadAuthToken: string;
+  expiresAt: number;
+}
 
-function generatePresignedUrl(key: string): string {
-  const datetime = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  const dateStamp = datetime.substring(0, 8);
+let cachedAuth: CachedAuth | null = null;
 
-  const canonicalUri = `/${B2_BUCKET}/${key}`;
-  const credentialScope = `${dateStamp}/${B2_REGION}/s3/aws4_request`;
+/**
+ * Authenticate with B2 native API and get a download authorization token.
+ * The download token is valid for 7 days; we refresh at 6 days.
+ */
+async function getB2Auth(): Promise<CachedAuth> {
+  if (cachedAuth && Date.now() < cachedAuth.expiresAt) {
+    return cachedAuth;
+  }
 
-  const queryParams = new URLSearchParams({
-    'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
-    'X-Amz-Credential': `${B2_KEY_ID}/${credentialScope}`,
-    'X-Amz-Date': datetime,
-    'X-Amz-Expires': '86400',
-    'X-Amz-SignedHeaders': 'host',
+  const authHeader =
+    'Basic ' + Buffer.from(`${B2_KEY_ID}:${B2_APP_KEY}`).toString('base64');
+
+  // Step 1: Authorize account
+  const authRes = await fetch(
+    'https://api.backblazeb2.com/b2api/v3/b2_authorize_account',
+    { headers: { Authorization: authHeader } }
+  );
+  if (!authRes.ok) {
+    throw new Error(`B2 authorize failed: ${authRes.status}`);
+  }
+  const authData = await authRes.json();
+  const apiUrl = authData.apiInfo.storageApi.apiUrl;
+  const downloadUrl = authData.apiInfo.storageApi.downloadUrl;
+  const authToken = authData.authorizationToken;
+
+  // Step 2: Get download authorization (valid 7 days)
+  const dlRes = await fetch(`${apiUrl}/b2api/v3/b2_get_download_authorization`, {
+    method: 'POST',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      bucketId: authData.apiInfo.storageApi.bucketId,
+      fileNamePrefix: '',
+      validDurationInSeconds: 604800,
+    }),
   });
+  if (!dlRes.ok) {
+    throw new Error(`B2 download auth failed: ${dlRes.status}`);
+  }
+  const dlData = await dlRes.json();
 
-  const canonicalHeaders = `host:${new URL(B2_ENDPOINT).hostname}\n`;
-  const signedHeaders = 'host';
-  const canonicalRequest = [
-    'GET',
-    canonicalUri,
-    queryParams.toString(),
-    canonicalHeaders,
-    signedHeaders,
-    'UNSIGNED-PAYLOAD',
-  ].join('\n');
+  cachedAuth = {
+    apiUrl,
+    downloadUrl,
+    authToken,
+    downloadAuthToken: dlData.authorizationToken,
+    expiresAt: Date.now() + 518400000, // Refresh at 6 days
+  };
 
-  const stringToSign = [
-    'AWS4-HMAC-SHA256',
-    datetime,
-    credentialScope,
-    crypto.createHash('sha256').update(canonicalRequest).digest('hex'),
-  ].join('\n');
-
-  const kDate = crypto
-    .createHmac('sha256', `AWS4${B2_APP_KEY}`)
-    .update(dateStamp)
-    .digest();
-  const kRegion = crypto
-    .createHmac('sha256', kDate)
-    .update(B2_REGION)
-    .digest();
-  const kService = crypto
-    .createHmac('sha256', kRegion)
-    .update('s3')
-    .digest();
-  const kSigning = crypto
-    .createHmac('sha256', kService)
-    .update('aws4_request')
-    .digest();
-
-  const signature = crypto
-    .createHmac('sha256', kSigning)
-    .update(stringToSign)
-    .digest('hex');
-
-  queryParams.set('X-Amz-Signature', signature);
-
-  return `${B2_ENDPOINT}${canonicalUri}?${queryParams.toString()}`;
+  return cachedAuth;
 }
 
 // ── Route Handler ───────────────────────────────────────────────────────────
@@ -133,11 +130,14 @@ export async function GET(
 
     // Build B2 key: audio/wuxing/{filename}
     const b2Key = `${B2_PREFIX}${filename}`;
+    const auth = await getB2Auth();
 
-    // Generate presigned URL and redirect
-    const presignedUrl = generatePresignedUrl(b2Key);
+    // Encode each path segment individually to preserve / separators
+    const encodedPath = b2Key.split('/').map(seg => encodeURIComponent(seg)).join('/');
 
-    return NextResponse.redirect(presignedUrl, {
+    const downloadUrl = `${auth.downloadUrl}/file/${B2_BUCKET}/${encodedPath}?Authorization=${encodeURIComponent(auth.downloadAuthToken)}`;
+
+    return NextResponse.redirect(downloadUrl, {
       headers: {
         'Cache-Control': 'public, max-age=3600, immutable',
       },
