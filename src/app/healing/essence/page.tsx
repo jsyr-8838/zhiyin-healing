@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { essenceOils, getCurrentSolarTerm, generateHealingPlan, ENERGY_PROPERTY, AROMA_NOTE, COLOR_PSYCHOLOGY, MERIDIAN_PSYCHOLOGY, type EssenceOil } from '@/lib/essence-data';
@@ -42,7 +42,8 @@ export default function EssenceAtlasPage() {
 
   return (
     <div className="min-h-screen" style={{ background: '#faf5ee' }}>
-      <header className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3" style={{ background: 'rgba(250,245,238,0.88)', backdropFilter: 'blur(12px)' }}>
+      <header className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3" style={{ background: 'rgba(250,245,238,0.88)',
+}}>
         <Link href="/healing" className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(26,26,26,0.06)' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </Link>
@@ -56,7 +57,8 @@ export default function EssenceAtlasPage() {
 
       <div className="px-4 pt-1 pb-2">
         <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-          <div className="flex gap-1.5 rounded-2xl px-2 py-1.5" style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)' }}>
+          <div className="flex gap-1.5 rounded-2xl px-2 py-1.5" style={{ background: 'rgba(255,255,255,0.6)',
+}}>
             {['all', 'monthly', 'solar_term', 'pentad'].map(t => (
               <button key={t} onClick={() => setTypeFilter(t)}
                 className="px-3 py-1.5 rounded-xl text-xs whitespace-nowrap transition-all"
@@ -97,8 +99,7 @@ export default function EssenceAtlasPage() {
                 className="relative rounded-2xl p-3 text-left transition-all active:scale-[0.97]"
                 style={{
                   background: 'rgba(255,255,255,0.65)',
-                  backdropFilter: 'blur(8px)',
-                  borderLeft: `3px solid ${color}`,
+borderLeft: `3px solid ${color}`,
                   boxShadow: isCurrent ? `0 0 0 1.5px ${color}50, 0 4px 16px ${color}18` : '0 1px 4px rgba(0,0,0,0.04)',
                 }}>
                 {isCurrent && (
@@ -141,7 +142,8 @@ export default function EssenceAtlasPage() {
 
       {selectedOil && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setSelectedOil(null)}>
-          <div className="absolute inset-0" style={{ background: 'rgba(26,26,26,0.35)', backdropFilter: 'blur(4px)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(26,26,26,0.35)',
+}} />
           <div className="relative w-full max-w-lg rounded-t-3xl overflow-hidden animate-slide-up" style={{ background: '#faf5ee', maxHeight: '85vh' }}
             onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 z-10 flex items-center justify-between px-5 pt-4 pb-2" style={{ background: '#faf5ee' }}>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -324,7 +324,7 @@ export default function HealingPage() {
               backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(139,92,246,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(59,130,246,0.3) 0%, transparent 50%)',
             }} />
             <div className="relative z-10 p-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-lg flex items-center justify-center text-purple-300 border border-white/20 flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-purple-300 border border-white/20 flex-shrink-0">
                 <Music2 size={22} />
               </div>
               <div className="flex-1 min-w-0">

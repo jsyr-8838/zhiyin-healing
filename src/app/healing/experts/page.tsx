@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -154,7 +154,7 @@ export default function ExpertBookingPage() {
       style={{ background: 'linear-gradient(180deg, #faf5ee 0%, #f5efe4 40%, #f0e8d8 100%)' }}
     >
       {/* 顶部导航 */}
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-[#faf5ee]/90 border-b border-[#e0d8c8]">
+      <div className="sticky top-0 z-50 bg-[#faf5ee]/90 border-b border-[#e0d8c8]">
         <div className="flex items-center justify-between px-4 pt-12 pb-3">
           <Link
             href="/healing"
@@ -228,8 +228,7 @@ export default function ExpertBookingPage() {
                       : 'rgba(250, 245, 238, 0.92)',
                     border: isSelected ? `1.5px solid ${ec.main}` : '1px solid #d0c8b8',
                     boxShadow: isSelected ? `0 4px 20px ${ec.glow}` : 'none',
-                    backdropFilter: 'blur(8px)',
-                  }}
+}}
                 >
                   <div className="p-4 flex gap-4">
                     {/* 头像 */}
@@ -580,7 +579,7 @@ export default function ExpertBookingPage() {
       {/* ═══ 微信二维码弹窗 ═══ */}
       {wechatModal && selected?.wechatId && (
         <div
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50"
           onClick={() => setWechatModal(false)}
         >
           <div

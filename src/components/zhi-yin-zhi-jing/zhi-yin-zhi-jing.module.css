@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 知音之境 — 液态禅意沉浸式样式
  * 移植自 FlowHaven style.css，改用 CSS 变量实现四境主题切换。
  * 主题变量由组件通过 inline style 注入：
@@ -311,8 +311,7 @@
   width: 56px; height: 56px;
   border-radius: 50%;
   background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(14px) saturate(1.4);
-  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+
   border: 1px solid color-mix(in srgb, var(--zzj-accent) 30%, transparent);
   display: flex;
   align-items: center;
@@ -339,8 +338,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   background: rgba(18, 20, 26, 0.82);
-  backdrop-filter: blur(22px) saturate(1.6);
-  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+
   border-radius: 22px;
   border: 1px solid color-mix(in srgb, var(--zzj-accent) 18%, transparent);
   padding: 22px;
@@ -840,8 +838,7 @@
   justify-content: center;
   padding: 24px;
   background: rgba(8, 10, 14, 0.68);
-  backdrop-filter: blur(8px) saturate(1.2);
-  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+
   animation: zzjOverlayIn 0.4s ease-out;
 }
 @keyframes zzjOverlayIn {
@@ -854,8 +851,7 @@
   position: relative;
   width: min(360px, 92vw);
   background: rgba(18, 20, 26, 0.92);
-  backdrop-filter: blur(26px) saturate(1.6);
-  -webkit-backdrop-filter: blur(26px) saturate(1.6);
+
   border-radius: 22px;
   border: 1px solid color-mix(in srgb, var(--zzj-accent) 22%, transparent);
   padding: 26px 22px 22px;
@@ -1044,8 +1040,7 @@
   position: relative;
   width: min(420px, 92vw);
   background: rgba(18, 20, 26, 0.92);
-  backdrop-filter: blur(26px) saturate(1.6);
-  -webkit-backdrop-filter: blur(26px) saturate(1.6);
+
   border-radius: 22px;
   border: 1px solid color-mix(in srgb, var(--zzj-accent) 22%, transparent);
   padding: 32px 26px 26px;
@@ -1130,8 +1125,7 @@
   position: relative;
   width: min(420px, 92vw);
   background: rgba(18, 20, 26, 0.94);
-  backdrop-filter: blur(26px) saturate(1.6);
-  -webkit-backdrop-filter: blur(26px) saturate(1.6);
+
   border-radius: 22px;
   border: 1px solid color-mix(in srgb, var(--zzj-accent) 24%, transparent);
   padding: 32px 26px 26px;

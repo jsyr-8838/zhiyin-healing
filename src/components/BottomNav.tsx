@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -36,8 +36,6 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom"
       style={{
         background: navBg,
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
         borderTop: `1px solid ${navBorder}`,
       }}
     >

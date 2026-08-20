@@ -70,3 +70,6 @@ public/textures/shanshui-*.jpg
 *.pre-sync.*
 
 start.bat
+
+.dev-stderr.txt
+.dev-stdout.txt

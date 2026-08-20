@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
 import {
@@ -80,7 +80,7 @@ export default memo(function WeatherRadio({ onStartRadio, compact = false }: Wea
 
   if (compact) {
     return (
-      <div className="glass-card p-4 rounded-2xl bg-black/30 backdrop-blur-xl border border-white/10">
+      <div className="glass-card p-4 rounded-2xl bg-black/30 border border-white/10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
             <Cloud size={20} className="text-purple-300" />
@@ -100,7 +100,7 @@ export default memo(function WeatherRadio({ onStartRadio, compact = false }: Wea
   }
 
   return (
-    <div className="rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 overflow-hidden">
+    <div className="rounded-3xl bg-black/40 border border-white/10 overflow-hidden">
       {/* 天气头图 */}
       <div className="relative h-28 sm:h-40 bg-gradient-to-br from-purple-900/60 via-blue-900/40 to-indigo-900/60 overflow-hidden">
         {/* 装饰粒子（用固定位置避免 hydration mismatch） */}

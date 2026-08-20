@@ -302,8 +302,7 @@ export default function MineradioPage() {
                 className="flex flex-col items-center justify-center text-center p-8 w-full lg:w-1/2"
                 style={{
                   background: 'rgba(255,255,255,0.9)',
-                  backdropFilter: 'blur(30px)',
-                  borderRadius: 40,
+borderRadius: 40,
                   boxShadow: '0 20px 60px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.02)',
                   minHeight: 400,
                 }}
@@ -332,8 +331,7 @@ export default function MineradioPage() {
                 className="flex flex-col items-center p-8 w-full lg:w-1/2"
                 style={{
                   background: 'rgba(255,255,255,0.9)',
-                  backdropFilter: 'blur(30px)',
-                  borderRadius: 40,
+borderRadius: 40,
                   boxShadow: '0 20px 60px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.02)',
                   minHeight: 500,
                 }}
@@ -541,12 +539,11 @@ export default function MineradioPage() {
         style={{
           borderBottom: isPlaying ? 'none' : '1px solid #e0d8c8',
           background: isInStressFlow ? 'rgba(253,251,247,0.8)' : isPlaying ? 'transparent' : 'rgba(250,245,238,0.8)',
-          backdropFilter: isInStressFlow || isPlaying ? 'none' : 'blur(8px)',
-        }}
+          }}
       >
         <Link
           href="/healing"
-          className={`p-2 rounded-xl transition ${isInStressFlow ? 'bg-[#5ba09a]/10 hover:bg-[#5ba09a]/20 text-[#5ba09a]' : isPlaying ? 'bg-white/10 hover:bg-white/15 backdrop-blur text-white' : 'bg-[#e8e0d0] hover:bg-[#ddd5c5] text-[#4a3a2a]'}`}
+          className={`p-2 rounded-xl transition ${isInStressFlow ? 'bg-[#5ba09a]/10 hover:bg-[#5ba09a]/20 text-[#5ba09a]' : isPlaying ? 'bg-white/10 hover:bg-white/15 text-white' : 'bg-[#e8e0d0] hover:bg-[#ddd5c5] text-[#4a3a2a]'}`}
         >
           {isInStressFlow ? (
             <button onClick={stress.backToIdle}><ArrowLeft size={20} /></button>
@@ -615,8 +612,7 @@ export default function MineradioPage() {
                   className="flex flex-col items-center justify-center p-6 cursor-pointer"
                   style={{
                     background: 'rgba(255,255,255,0.9)',
-                    backdropFilter: 'blur(30px)',
-                    borderRadius: 40,
+borderRadius: 40,
                     boxShadow: '0 20px 60px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.02)',
                   }}
                   onClick={stress.handleStart}

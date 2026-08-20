@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
@@ -82,7 +82,7 @@ export default function YunQiClient() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a12] via-[#0d0d1a] to-[#0a0a12]">
       {/* ===== Header ===== */}
-      <header className="sticky top-0 z-50 bg-[#0a0a12]/90 backdrop-blur-xl border-b border-white/5">
+      <header className="sticky top-0 z-50 bg-[#0a0a12]/90 border-b border-white/5">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <a href="/healing" className="text-zinc-500 hover:text-white transition-colors text-sm">
             ← 疗愈

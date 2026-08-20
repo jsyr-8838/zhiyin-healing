@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import BottomNav from '@/components/BottomNav';
@@ -822,9 +822,8 @@ export default function LiuzijuePage() {
           style={{
             top: 64, bottom: 56,
             background: `radial-gradient(ellipse at center, rgba(253,248,240,0.96) 0%, rgba(253,248,240,0.86) 60%, rgba(253,248,240,0.72) 100%)`,
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-          }}>
+
+}}>
           {/* 字诀大字 */}
           <div className="font-black font-serif mb-4" style={{
             fontSize: 104,

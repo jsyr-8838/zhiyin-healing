@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
@@ -138,8 +138,7 @@ export default function CDPlayer({
           width: 60,
           height: 60,
           background: 'rgba(255,255,255,0.2)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.4)',
+border: '1px solid rgba(255,255,255,0.4)',
           color: 'white',
           fontSize: '1.2rem',
           zIndex: 30,

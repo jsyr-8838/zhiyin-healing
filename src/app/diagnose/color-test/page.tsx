@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { SEASONS, SEASON_KEYS, type SeasonColor } from '@/lib/season-colors';
@@ -197,10 +197,12 @@ export default function ColorTestPage() {
         <div className="relative flex-1 flex flex-col">
           <div className="absolute top-0 left-0 right-0 z-10 p-4">
             <div className="flex items-center justify-between mb-3">
-              <div className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff', backdropFilter: 'blur(8px)' }}>
+              <div className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff',
+}}>
                 {isPhase2 ? '阶段2·日常色精筛' : '阶段1·极端色初筛'}
               </div>
-              <div className="px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff', backdropFilter: 'blur(8px)' }}>
+              <div className="px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff',
+}}>
                 {currentRound + 1} / {TOTAL_ROUNDS}
               </div>
             </div>
@@ -211,7 +213,8 @@ export default function ColorTestPage() {
 
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="mb-4 px-5 py-2 rounded-full inline-block" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(12px)' }}>
+              <div className="mb-4 px-5 py-2 rounded-full inline-block" style={{ background: 'rgba(0,0,0,0.45)',
+}}>
                 <p className="text-2xl font-bold text-white">{currentTest.colorName}</p>
                 <p className="text-sm text-white/70 mt-1">{currentTest.nameCN} · {currentTest.name}</p>
               </div>
@@ -221,7 +224,8 @@ export default function ColorTestPage() {
             </div>
           </div>
 
-          <div className="p-4 pb-8" style={{ background: 'rgba(250,245,238,0.97)', backdropFilter: 'blur(20px)', borderRadius: '24px 24px 0 0' }}>
+          <div className="p-4 pb-8" style={{ background: 'rgba(250,245,238,0.97)',
+borderRadius: '24px 24px 0 0' }}>
             <p className="text-center text-sm mb-4" style={{ color: '#888' }}>这个色彩与你有多契合？</p>
             <div className="flex items-center justify-center gap-4 mb-2">
               {EMOJI_SCORES.map(({ emoji, label, score }) => (

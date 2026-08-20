@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { QUIZ_QUESTIONS, AROMA_LABELS, AROMA_PERSONALITIES, computeAromaRecommendation, type AromaQuizResult, type AromaVector, type QuizQuestion } from '@/lib/aroma-engine';
@@ -55,7 +55,8 @@ export default function AromaQuizPage() {
 
   return (
     <div className="min-h-screen" style={{ background: '#faf5ee' }}>
-      <header className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3" style={{ background: 'rgba(250,245,238,0.88)', backdropFilter: 'blur(12px)' }}>
+      <header className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3" style={{ background: 'rgba(250,245,238,0.88)',
+}}>
         {currentStep < totalSteps ? (
           <button onClick={() => { if (currentStep > 0) setCurrentStep(s => s - 1); }}
             className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(26,26,26,0.06)' }}>
@@ -119,8 +120,7 @@ export default function AromaQuizPage() {
                     className="w-full flex items-start gap-3 px-4 py-3.5 rounded-2xl text-left transition-all active:scale-[0.98]"
                     style={{
                       background: isSelected ? 'rgba(91,160,154,0.1)' : 'rgba(255,255,255,0.65)',
-                      backdropFilter: 'blur(8px)',
-                      border: isSelected ? '1.5px solid #5ba09a' : '1.5px solid rgba(0,0,0,0.04)',
+border: isSelected ? '1.5px solid #5ba09a' : '1.5px solid rgba(0,0,0,0.04)',
                       boxShadow: isSelected ? '0 2px 12px rgba(91,160,154,0.15)' : '0 1px 4px rgba(0,0,0,0.04)',
                     }}>
                     <span className="text-xl shrink-0 mt-0.5">{opt.emoji}</span>
@@ -155,7 +155,8 @@ export default function AromaQuizPage() {
             </div>
           </div>
 
-          <div className="mb-5 px-4 py-4 rounded-2xl" style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(8px)' }}>
+          <div className="mb-5 px-4 py-4 rounded-2xl" style={{ background: 'rgba(255,255,255,0.65)',
+}}>
             <div className="text-xs font-bold mb-3" style={{ color: '#1a1a1a', fontWeight: 760 }}>香气基因图谱</div>
             <div className="space-y-2.5">
               {(Object.keys(AROMA_LABELS) as (keyof AromaVector)[]).map(key => {
@@ -182,7 +183,8 @@ export default function AromaQuizPage() {
                 const color = WUXING_COLORS[rec.oil.wuxing];
                 return (
                   <div key={rec.oil.id} className="px-4 py-3.5 rounded-2xl flex items-start gap-3"
-                    style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(8px)', borderLeft: `3px solid ${color}` }}>
+                    style={{ background: 'rgba(255,255,255,0.65)',
+borderLeft: `3px solid ${color}` }}>
                     <div className="text-lg font-bold shrink-0 mt-0.5" style={{ color, fontWeight: 780 }}>{i + 1}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">

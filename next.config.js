@@ -11,6 +11,21 @@ const nextConfig = {
     ".loca.lt",
   ],
 
+  // Performance: compress responses
+  compress: true,
+
+  // Performance: tree-shake large icon/utility libraries
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'react-icons',
+      '@heroicons/react',
+      'date-fns',
+      'lodash-es',
+    ],
+    optimizeCss: true,
+  },
+
   // Image optimization
   images: {
     formats: ["image/avif", "image/webp"],
@@ -26,7 +41,7 @@ const nextConfig = {
     ],
   },
 
-  // Security headers
+  // Security + caching headers
   async headers() {
     return [
       {
@@ -49,6 +64,32 @@ const nextConfig = {
               "manifest-src 'self'",
             ].join("; "),
           },
+        ],
+      },
+      // Static asset caching (1 year immutable)
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      // Media files (audio/video/images) caching
+      {
+        source: "/videos/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, immutable" },
+        ],
+      },
+      {
+        source: "/audio/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, immutable" },
+        ],
+      },
+      {
+        source: "/images/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, immutable" },
         ],
       },
     ];

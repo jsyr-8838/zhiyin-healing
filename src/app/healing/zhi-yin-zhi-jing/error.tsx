@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 
@@ -36,8 +36,7 @@ export default function ZhiYinZhiJingError({
           background: 'rgba(255,255,255,0.04)',
           border: '1px solid rgba(255,179,71,0.22)',
           borderRadius: 22,
-          backdropFilter: 'blur(22px) saturate(1.4)',
-          WebkitBackdropFilter: 'blur(22px) saturate(1.4)',
+
         }}
       >
         <div

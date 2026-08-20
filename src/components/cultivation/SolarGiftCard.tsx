@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { getCurrentSolarTerm } from '@/lib/solar-terms-data';
@@ -76,8 +76,7 @@ export default function SolarGiftCard() {
   return (
     <div className="rounded-2xl overflow-hidden" style={{
       background: `linear-gradient(145deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35))`,
-      backdropFilter: 'blur(16px)',
-      border: '1px solid rgba(255,255,255,0.6)',
+border: '1px solid rgba(255,255,255,0.6)',
       boxShadow: '0 8px 32px rgba(30,45,38,0.08)',
     }}>
       {!opened ? (

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -70,7 +70,7 @@ export default function AcupointClient() {
   return (
     <div className="min-h-screen bg-[#faf5ee]">
       {/* 顶部标题栏 */}
-      <div className="sticky top-0 z-30 bg-[#faf5ee]/95 backdrop-blur-sm border-b border-[#e8ddd0]/60 px-4 py-3">
+      <div className="sticky top-0 z-30 bg-[#faf5ee]/95 border-b border-[#e8ddd0]/60 px-4 py-3">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
@@ -135,7 +135,7 @@ export default function AcupointClient() {
       <div className="max-w-4xl mx-auto px-4 pb-8">
         {/* 穴位详情 */}
         {selectedPoint && currentMeridian && (
-          <div className="mb-4 bg-white/90 backdrop-blur-sm rounded-2xl border border-[#e8ddd0]/60 overflow-hidden shadow-sm">
+          <div className="mb-4 bg-white/90 rounded-2xl border border-[#e8ddd0]/60 overflow-hidden shadow-sm">
             {/* 头部 */}
             <div className="p-4 border-b border-[#e8ddd0]/40">
               <div className="flex items-center gap-2">

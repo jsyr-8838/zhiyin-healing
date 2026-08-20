@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
@@ -258,7 +258,7 @@ export default function ExpertAdminPage() {
       style={{ background: 'linear-gradient(180deg, #faf5ee 0%, #f5efe4 40%, #f0e8d8 100%)' }}
     >
       {/* 顶部导航 */}
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-[#faf5ee]/90 border-b border-[#e0d8c8]">
+      <div className="sticky top-0 z-50 bg-[#faf5ee]/90 border-b border-[#e0d8c8]">
         <div className="flex items-center justify-between px-4 pt-12 pb-3">
           <Link
             href="/healing/experts"

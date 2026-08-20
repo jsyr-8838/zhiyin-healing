@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
@@ -99,15 +99,15 @@ export default function ClassicsAIAssistant({ onClose }: Props) {
   return (
     <div
       className="fixed inset-0 z-[60] flex items-end md:items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+      style={{ background: 'rgba(0,0,0,0.5)',
+}}
       onClick={onClose}
     >
       <div
         className="w-full max-w-2xl h-[85vh] md:h-[80vh] md:rounded-2xl rounded-t-2xl flex flex-col overflow-hidden"
         style={{
           background: 'rgba(245,240,232,0.98)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 -4px 40px rgba(0,0,0,0.15)',
+boxShadow: '0 -4px 40px rgba(0,0,0,0.15)',
         }}
         onClick={e => e.stopPropagation()}
       >

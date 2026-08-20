@@ -95,10 +95,10 @@
   --paper-800: #3a5545;           /* = 淡墨 */
   --paper-900: #1e2d26;           /* = 浓墨 */
 
-  /* 毛玻璃 */
-  --glass-bg: rgba(255, 255, 255, 0.52);
+  /* 毛玻璃（已移除blur，改为纯色半透明） */
+  --glass-bg: rgba(255, 255, 255, 0.88);
   --glass-border: rgba(255, 255, 255, 0.72);
-  --glass-blur: 24px;
+  --glass-blur: 0px;
   --glass-glow: rgba(255, 255, 255, 0.15);
 
   /* 圆角 */
@@ -146,249 +146,42 @@
   --night-text-dim: rgba(255, 255, 255, 0.40);
   --night-text-faint: rgba(255, 255, 255, 0.20);
   --night-glow: rgba(196, 163, 90, 0.12);     /* 金色微光 */
-  --night-blur: 16px;
+  --night-blur: 0px;
 }
 
-/* ═══ Tailwind 色阶重映射至五行疗愈色 ═══
-   原理：Tailwind v4 的 @theme inline 允许覆盖默认色阶，
-   将 gray→宣纸墨色, emerald→木行, amber→土行, red→火行,
-   purple/indigo→水行靛蓝, teal→水行天青, orange→赭石,
-   blue→水行, green→木行, yellow→土行暮金
-   这样页面中 ~880 处硬编码类名自动产生正确疗愈色，
-   无需逐个修改。 */
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-light: var(--primary-light);
-  --color-accent: var(--accent);
-
-  /* gray → 宣纸墨色 (影响最广: 487处) */
-  --color-gray-50: var(--paper-50);
-  --color-gray-100: var(--paper-100);
-  --color-gray-200: var(--paper-200);
-  --color-gray-300: var(--paper-300);
-  --color-gray-400: var(--paper-400);
-  --color-gray-500: var(--paper-500);
-  --color-gray-600: var(--paper-600);
-  --color-gray-700: var(--paper-700);
-  --color-gray-800: var(--paper-800);
-  --color-gray-900: var(--paper-900);
-  --color-gray-950: #0f1810;
-
-  /* paper → 宣纸色阶 (显式语义名, 用于 bg-paper-200 等) */
-  --color-paper-50: var(--paper-50);
-  --color-paper-100: var(--paper-100);
-  --color-paper-200: var(--paper-200);
-  --color-paper-300: var(--paper-300);
-  --color-paper-400: var(--paper-400);
-  --color-paper-500: var(--paper-500);
-  --color-paper-600: var(--paper-600);
-  --color-paper-700: var(--paper-700);
-  --color-paper-800: var(--paper-800);
-  --color-paper-900: var(--paper-900);
-  --color-paper-light: var(--paper-light);
-  --color-paper-old: var(--paper-old);
-
-  /* emerald → 木行青瓷色 (148处) */
-  --color-emerald-50: var(--wood-50);
-  --color-emerald-100: var(--wood-100);
-  --color-emerald-200: var(--wood-200);
-  --color-emerald-300: var(--wood-300);
-  --color-emerald-400: var(--wood-400);
-  --color-emerald-500: var(--wood-500);
-  --color-emerald-600: var(--wood-600);
-  --color-emerald-700: var(--wood-700);
-  --color-emerald-800: var(--wood-800);
-  --color-emerald-900: var(--wood-900);
-  --color-emerald-950: #081208;
-
-  /* amber → 土行暮金色 (145处) */
-  --color-amber-50: var(--earth-50);
-  --color-amber-100: var(--earth-100);
-  --color-amber-200: var(--earth-200);
-  --color-amber-300: var(--earth-300);
-  --color-amber-400: var(--earth-400);
-  --color-amber-500: var(--earth-500);
-  --color-amber-600: var(--earth-600);
-  --color-amber-700: var(--earth-700);
-  --color-amber-800: var(--earth-800);
-  --color-amber-900: var(--earth-900);
-  --color-amber-950: #1d180a;
-
-  /* red → 火行朱砂色 (44处) */
-  --color-red-50: var(--fire-50);
-  --color-red-100: var(--fire-100);
-  --color-red-200: var(--fire-200);
-  --color-red-300: var(--fire-300);
-  --color-red-400: var(--fire-400);
-  --color-red-500: var(--fire-500);
-  --color-red-600: var(--fire-600);
-  --color-red-700: var(--fire-700);
-  --color-red-800: var(--fire-800);
-  --color-red-900: var(--fire-900);
-  --color-red-950: #2a0f0d;
-
-  /* purple → 水行靛蓝 (69处, 占卜冷色) */
-  --color-purple-50: #eef2f6;
-  --color-purple-100: #d5e0ea;
-  --color-purple-200: #a8c1d5;
-  --color-purple-300: #7ba2c0;
-  --color-purple-400: #5a8aaa;
-  --color-purple-500: #4a6880;    /* = --indigo 修饰色 */
-  --color-purple-600: #3a5268;
-  --color-purple-700: #2a3c50;
-  --color-purple-800: #1a2638;
-  --color-purple-900: #0a101f;
-  --color-purple-950: #050810;
-
-  /* indigo → 靛蓝修饰色 (37处, 与purple配对) */
-  --color-indigo-50: #eef2f6;
-  --color-indigo-100: #d5e0ea;
-  --color-indigo-200: #a8c1d5;
-  --color-indigo-300: #7ba2c0;
-  --color-indigo-400: #5a8aaa;
-  --color-indigo-500: #4a6880;
-  --color-indigo-600: #3a5268;
-  --color-indigo-700: #2a3c50;
-  --color-indigo-800: #1a2638;
-  --color-indigo-900: #0a101f;
-  --color-indigo-950: #050810;
-
-  /* teal → 水行天青色 (35处, 与emerald配对) */
-  --color-teal-50: var(--water-50);
-  --color-teal-100: var(--water-100);
-  --color-teal-200: var(--water-200);
-  --color-teal-300: var(--water-300);
-  --color-teal-400: var(--water-400);
-  --color-teal-500: var(--water-500);
-  --color-teal-600: var(--water-600);
-  --color-teal-700: var(--water-700);
-  --color-teal-800: var(--water-800);
-  --color-teal-900: var(--water-900);
-  --color-teal-950: #071211;
-
-  /* orange → 赭石暖色 (28处, 与amber配对) */
-  --color-orange-50: #fdf3e8;
-  --color-orange-100: #f8e2c8;
-  --color-orange-200: #f0c596;
-  --color-orange-300: #e5a964;
-  --color-orange-400: #c28a5a;     /* = --ochre 赭石 */
-  --color-orange-500: #a87a50;
-  --color-orange-600: #8e6a46;
-  --color-orange-700: #6e5236;
-  --color-orange-800: #4e3a26;
-  --color-orange-900: #2e2216;
-  --color-orange-950: #17110b;
-
-  /* blue → 水行天青偏蓝 (23处) */
-  --color-blue-50: var(--water-50);
-  --color-blue-100: var(--water-100);
-  --color-blue-200: var(--water-200);
-  --color-blue-300: var(--water-300);
-  --color-blue-400: var(--water-400);
-  --color-blue-500: var(--water-500);
-  --color-blue-600: var(--water-600);
-  --color-blue-700: var(--water-700);
-  --color-blue-800: var(--water-800);
-  --color-blue-900: var(--water-900);
-  --color-blue-950: #071211;
-
-  /* green → 木行色 (11处) */
-  --color-green-50: var(--wood-50);
-  --color-green-100: var(--wood-100);
-  --color-green-200: var(--wood-200);
-  --color-green-300: var(--wood-300);
-  --color-green-400: var(--wood-400);
-  --color-green-500: var(--wood-500);
-  --color-green-600: var(--wood-600);
-  --color-green-700: var(--wood-700);
-  --color-green-800: var(--wood-800);
-  --color-green-900: var(--wood-900);
-  --color-green-950: #081208;
-
-  /* yellow → 土行暮金色 (11处) */
-  --color-yellow-50: var(--earth-50);
-  --color-yellow-100: var(--earth-100);
-  --color-yellow-200: var(--earth-200);
-  --color-yellow-300: var(--earth-300);
-  --color-yellow-400: var(--earth-400);
-  --color-yellow-500: var(--earth-500);
-  --color-yellow-600: var(--earth-600);
-  --color-yellow-700: var(--earth-700);
-  --color-yellow-800: var(--earth-800);
-  --color-yellow-900: var(--earth-900);
-  --color-yellow-950: #1d180a;
-
-  /* violet → 脉轮紫 (6处) */
-  --color-violet-50: #f2eef6;
-  --color-violet-100: #ddd5ea;
-  --color-violet-200: #bbabd5;
-  --color-violet-300: #9981c0;
-  --color-violet-400: #7a5faa;
-  --color-violet-500: #5e4294;
-  --color-violet-600: #4a3478;
-  --color-violet-700: #36265c;
-  --color-violet-800: #221840;
-  --color-violet-900: #0e0a24;
-  --color-violet-950: #070512;
-
-  /* pink → 胭脂 (3处) */
-  --color-pink-50: var(--fire-50);
-  --color-pink-100: var(--fire-100);
-  --color-pink-200: var(--fire-200);
-  --color-pink-300: var(--fire-300);
-  --color-pink-400: var(--fire-400);
-  --color-pink-500: var(--fire-500);
-  --color-pink-600: var(--fire-600);
-  --color-pink-700: var(--fire-700);
-  --color-pink-800: var(--fire-800);
-  --color-pink-900: var(--fire-900);
-  --color-pink-950: #2a0f0d;
-
-  /* cyan → 天青 (2处) */
-  --color-cyan-50: var(--water-50);
-  --color-cyan-100: var(--water-100);
-  --color-cyan-200: var(--water-200);
-  --color-cyan-300: var(--water-300);
-  --color-cyan-400: var(--water-400);
-  --color-cyan-500: var(--water-500);
-  --color-cyan-600: var(--water-600);
-  --color-cyan-700: var(--water-700);
-  --color-cyan-800: var(--water-800);
-  --color-cyan-900: var(--water-900);
-  --color-cyan-950: #071211;
-
-  /* rose → 胭脂红 (1处) */
-  --color-rose-50: var(--fire-50);
-  --color-rose-100: var(--fire-100);
-  --color-rose-200: var(--fire-200);
-  --color-rose-300: var(--fire-300);
-  --color-rose-400: var(--fire-400);
-  --color-rose-500: var(--fire-500);
-  --color-rose-600: var(--fire-600);
-  --color-rose-700: var(--fire-700);
-  --color-rose-800: var(--fire-800);
-  --color-rose-900: var(--fire-900);
-  --color-rose-950: #2a0f0d;
-
-  /* slate → 月白银 (1处) */
-  --color-slate-50: var(--metal-50);
-  --color-slate-100: var(--metal-100);
-  --color-slate-200: var(--metal-200);
-  --color-slate-300: var(--metal-300);
-  --color-slate-400: var(--metal-400);
-  --color-slate-500: var(--metal-500);
-  --color-slate-600: var(--metal-600);
-  --color-slate-700: var(--metal-700);
-  --color-slate-800: var(--metal-800);
-  --color-slate-900: var(--metal-900);
-  --color-slate-950: #111816;
-
-  /* zinc 独立：3D经络页面暗色UI，保留原暗色调不变 */
-  /* 不重映射 zinc，meridian/page.tsx 的暗色UI应保持原有对比度 */
+/* ═══ 首页专属样式 ═══ */
+.hero-char {
+  display: inline-block;
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
+  font-weight: 900;
 }
+.hero-char:hover {
+  transform: translateY(-4px) scale(1.05);
+}
+.hero-divider {
+  display: inline-block;
+  color: var(--ink-light);
+  opacity: 0.35;
+  margin: 0 2px;
+}
+@keyframes homepage-slow-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-slow-rotate {
+  animation: homepage-slow-rotate 120s linear infinite;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation-name: fade-up; }
+@keyframes fade-scale {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-scale { animation-name: fade-scale; }
+
 
 /* ═══ 全局基础 ═══ */
 body {
@@ -561,16 +354,14 @@ body {
     linear-gradient(165deg, #f0e4cf 0%, var(--xuan-warm) 50%, #ece0c8 100%);
 }
 
-/* ═══ 毛玻璃卡 ═══ */
+/* ═══ 半透明卡片（原毛玻璃，已移除backdrop-filter） ═══ */
 .glass-card {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
-  background: linear-gradient(145deg, rgba(255,255,255,0.58), rgba(255,255,255,0.28));
+  background: rgba(255, 255, 255, 0.88);
   box-shadow: var(--shadow-md), var(--shadow-glow);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
   transition: transform 500ms cubic-bezier(.22,.61,.36,1), box-shadow 500ms ease;
 }
 .glass-card::before {
@@ -602,11 +393,9 @@ body {
   transition-duration: 150ms;
 }
 
-/* 毛玻璃（非卡片场景） */
+/* 半透明（非卡片场景，已移除backdrop-filter） */
 .glass {
-  background: linear-gradient(145deg, rgba(255,255,255,0.56), rgba(255,255,255,0.26));
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: rgba(255, 255, 255, 0.88);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-md);
 }
@@ -708,16 +497,14 @@ body {
     linear-gradient(180deg, #0a0a1a 0%, #12122a 50%, #0a0a1a 100%);
 }
 
-/* 暗色毛玻璃面板 */
+/* 暗色半透明面板（已移除backdrop-filter） */
 .glass-dark {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--night-border);
   border-radius: var(--r-lg);
-  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  background: rgba(18, 18, 42, 0.92);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30), 0 0 24px rgba(196, 163, 90, 0.05);
-  backdrop-filter: blur(var(--night-blur));
-  -webkit-backdrop-filter: blur(var(--night-blur));
   transition: transform 500ms cubic-bezier(.22,.61,.36,1), box-shadow 500ms ease;
 }
 .glass-dark::before {
@@ -744,11 +531,9 @@ body {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 32px rgba(196, 163, 90, 0.08);
 }
 
-/* 暗色毛玻璃（非卡片） */
+/* 暗色半透明（非卡片，已移除backdrop-filter） */
 .glass-dark-surface {
-  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  backdrop-filter: blur(var(--night-blur));
-  -webkit-backdrop-filter: blur(var(--night-blur));
+  background: rgba(18, 18, 42, 0.92);
   border: 1px solid var(--night-border);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30);
 }

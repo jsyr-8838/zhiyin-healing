@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import {
   TWELVE_MERIDIANS,
   getMeridianByCode,
@@ -61,7 +61,7 @@ export const MeridianSidebar = memo(function MeridianSidebar({
 
   return (
     <div
-      className={`fixed left-0 top-0 bottom-0 z-50 w-[340px] max-w-[85vw] bg-black/80 backdrop-blur-xl border-r border-white/10
+      className={`fixed left-0 top-0 bottom-0 z-50 w-[340px] max-w-[85vw] bg-black/80 border-r border-white/10
         transform transition-transform duration-300 overflow-y-auto
         ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:top-12 md:bottom-20 md:rounded-r-2xl md:border md:h-auto`}
     >
@@ -125,7 +125,7 @@ export const MeridianSidebar = memo(function MeridianSidebar({
             )}
           </div>
           {showSearchDropdown && searchResults.length > 0 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-1 max-h-[280px] overflow-y-auto bg-zinc-900/95 border border-white/15 rounded-lg shadow-xl backdrop-blur-sm">
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 max-h-[280px] overflow-y-auto bg-zinc-900/95 border border-white/15 rounded-lg shadow-xl">
               <div className="px-2 py-1.5 text-[10px] text-zinc-500 border-b border-white/5">
                 找到 {searchResults.length > 20 ? '20+' : searchResults.length} 个结果
               </div>

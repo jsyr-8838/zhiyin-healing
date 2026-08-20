@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import type { PlayerTrack, PlaylistState, RepeatMode } from '@/lib/mineradio/playlist';
@@ -161,7 +161,7 @@ function MusicPlayer({
   if (compact) {
     const compactTheme = elementKey ? ELEMENT_THEME[elementKey] : null;
     return (
-      <div className="flex items-center gap-3 px-4 py-2 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10">
+      <div className="flex items-center gap-3 px-4 py-2 bg-black/40 rounded-2xl border border-white/10">
         <div className={`w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 ${
           compactTheme ? `bg-gradient-to-br ${compactTheme.gradient}` : 'bg-white/10'
         } flex items-center justify-center`}>
@@ -373,8 +373,7 @@ function MusicPlayer({
             padding: '9px 22px 14px',
             borderRadius: 50,
             background: 'rgba(0,0,0,0.10)',
-            backdropFilter: 'blur(12px) saturate(1.8) brightness(1.16)',
-            WebkitBackdropFilter: 'blur(12px) saturate(1.8) brightness(1.16)',
+
             boxShadow: `
               inset 0 0 2px 1px rgba(255,255,255,0.35),
               inset 0 0 10px 4px rgba(255,255,255,0.15),
@@ -426,8 +425,7 @@ function MusicPlayer({
                     inset 0 0 10px 4px rgba(255,255,255,0.13),
                     0 10px 30px rgba(0,0,0,0.18)
                   `,
-                  backdropFilter: 'blur(12px) saturate(1.8) brightness(1.16)',
-                  WebkitBackdropFilter: 'blur(12px) saturate(1.8) brightness(1.16)',
+
                 }}
               >
                 {isPlaying ? (
@@ -466,8 +464,7 @@ function MusicPlayer({
                     style={{
                       width: 154,
                       background: 'rgba(12,12,16,0.78)',
-                      backdropFilter: 'blur(24px) saturate(1.12)',
-                      WebkitBackdropFilter: 'blur(24px) saturate(1.12)',
+
                       boxShadow: '0 18px 48px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.07)',
                       border: '1px solid rgba(255,255,255,0.09)',
                     }}
@@ -513,8 +510,7 @@ function MusicPlayer({
                       borderRadius: 16,
                       border: '1px solid rgba(255,255,255,0.075)',
                       background: 'linear-gradient(145deg, rgba(18,18,23,0.82), rgba(8,8,12,0.88))',
-                      backdropFilter: 'blur(30px) saturate(1.08)',
-                      WebkitBackdropFilter: 'blur(30px) saturate(1.08)',
+
                       boxShadow: '0 22px 70px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.065)',
                     }}
                   >

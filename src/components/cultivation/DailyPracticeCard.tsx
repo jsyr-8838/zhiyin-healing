@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -25,8 +25,7 @@ export default function DailyPracticeCard() {
   return (
     <div className="rounded-2xl overflow-hidden" style={{
       background: `linear-gradient(145deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35))`,
-      backdropFilter: 'blur(16px)',
-      border: '1px solid rgba(255,255,255,0.6)',
+border: '1px solid rgba(255,255,255,0.6)',
       boxShadow: `0 8px 32px rgba(30,45,38,0.08), inset 0 1px 0 rgba(255,255,255,0.8)`,
     }}>
       {/* 顶部：时辰 + 问候 */}

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -264,7 +264,7 @@ export default function ZhiShiClient() {
   return (
     <div className="min-h-screen bg-[#faf5ee]">
       {/* 顶部 */}
-      <div className="sticky top-0 z-30 bg-[#faf5ee]/95 backdrop-blur-sm border-b border-[#e8ddd0]/60 px-4 py-3">
+      <div className="sticky top-0 z-30 bg-[#faf5ee]/95 border-b border-[#e8ddd0]/60 px-4 py-3">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between">
             <div>

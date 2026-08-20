@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -74,7 +74,8 @@ export default function FengShuiPage() {
   return (
     <PageContainer theme="divination" className="pb-24">
       {/* Header */}
-      <div className="px-5 pt-12 pb-6" style={{ background: 'linear-gradient(150deg, rgba(180,120,40,0.88), rgba(160,80,30,0.90))', backdropFilter: 'blur(20px)' }}>
+      <div className="px-5 pt-12 pb-6" style={{ background: 'linear-gradient(150deg, rgba(180,120,40,0.88), rgba(160,80,30,0.90))',
+}}>
         <div className="flex items-center gap-3 mb-2">
           <Link href="/divination" className="text-white/70 hover:text-white"><ArrowLeft size={22} /></Link>
           <h1 className="text-xl font-black text-white" style={{ letterSpacing: '0.08em' }}>风水堪舆</h1>

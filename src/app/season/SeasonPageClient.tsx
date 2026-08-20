@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -64,7 +64,7 @@ export default function SeasonPageClient() {
         </div>
 
         {/* 当前节气概览 */}
-        <div className="bg-white/15 rounded-2xl p-4 backdrop-blur-sm">
+        <div className="bg-white/15 rounded-2xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-white/60">当前节气</span>
             <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
@@ -255,7 +255,7 @@ export default function SeasonPageClient() {
       {/* === 养生详情弹窗 === */}
       {selectedTerm && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={closeDetail}>
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/40" />
           <div
             className="relative w-full max-w-lg bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto animate-slide-up"
             onClick={e => e.stopPropagation()}

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
@@ -260,7 +260,8 @@ export default function DiagnoseClient() {
     return (
       <PageContainer theme="diagnose" className="pb-24 pattern-clouds">
         {/* 宣纸背景上的毛玻璃头部 */}
-        <div className="px-5 pt-12 pb-8" style={{ background: 'linear-gradient(150deg, rgba(93,138,99,0.85), rgba(61,97,66,0.90))', backdropFilter: 'blur(20px)' }}>
+        <div className="px-5 pt-12 pb-8" style={{ background: 'linear-gradient(150deg, rgba(93,138,99,0.85), rgba(61,97,66,0.90))',
+}}>
           <h1 className="text-2xl font-black text-white" style={{ letterSpacing: '0.12em' }}>明辨</h1>
           <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.72)' }}>体质辨识 · 中医自助诊断 · 综合分析</p>
         </div>
@@ -590,7 +591,7 @@ export default function DiagnoseClient() {
     return (
       <PageContainer theme="diagnose" className="flex flex-col">
         {/* 进度条 */}
-        <div className="bg-white/60 backdrop-blur-md border-b border-[rgba(93,138,99,0.15)] px-5 pt-12 pb-3">
+        <div className="bg-white/60 border-b border-[rgba(93,138,99,0.15)] px-5 pt-12 pb-3">
           <div className="flex items-center justify-between mb-2">
             <button onClick={() => setTab('home')} className="text-gray-500 text-sm">
               {diagnosisFlow.active ? '退出' : '取消'}

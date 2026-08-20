@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -169,7 +169,7 @@ export default function AuthLoginPage() {
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
         <div className="relative px-6 pt-16 pb-12 text-white text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-5 border border-white/10">
+          <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-5 border border-white/10">
             <Music size={30} className="text-white" />
           </div>
           <h1 className="text-3xl font-black tracking-wide mb-2">知音</h1>
@@ -179,7 +179,7 @@ export default function AuthLoginPage() {
 
       {/* 主内容 */}
       <div className="flex-1 px-5 -mt-6 relative z-10">
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-black/5 border border-white/60 p-6 max-w-md mx-auto">
+        <div className="bg-white/90 rounded-3xl shadow-xl shadow-black/5 border border-white/60 p-6 max-w-md mx-auto">
           {/* 模式切换 Tab */}
           <div className="flex bg-[#f5ede0] rounded-xl p-1 mb-6">
             <button

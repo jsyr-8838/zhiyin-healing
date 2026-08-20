@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { personalityColorMap, getRecommendedColors, getColorHex, ENERGY_PROPERTY, COLOR_PSYCHOLOGY } from '@/lib/essence-data';
@@ -104,7 +104,7 @@ export default function PersonalityPage() {
   if (phase === 'intro') {
     return (
       <div className="min-h-screen bg-[#faf5ee]">
-        <div className="sticky top-0 z-10 bg-[#faf5ee]/90 backdrop-blur-md border-b border-[#e8d4b8]">
+        <div className="sticky top-0 z-10 bg-[#faf5ee]/90 border-b border-[#e8d4b8]">
           <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
             <Link href="/diagnose" className="text-[#8b7b6b] hover:text-[#1a1a1a] transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
@@ -163,7 +163,7 @@ export default function PersonalityPage() {
 
     return (
       <div className="min-h-screen bg-[#faf5ee]">
-        <div className="sticky top-0 z-10 bg-[#faf5ee]/90 backdrop-blur-md border-b border-[#e8d4b8]">
+        <div className="sticky top-0 z-10 bg-[#faf5ee]/90 border-b border-[#e8d4b8]">
           <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
             <button onClick={() => setPhase('intro')} className="text-[#8b7b6b] hover:text-[#1a1a1a] transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
@@ -259,7 +259,7 @@ export default function PersonalityPage() {
 
     return (
       <div className="min-h-screen bg-[#faf5ee]">
-        <div className="sticky top-0 z-10 bg-[#faf5ee]/90 backdrop-blur-md border-b border-[#e8d4b8]">
+        <div className="sticky top-0 z-10 bg-[#faf5ee]/90 border-b border-[#e8d4b8]">
           <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
             <button onClick={() => setPhase('quiz')} className="text-[#8b7b6b] hover:text-[#1a1a1a]">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
@@ -356,7 +356,7 @@ export default function PersonalityPage() {
 
   return (
     <div className="min-h-screen bg-[#faf5ee]">
-      <div className="sticky top-0 z-10 bg-[#faf5ee]/90 backdrop-blur-md border-b border-[#e8d4b8]">
+      <div className="sticky top-0 z-10 bg-[#faf5ee]/90 border-b border-[#e8d4b8]">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={() => setPhase('result')} className="text-[#8b7b6b] hover:text-[#1a1a1a]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>

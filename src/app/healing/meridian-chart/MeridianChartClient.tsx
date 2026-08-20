@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
 import { ACUPOINT_LIST } from '@/lib/xws-data';
@@ -43,7 +43,7 @@ export default function MeridianChartClient() {
   return (
     <div className="min-h-screen bg-[#faf5ee]">
       {/* 顶部标题栏 */}
-      <div className="sticky top-0 z-30 bg-[#faf5ee]/95 backdrop-blur-sm border-b border-[#e8ddd0]/60 px-4 py-3">
+      <div className="sticky top-0 z-30 bg-[#faf5ee]/95 border-b border-[#e8ddd0]/60 px-4 py-3">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-lg font-bold text-[#1a1a1a]" style={{ fontWeight: 760 }}>
             经络图解
@@ -98,7 +98,7 @@ export default function MeridianChartClient() {
       {/* 经络详情 */}
       {current && selectedMeridian && (
         <div className="max-w-4xl mx-auto px-4 pb-8">
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-[#e8ddd0]/60 overflow-hidden shadow-sm">
+          <div className="bg-white/90 rounded-2xl border border-[#e8ddd0]/60 overflow-hidden shadow-sm">
             {/* 切换按钮 */}
             <div className="flex border-b border-[#e8ddd0]/60">
               <button

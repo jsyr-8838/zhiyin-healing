@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import type { BreathPhase } from './types';
@@ -137,7 +137,7 @@ export default function BreathOrb({
       borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
       background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.98), rgba(245,250,255,0.9))',
       border: '1px solid rgba(255,255,255,0.2)',
-      backdropFilter: 'blur(12px)',
+
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',

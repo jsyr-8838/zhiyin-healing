@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -114,7 +114,8 @@ export default function OnboardingFlow() {
   const recommendation = feeling && timePref ? getRecommendation(feeling, timePref) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)',
+}}>
       <div className="w-full max-w-sm rounded-2xl p-6 relative" style={{
         background: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(250,245,238,0.95))',
         boxShadow: '0 24px 64px rgba(30,45,38,0.2)',

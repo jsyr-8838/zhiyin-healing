@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
 import {
@@ -98,7 +98,7 @@ export default function JibingPage() {
   return (
     <div className="min-h-screen bg-[#0a0a12] text-white">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-[#0a0a12]/95 backdrop-blur-xl border-b border-white/5 px-4 py-4">
+      <div className="sticky top-0 z-30 bg-[#0a0a12]/95 border-b border-white/5 px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-xl font-bold">疾病仿真</h1>
           <p className="text-xs text-zinc-500 mt-0.5">基于六经辨证·十问歌·知识图谱的智能辨证推理</p>

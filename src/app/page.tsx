@@ -24,8 +24,7 @@ export default function LandingPage() {
     <div className="min-h-screen" style={{ background: '#f5f0e8' }}>
       {/* 导航栏 — 毛玻璃墨色 */}
       <nav className="fixed top-0 left-0 right-0 z-50" style={{
-        background: 'rgba(245,240,232,0.88)',
-        backdropFilter: 'blur(24px)',
+        background: 'rgba(245,240,232,0.95)',
         borderBottom: '1px solid rgba(30,45,38,0.06)',
       }}>
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -65,11 +64,11 @@ export default function LandingPage() {
         }} />
 
         {/* 水墨晕散装饰 — 五行色光晕 */}
-        <div className="absolute top-12 left-[8%] w-80 h-80 rounded-full opacity-[0.07] blur-[80px]" style={{ background: 'var(--wood)' }} />
-        <div className="absolute top-32 right-[12%] w-64 h-64 rounded-full opacity-[0.07] blur-[80px]" style={{ background: 'var(--fire)' }} />
-        <div className="absolute bottom-20 left-[25%] w-72 h-72 rounded-full opacity-[0.06] blur-[80px]" style={{ background: 'var(--earth)' }} />
-        <div className="absolute bottom-8 right-[5%] w-56 h-56 rounded-full opacity-[0.07] blur-[80px]" style={{ background: 'var(--water)' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full opacity-[0.05] blur-[60px]" style={{ background: 'var(--metal)' }} />
+        <div className="absolute top-12 left-[8%] w-80 h-80 rounded-full opacity-[0.07]" style={{ background: 'var(--wood)' }} />
+        <div className="absolute top-32 right-[12%] w-64 h-64 rounded-full opacity-[0.07]" style={{ background: 'var(--fire)' }} />
+        <div className="absolute bottom-20 left-[25%] w-72 h-72 rounded-full opacity-[0.06]" style={{ background: 'var(--earth)' }} />
+        <div className="absolute bottom-8 right-[5%] w-56 h-56 rounded-full opacity-[0.07]" style={{ background: 'var(--water)' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full opacity-[0.05]" style={{ background: 'var(--metal)' }} />
 
         {/* 五行流转圆环 — 气韵生生 */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] opacity-[0.06] pointer-events-none hero-wuxing-ring">
@@ -221,8 +220,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-5">
             {FEATURES.map(({ icon: Icon, title, desc, color }) => (
               <div key={title} className="rounded-2xl p-6 transition-all hover:shadow-lg" style={{
-                background: 'rgba(255,255,255,0.55)',
-                backdropFilter: 'blur(12px)',
+                background: 'rgba(255,255,255,0.85)',
                 border: '1px solid rgba(255,255,255,0.6)',
               }}>
                 <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center text-white mb-4 shadow-sm`}>
@@ -272,8 +270,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {TESTIMONIALS.map((t, i) => (
               <div key={i} className="rounded-2xl p-6" style={{
-                background: 'rgba(255,255,255,0.55)',
-                backdropFilter: 'blur(12px)',
+                background: 'rgba(255,255,255,0.85)',
                 border: '1px solid rgba(255,255,255,0.6)',
               }}>
                 <div className="flex items-center gap-3 mb-4">
@@ -330,40 +327,6 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* ═══ 页面专属样式 ═══ */}
-      <style jsx global>{`
-        .hero-char {
-          display: inline-block;
-          transition: transform 0.3s ease, text-shadow 0.3s ease;
-          font-weight: 900;
-        }
-        .hero-char:hover {
-          transform: translateY(-4px) scale(1.05);
-        }
-        .hero-divider {
-          display: inline-block;
-          color: var(--ink-light);
-          opacity: 0.35;
-          margin: 0 2px;
-        }
-        @keyframes slow-rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-slow-rotate {
-          animation: slow-rotate 120s linear infinite;
-        }
-        @keyframes fade-up {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-up { animation-name: fade-up; }
-        @keyframes fade-scale {
-          from { opacity: 0; transform: scale(0.85); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-scale { animation-name: fade-scale; }
-      `}</style>
     </div>
   );
 }

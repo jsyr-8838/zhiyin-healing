@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { essenceOils, generateOilPsychResult, ENERGY_PROPERTY, type EssenceOil, type OilPsychResult } from '@/lib/essence-data';
@@ -216,7 +216,8 @@ export default function OilPsychPage() {
       </div>
 
       {selected.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-10" style={{ background: 'rgba(250,245,238,0.96)', backdropFilter: 'blur(12px)', borderTop: '1px solid #e8e1d5' }}>
+        <div className="fixed bottom-0 left-0 right-0 z-10" style={{ background: 'rgba(250,245,238,0.96)',
+borderTop: '1px solid #e8e1d5' }}>
           <div className="max-w-2xl mx-auto px-4 py-3">
             <div className="flex items-center gap-2 mb-2">
               {selectedOils.map(o => (

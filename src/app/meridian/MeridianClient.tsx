@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -48,7 +48,7 @@ function TcmAcupointDetail({ point, meridian, infoPanelOpen, onClose, onToggleMe
 
   return (
     <div
-      className={`fixed right-0 top-0 bottom-0 z-50 w-[380px] max-w-[85vw] bg-black/80 backdrop-blur-xl border-l border-white/10
+      className={`fixed right-0 top-0 bottom-0 z-50 w-[380px] max-w-[85vw] bg-black/80 border-l border-white/10
         transform transition-transform duration-300 overflow-y-auto
         ${infoPanelOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:top-12 md:bottom-20 md:rounded-l-2xl md:border md:h-auto
         ${point ? 'md:translate-x-0' : 'md:translate-x-full'}`}
@@ -203,7 +203,7 @@ function TcmMeridianSidebar({
   const shiChenInfo = SHI_CHEN_MAP[currentShiChen];
 
   return (
-    <div className={`fixed left-0 top-12 bottom-20 z-50 w-[280px] max-w-[80vw] bg-black/70 backdrop-blur-xl border-r border-white/10 overflow-y-auto transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
+    <div className={`fixed left-0 top-12 bottom-20 z-50 w-[280px] max-w-[80vw] bg-black/70 border-r border-white/10 overflow-y-auto transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="p-3">
         {/* 搜索框 */}
         <div className="relative mb-3">

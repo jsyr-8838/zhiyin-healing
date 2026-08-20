@@ -80,10 +80,17 @@ async function getB2Auth(): Promise<B2Auth> {
 
 // ── Route Handler ───────────────────────────────────────────────────────────
 
-export const dynamic = 'force-dynamic';
+// In-memory catalog cache (avoid repeated B2 API calls)
+let catalogCache: { data: object; timestamp: number } | null = null;
+const CATALOG_TTL = 600000; // 10 minutes
 
 export async function GET() {
   try {
+    // Return cached catalog if fresh
+    if (catalogCache && Date.now() - catalogCache.timestamp < CATALOG_TTL) {
+      return NextResponse.json(catalogCache.data);
+    }
+
     if (!B2_KEY_ID || !B2_APP_KEY) {
       return NextResponse.json({
         tracks: [],
@@ -156,12 +163,17 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({
+    const responseData = {
       tracks,
       total: tracks.length,
       available: true,
       source: 'b2',
-    });
+    };
+    
+    // Cache the result
+    catalogCache = { data: responseData, timestamp: Date.now() };
+    
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Wuxing audio catalog error:', error);
     return NextResponse.json({

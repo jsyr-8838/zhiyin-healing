@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import type { SessionData } from './types';
@@ -87,8 +87,7 @@ export default function HealingReportModal({
       className="fixed inset-0 flex justify-center items-center"
       style={{
         background: 'rgba(45, 52, 54, 0.4)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 200,
+zIndex: 200,
         animation: 'fadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
       }}
       onClick={e => {

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -200,15 +200,15 @@ export default function CheckinPage() {
 
         {/* 统计概览 */}
         <div className="flex gap-3 mt-4">
-          <div className="flex-1 bg-white/15 rounded-xl p-3 backdrop-blur-sm text-center">
+          <div className="flex-1 bg-white/15 rounded-xl p-3 text-center">
             <p className="text-2xl font-black">{streak}</p>
             <p className="text-[10px] text-emerald-200 mt-0.5">连续天数</p>
           </div>
-          <div className="flex-1 bg-white/15 rounded-xl p-3 backdrop-blur-sm text-center">
+          <div className="flex-1 bg-white/15 rounded-xl p-3 text-center">
             <p className="text-2xl font-black">{avgScore || '--'}</p>
             <p className="text-[10px] text-emerald-200 mt-0.5">近期均分</p>
           </div>
-          <div className="flex-1 bg-white/15 rounded-xl p-3 backdrop-blur-sm text-center">
+          <div className="flex-1 bg-white/15 rounded-xl p-3 text-center">
             <p className="text-2xl font-black">{todayCheckin?.healthScore || '--'}</p>
             <p className="text-[10px] text-emerald-200 mt-0.5">今日评分</p>
           </div>

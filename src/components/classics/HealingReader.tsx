@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * 中式美学疗愈阅读器
@@ -269,8 +269,7 @@ export default memo(function HealingReader({ book }: HealingReaderProps) {
         className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 md:px-6"
         style={{
           background: isDark ? 'rgba(26,24,20,0.96)' : 'rgba(245,240,232,0.96)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(139,69,19,0.1)',
+borderBottom: '1px solid rgba(139,69,19,0.1)',
         }}
       >
         <div className="flex items-center gap-3">
@@ -549,8 +548,7 @@ export default memo(function HealingReader({ book }: HealingReaderProps) {
         className="fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-1.5 rounded-full z-40 md:z-30"
         style={{
           background: isDark ? 'rgba(26,24,20,0.96)' : 'rgba(245,240,232,0.96)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 4px 24px rgba(44,36,22,0.1)',
+boxShadow: '0 4px 24px rgba(44,36,22,0.1)',
         }}
       >
         <button onClick={() => setIsVertical(!isVertical)} className="toolbar-healing-btn" title="竖排/横排">
@@ -586,7 +584,8 @@ export default memo(function HealingReader({ book }: HealingReaderProps) {
       <div className="md:hidden fixed bottom-16 left-0 right-0 z-30">
         {/* 释义浮窗 */}
         {selectedText && !shareOpen && !searchOpen && (
-          <div className="mx-3 mb-2 rounded-xl p-3" style={{ background: isDark ? 'rgba(26,24,20,0.96)' : 'rgba(245,240,232,0.96)', backdropFilter: 'blur(20px)', boxShadow: '0 4px 24px rgba(44,36,22,0.1)' }}>
+          <div className="mx-3 mb-2 rounded-xl p-3" style={{ background: isDark ? 'rgba(26,24,20,0.96)' : 'rgba(245,240,232,0.96)',
+boxShadow: '0 4px 24px rgba(44,36,22,0.1)' }}>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-0.5 h-4 rounded-full" style={{ background: isDark ? '#c5a55a' : '#8b4513' }} />
               <span className="text-xs font-bold tracking-wider" style={{ color: isDark ? '#c5a55a' : '#8b4513' }}>释义</span>
@@ -629,8 +628,7 @@ export default memo(function HealingReader({ book }: HealingReaderProps) {
             className="absolute bottom-14 right-0 w-56 rounded-xl p-4"
             style={{
               background: isDark ? 'rgba(26,24,20,0.96)' : 'rgba(245,240,232,0.96)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 4px 24px rgba(44,36,22,0.1)',
+boxShadow: '0 4px 24px rgba(44,36,22,0.1)',
             }}
           >
             <div className="text-xs opacity-40 tracking-widest mb-3">五音疗愈</div>

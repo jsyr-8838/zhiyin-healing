@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { SOLAR_TERM_DATES, SOLAR_TERM_WELLNESS, SEASON_COLORS, SEASON_ICONS, SEASON_GRADIENTS, getCurrentSolarTermDateInfo, getCurrentWellness, getSolarTermProximity, getCalendarTermMarkers, getSolarTermsInMonth, type SolarTermDateInfo, type SolarTermWellness } from '@/lib/solar-wellness';
@@ -85,7 +85,7 @@ export default function SolarCalendarPage() {
 
   return (
     <div className="min-h-screen bg-[#faf5ee]">
-      <div className="sticky top-0 z-20 bg-[#faf5ee]/90 backdrop-blur-md border-b border-[#e8d4b8]">
+      <div className="sticky top-0 z-20 bg-[#faf5ee]/90 border-b border-[#e8d4b8]">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <Link href="/healing" className="text-[#8b7b6b] hover:text-[#1a1a1a] transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
@@ -211,7 +211,7 @@ export default function SolarCalendarPage() {
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/30" onClick={() => setPanelOpen(false)} />
           <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] bg-[#faf5ee] rounded-t-3xl overflow-y-auto animate-slide-up" style={{ animation: 'slideUp 0.3s ease-out' }}>
-            <div className="sticky top-0 bg-[#faf5ee]/95 backdrop-blur-md z-10 px-4 pt-3 pb-2 border-b border-[#e8d4b8]">
+            <div className="sticky top-0 bg-[#faf5ee]/95 z-10 px-4 pt-3 pb-2 border-b border-[#e8d4b8]">
               <div className="w-10 h-1 bg-[#d4c4b4] rounded-full mx-auto mb-3" />
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl text-white" style={{ backgroundColor: SEASON_COLORS[selectedTerm.season] }}>

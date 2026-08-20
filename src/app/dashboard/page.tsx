@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -96,8 +96,7 @@ export default function DashboardPage() {
         {/* 节气卡片 — 微宣纸质感 */}
         <div className="relative mt-6 rounded-2xl p-5 overflow-hidden" style={{
           background: 'linear-gradient(145deg, rgba(255,255,255,0.55), rgba(255,255,255,0.25))',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255,255,255,0.6)',
+border: '1px solid rgba(255,255,255,0.6)',
           boxShadow: '0 8px 32px rgba(30,45,38,0.08)',
         }}>
           <div className="flex items-start justify-between">

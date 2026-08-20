@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { ArrowLeft, RefreshCw, Calendar } from 'lucide-react';
 import type { Step } from './types';
 
@@ -15,7 +15,8 @@ interface DivinationHeaderProps {
 
 export function DivinationHeader({ step, onGoHome, todayGanZhi }: DivinationHeaderProps) {
   return (
-    <div className="px-5 pt-12 pb-6" style={{ background: 'linear-gradient(150deg, rgba(74,88,128,0.88), rgba(94,66,148,0.90))', backdropFilter: 'blur(20px)' }}>
+    <div className="px-5 pt-12 pb-6" style={{ background: 'linear-gradient(150deg, rgba(74,88,128,0.88), rgba(94,66,148,0.90))',
+}}>
       <div className="flex items-center gap-3 mb-3">
         <Link href="/dashboard" className="text-white/70 hover:text-white"><ArrowLeft size={22} /></Link>
         <h1 className="text-xl font-black text-white" style={{ letterSpacing: '0.08em' }}>知几</h1>

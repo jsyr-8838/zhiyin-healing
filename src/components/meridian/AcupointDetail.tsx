@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import { getMeridianByCode, type Acupoint, type Meridian } from '@/lib/meridian-data';
 import { WUXING_COLORS_DISPLAY, getPointBadges, getBadgeColor, getBadgeLabel } from './constants';
 
@@ -21,7 +21,7 @@ export const AcupointDetail = memo(function AcupointDetail({
 
   return (
     <div
-      className={`fixed right-0 top-0 bottom-0 z-50 w-[380px] max-w-[85vw] bg-black/80 backdrop-blur-xl border-l border-white/10
+      className={`fixed right-0 top-0 bottom-0 z-50 w-[380px] max-w-[85vw] bg-black/80 border-l border-white/10
         transform transition-transform duration-300 overflow-y-auto
         ${infoPanelOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:top-12 md:bottom-20 md:rounded-l-2xl md:border md:h-auto
         ${point ? 'md:translate-x-0' : 'md:translate-x-full'}`}

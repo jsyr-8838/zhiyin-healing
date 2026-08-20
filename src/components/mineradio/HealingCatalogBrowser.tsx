@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback, memo, useMemo } from 'react';
 import {
@@ -160,8 +160,7 @@ export default memo(function HealingCatalogBrowser({
       style={{
         background: 'rgba(250, 245, 238, 0.92)',
         border: '1px solid #d0c8b8',
-        backdropFilter: 'blur(8px)',
-      }}
+}}
     >
       {/* ═══ 标题栏 ═══ */}
       <button

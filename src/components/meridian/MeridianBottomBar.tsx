@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import { SHI_CHEN_MAP } from '@/lib/tcm-calendar';
 import { type WuxingElement } from '@/lib/meridian-data';
 import { ViewMode, WUXING_COLORS_DISPLAY, WUXING_LABELS } from './constants';
@@ -27,7 +27,7 @@ export const MeridianBottomBar = memo(function MeridianBottomBar({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
       <div className="flex flex-col gap-2 px-4 pb-4 pointer-events-auto">
-        <div className="bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3">
+        <div className="bg-black/80 border border-white/10 rounded-2xl px-4 py-3">
           <div className="flex items-center gap-1 mb-2">
             <span className="text-[10px] text-zinc-500 uppercase tracking-wider mr-2">子午流注</span>
             {SHI_CHEN_MAP.map((sc, i) => (
@@ -49,7 +49,7 @@ export const MeridianBottomBar = memo(function MeridianBottomBar({
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl px-3 py-2">
+          <div className="flex items-center gap-1 bg-black/80 border border-white/10 rounded-2xl px-3 py-2">
             {(['bones', 'meridians', 'points', 'all'] as ViewMode[]).map(mode => (
               <button
                 key={mode}
@@ -65,14 +65,14 @@ export const MeridianBottomBar = memo(function MeridianBottomBar({
 
           <button
             onClick={onAutoRotateToggle}
-            className={`bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl px-3 py-2 text-xs font-medium transition-all ${
+            className={`bg-black/80 border border-white/10 rounded-2xl px-3 py-2 text-xs font-medium transition-all ${
               autoRotate ? 'text-blue-400 border-blue-500/30' : 'text-zinc-400 hover:text-white'
             }`}
           >
             {autoRotate ? '⟳ 旋转中' : '⟳ 自动旋转'}
           </button>
 
-          <div className="flex items-center gap-1 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl px-3 py-2">
+          <div className="flex items-center gap-1 bg-black/80 border border-white/10 rounded-2xl px-3 py-2">
             <span className="text-xs text-zinc-500">五行</span>
             {WUXING_LABELS.map(w => (
               <button

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import {
@@ -58,8 +58,6 @@ function FullScreenPlayer() {
       style={{
         bottom: 80, // BottomNav 高度
         background: 'rgba(12,10,26,0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
         borderRadius: 16,
         border: `1px solid rgba(196,163,90,0.15)`,
         boxShadow: `0 4px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(196,163,90,0.08)`,
@@ -214,7 +212,7 @@ function FullScreenPlayer() {
         )}
 
         {/* 计时器 */}
-        <div className="absolute right-3 top-3 rounded-xl bg-black/30 backdrop-blur-sm px-3 py-1.5">
+        <div className="absolute right-3 top-3 rounded-xl bg-black/30 px-3 py-1.5">
           <div className="font-mono text-xs tabular-nums text-white/70">
             {timerMinutes > 0
               ? <>{fmtTime(timerRemaining)}<span className="text-white/30 ml-1">/{timerMinutes}:00</span></>

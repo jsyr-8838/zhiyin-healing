@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -40,7 +40,8 @@ export default function ClassicsPage() {
           <button
             onClick={() => setAiOpen(true)}
             className="ml-auto flex items-center gap-1 px-3 py-1.5 rounded-full text-xs transition-all hover:scale-105"
-            style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)' }}
+            style={{ background: 'rgba(255,255,255,0.15)',
+}}
           >
             <Sparkles size={13} />
             <span>AI助读</span>
@@ -79,8 +80,7 @@ export default function ClassicsPage() {
               background: 'rgba(255,255,255,0.6)',
               borderColor: 'rgba(201,169,79,0.2)',
               color: 'var(--ink-main)',
-              backdropFilter: 'blur(12px)',
-            }}
+}}
           />
         </div>
 

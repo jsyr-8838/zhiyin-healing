@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -259,7 +259,7 @@ export default function WuXingPage() {
         </div>
 
         {/* 固定底部按钮 */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-gray-200 px-4 py-3">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 border-t border-gray-200 px-4 py-3">
           <button
             onClick={handleCalc}
             className="w-full py-3.5 bg-gradient-to-r from-amber-600 to-red-500 text-white font-bold rounded-2xl text-lg shadow-lg shadow-amber-600/20 hover:shadow-amber-600/30 transition-all active:scale-[0.98]"

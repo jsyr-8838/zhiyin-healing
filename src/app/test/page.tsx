@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -185,7 +185,7 @@ export default function TestPage() {
 
   return (
     <div className="min-h-screen bg-[#fafaf9] pb-24">
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+      <div className="sticky top-0 z-10 bg-white/80 border-b border-gray-100">
         <div className="px-4 py-3 flex items-center gap-4">
           <button onClick={handleBack} className="p-1">
             <ArrowLeft size={20} className="text-gray-600" />

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useMemo, useCallback, Suspense } from 'react';
 import Link from 'next/link';
@@ -154,7 +154,7 @@ export default function SpineSolarPage() {
   return (
     <div className="min-h-screen bg-[#faf5ee]">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-[#faf5ee]/90 backdrop-blur-md border-b border-[#e8dcc8]">
+      <header className="sticky top-0 z-30 bg-[#faf5ee]/90 border-b border-[#e8dcc8]">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <Link

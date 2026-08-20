@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -99,8 +99,7 @@ export default function ModuleIntroPage({
       <header className="relative z-20 px-4 pt-12 pb-3 flex items-center gap-3"
         style={{
           background: 'linear-gradient(to bottom, rgba(253,248,240,0.95), rgba(253,248,240,0))',
-          backdropFilter: 'blur(12px)',
-        }}>
+}}>
         <Link href={backHref}
           className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
           style={{ background: 'rgba(30,45,38,0.05)' }}>
@@ -187,8 +186,7 @@ export default function ModuleIntroPage({
               <div key={i} className="rounded-xl p-4 relative overflow-hidden transition-all hover:scale-[1.01]"
                 style={{
                   background: `linear-gradient(145deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3))`,
-                  backdropFilter: 'blur(12px)',
-                  border: `1px solid ${colors.mid}30`,
+border: `1px solid ${colors.mid}30`,
                   boxShadow: `0 4px 16px ${colors.glow.replace('0.25', '0.06')}`,
                 }}>
                 {/* 左侧五行色条 */}
