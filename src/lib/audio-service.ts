@@ -21,7 +21,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { WuYinKey, BinauralValue, ModulationValue } from './five-tone-data';
-import { FIVE_TONES_MAP, BINAURAL_MODES, MODULATIONS, BOWL_FREQUENCIES } from './five-tone-data';
+import { FIVE_TONES_MAP, BINAURAL_MODES, MODULATIONS, BOWL_FREQUENCIES, AMBIENT_SOUNDSCAPES } from './five-tone-data';
 import { getFreqAudioURL, setupMediaSession, revokeAllCache } from './audio-engine';
 import { getDefaultTrackForTone, getTrackById, getBowlTrackById } from './healing-music-catalog';
 import type { HealingTrack, BowlTrack } from './healing-music-catalog';
@@ -124,6 +124,12 @@ interface AudioServiceState {
   setCurrentTime: (t: number) => void;
   isLooping: boolean;
   toggleLoop: () => void;
+
+  // ===== 环境音叠加层 =====
+  ambientSoundId: string;        // 'none' = 关闭
+  ambientVolume: number;         // 0~1，独立于主音量
+  setAmbientSound: (id: string) => void;
+  setAmbientVolume: (v: number) => void;
 }
 
 // ===== 内部单例 =====
@@ -142,6 +148,40 @@ let lfoGain: GainNode | null = null;
 let fadeInterval: ReturnType<typeof setInterval> | null = null;
 let timerInterval: ReturnType<typeof setInterval> | null = null;
 let prescriptionTimerInterval: ReturnType<typeof setInterval> | null = null;
+
+// ===== 环境音叠加层（独立 Audio 元素，不经过 Web Audio 效果链） =====
+let ambientAudioElement: HTMLAudioElement | null = null;
+let ambientFadeInterval: ReturnType<typeof setInterval> | null = null;
+
+function getAmbientAudioElement(): HTMLAudioElement {
+  if (!ambientAudioElement) {
+    ambientAudioElement = new Audio();
+    ambientAudioElement.loop = true;
+    ambientAudioElement.preload = 'auto';
+  }
+  return ambientAudioElement;
+}
+
+/** 环境音淡入淡出 */
+function fadeAmbient(targetGain: number, durationSec: number = 1.5): Promise<void> {
+  return new Promise((resolve) => {
+    const el = ambientAudioElement;
+    if (!el) { resolve(); return; }
+    if (ambientFadeInterval) { clearInterval(ambientFadeInterval); ambientFadeInterval = null; }
+    const startVol = el.volume;
+    const startTime = performance.now();
+    ambientFadeInterval = setInterval(() => {
+      const elapsed = (performance.now() - startTime) / 1000;
+      const ratio = Math.min(1, elapsed / durationSec);
+      el.volume = startVol + (targetGain - startVol) * ratio;
+      if (ratio >= 1) {
+        clearInterval(ambientFadeInterval!);
+        ambientFadeInterval = null;
+        resolve();
+      }
+    }, 50);
+  });
+}
 
 function getAudioElement(): HTMLAudioElement {
   if (!audioElement) {
@@ -453,6 +493,10 @@ export const useAudioService = create<AudioServiceState>()(
       lastMode: 'wuyin',
       favoritePrescriptions: [],
 
+      // 环境音叠加层
+      ambientSoundId: 'none',
+      ambientVolume: 0.3,
+
       // ===== 操作 =====
 
       play: (track: AudioTrack) => {
@@ -523,6 +567,17 @@ export const useAudioService = create<AudioServiceState>()(
         if (get().playMode === 'prescription' && get().activePrescription) {
           get().startPrescriptionTimer();
         }
+
+        // 启动环境音叠加层（如果已设置且未在播放）
+        if (get().ambientSoundId !== 'none') {
+          const soundscape = AMBIENT_SOUNDSCAPES.find(s => s.id === get().ambientSoundId);
+          if (soundscape?.src && (!ambientAudioElement || ambientAudioElement.paused)) {
+            const ambientEl = getAmbientAudioElement();
+            ambientEl.src = soundscape.src;
+            ambientEl.volume = 0;
+            ambientEl.play().then(() => fadeAmbient(get().ambientVolume, 1.5)).catch(() => {});
+          }
+        }
       },
 
       pause: () => {
@@ -553,6 +608,10 @@ export const useAudioService = create<AudioServiceState>()(
       stop: () => {
         const el = getAudioElement();
         syntheticAnalyser?.setPlaying(false);
+        // 停止环境音
+        if (ambientAudioElement && !ambientAudioElement.paused) {
+          fadeAmbient(0, 1).then(() => { ambientAudioElement?.pause(); });
+        }
         // 清理方案计时器
         if (prescriptionTimerInterval) {
           clearInterval(prescriptionTimerInterval);
@@ -700,6 +759,48 @@ export const useAudioService = create<AudioServiceState>()(
         set({ currentTime: t });
       },
 
+      // ===== 环境音操作 =====
+      setAmbientSound: (id: string) => {
+        if (id === 'none') {
+          const el = ambientAudioElement;
+          if (el && !el.paused) {
+            fadeAmbient(0, 1).then(() => { el.pause(); el.src = ''; });
+          }
+          set({ ambientSoundId: 'none' });
+          return;
+        }
+        const soundscape = AMBIENT_SOUNDSCAPES.find(s => s.id === id);
+        if (!soundscape || !soundscape.src) {
+          set({ ambientSoundId: 'none' });
+          return;
+        }
+        const el = getAmbientAudioElement();
+        const state = get();
+        const targetVol = state.ambientVolume;
+        // 切换环境音：先淡出旧音再淡入新音
+        if (state.ambientSoundId !== 'none' && !el.paused) {
+          fadeAmbient(0, 0.8).then(() => {
+            el.src = soundscape.src;
+            el.load();
+            el.volume = 0;
+            el.play().then(() => fadeAmbient(targetVol, 1.5)).catch(() => {});
+          });
+        } else {
+          el.src = soundscape.src;
+          el.load();
+          el.volume = 0;
+          el.play().then(() => fadeAmbient(targetVol, 1.5)).catch(() => {});
+        }
+        set({ ambientSoundId: id });
+      },
+
+      setAmbientVolume: (v: number) => {
+        const clamped = Math.max(0, Math.min(1, v));
+        const el = ambientAudioElement;
+        if (el) el.volume = clamped;
+        set({ ambientVolume: clamped });
+      },
+
       /** 方案自动流转：当前曲目播放到指定时长后，淡出并切换下一首 */
       startPrescriptionTimer: () => {
         const state = get();
@@ -750,6 +851,7 @@ export const useAudioService = create<AudioServiceState>()(
         timerMinutes: state.timerMinutes,
         playMode: state.playMode,
         favoritePrescriptions: state.favoritePrescriptions,
+        ambientVolume: state.ambientVolume,
       }),
     }
   )
@@ -779,6 +881,12 @@ export function cleanupAudioService() {
   if (prescriptionTimerInterval) clearInterval(prescriptionTimerInterval);
   if (fadeInterval) clearInterval(fadeInterval);
   revokeAllCache();
+
+  // 清理环境音
+  try { ambientAudioElement?.pause(); } catch {}
+  if (ambientFadeInterval) clearInterval(ambientFadeInterval);
+  ambientAudioElement = null;
+  ambientFadeInterval = null;
 
   audioElement = null;
   audioContext = null;

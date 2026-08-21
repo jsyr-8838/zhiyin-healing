@@ -230,3 +230,91 @@ export const CHAKRA_FREQ: Record<string, number> = {
   root: 256, sacral: 288, solar: 324, heart: 342,
   throat: 384, third: 432, crown: 480,
 };
+
+// ===== 颂钵增强：环境音叠加层 =====
+
+export interface AmbientSoundscape {
+  id: string;
+  name: string;
+  icon: string;
+  src: string;
+  desc: string;
+  color: string;
+  /** 音量建议 (0~1) */
+  defaultVolume: number;
+}
+
+export const AMBIENT_SOUNDSCAPES: AmbientSoundscape[] = [
+  { id: 'none', name: '静默', icon: '—', src: '', desc: '仅颂钵纯净音', color: '#8B7355', defaultVolume: 0 },
+  { id: 'rain', name: '雨声', icon: '雨', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_nature_xiayu.mp3'), desc: '夏日细雨·洗涤心灵', color: '#3498DB', defaultVolume: 0.3 },
+  { id: 'snow', name: '雪原', icon: '雪', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_nature_snow_wild.mp3'), desc: '原野落雪·万籁俱寂', color: '#85C1E9', defaultVolume: 0.25 },
+  { id: 'crickets', name: '蟋蟀', icon: '虫', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_nature_ququ.mp3'), desc: '秋夜虫鸣·自然安眠', color: '#27AE60', defaultVolume: 0.2 },
+  { id: 'owl', name: '猫头鹰', icon: '鸮', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_animal_owl.mp3'), desc: '林间夜鸟·空灵幽远', color: '#8E44AD', defaultVolume: 0.25 },
+  { id: 'book', name: '翻书', icon: '书', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_life_book.mp3'), desc: '翻书白噪音·专注学习', color: '#D4AC0D', defaultVolume: 0.2 },
+  { id: 'keyboard', name: '键盘', icon: '键', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_life_keyboard.mp3'), desc: '键盘敲击·工作陪伴', color: '#2C3E50', defaultVolume: 0.2 },
+];
+
+// ===== 颂钵增强：敲击模式音色 =====
+
+export interface BowlHitSample {
+  id: string;
+  name: string;
+  src: string;
+  desc: string;
+  /** 对应近似频率 */
+  freq: number;
+  color: string;
+}
+
+export const BOWL_HIT_SAMPLES: BowlHitSample[] = [
+  // 真实颂钵敲击（SoundDino 免版税）
+  { id: 'hit-decayed', name: '铜钵·衰减', src: cosUrl('/audio/singing-bowl/sounddino/decayed-sound.mp3'), desc: '槌击起音·泛音消散', freq: 432, color: '#8B2500' },
+  { id: 'hit-monotonous', name: '铜钵·长鸣', src: cosUrl('/audio/singing-bowl/sounddino/monotonous-sound.mp3'), desc: '持续歌唱·单调嗡鸣', freq: 432, color: '#5C1A00' },
+  { id: 'hit-long', name: '铜钵·超长鸣', src: cosUrl('/audio/singing-bowl/sounddino/long-monotonous-sound.mp3'), desc: '62秒长音·冥想音床', freq: 256, color: '#1a1a2e' },
+  { id: 'hit-low-quiet', name: '铜钵·低沉', src: cosUrl('/audio/singing-bowl/sounddino/low-quiet-sound.mp3'), desc: '低沉安静·30秒余韵', freq: 174, color: '#2C3E50' },
+  { id: 'hit-lingering', name: '铜钵·余音', src: cosUrl('/audio/singing-bowl/sounddino/lingering-sound.mp3'), desc: '槌击余韵·4秒收功', freq: 528, color: '#B8860B' },
+  { id: 'hit-short', name: '铜钵·短音', src: cosUrl('/audio/singing-bowl/sounddino/short-sound.mp3'), desc: '清脆短击·1秒收功', freq: 741, color: '#3498DB' },
+  { id: 'hit-high', name: '铜钵·高音', src: cosUrl('/audio/singing-bowl/sounddino/high-pitched-sound.mp3'), desc: '高音调·32秒共振', freq: 852, color: '#9B59B6' },
+  { id: 'hit-pulsation', name: '铜钵·脉动', src: cosUrl('/audio/singing-bowl/sounddino/barely-noticeable-pulsation.mp3'), desc: '微妙脉动·5秒过渡', freq: 639, color: '#F39C12' },
+  // 水晶钵敲击（CrystalBowls）
+  { id: 'hit-crystal1', name: '水晶钵·清音', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_crystal1.mp3'), desc: '水晶钵清透·高频渗透', freq: 528, color: '#E74C3C' },
+  { id: 'hit-crystal2', name: '水晶钵·泛音', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_crystal2.mp3'), desc: '水晶钵泛音·层次丰富', freq: 741, color: '#3498DB' },
+  { id: 'hit-crystal3', name: '水晶钵·共振', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_crystal3.mp3'), desc: '水晶钵共振·身心通透', freq: 432, color: '#4B0082' },
+  { id: 'hit-crystal4', name: '水晶钵·空明', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_crystal4.mp3'), desc: '水晶钵空明·入静冥想', freq: 639, color: '#F39C12' },
+  { id: 'hit-crystal5', name: '水晶钵·清澈', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_crystal5.mp3'), desc: '水晶钵清澈·净化气场', freq: 417, color: '#27AE60' },
+  { id: 'hit-crystal6', name: '水晶钵·悠远', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_crystal6.mp3'), desc: '水晶钵悠远·灵性扩展', freq: 852, color: '#1ABC9C' },
+  { id: 'hit-crystal7', name: '水晶钵·收功', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_crystal7.mp3'), desc: '水晶钵收功·温和收束', freq: 396, color: '#2C3E50' },
+  // 传统钵敲击（CrystalBowls tap_bowl）
+  { id: 'hit-bowl1', name: '藏钵·低音击', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_bowl1.mp3'), desc: '藏钵低音·深沉共鸣', freq: 256, color: '#8B2500' },
+  { id: 'hit-bowl4', name: '藏钵·中音击', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_bowl4.mp3'), desc: '藏钵中音·稳定悠长', freq: 432, color: '#B8860B' },
+  { id: 'hit-bowl7', name: '藏钵·高音击', src: cosUrl('/audio/singing-bowl/crystalbowls/tap_bowl7.mp3'), desc: '藏钵高音·清亮穿透', freq: 741, color: '#3498DB' },
+];
+
+// ===== 颂钵增强：真实录音持续音 =====
+
+export interface BowlRecording {
+  id: string;
+  name: string;
+  src: string;
+  desc: string;
+  /** 对应近似频率 */
+  freq: number;
+  bowlType: 'brass' | 'crystal' | 'tibetan' | 'mix';
+  color: string;
+}
+
+export const BOWL_RECORDINGS: BowlRecording[] = [
+  { id: 'rec-bowl1', name: '铜钵·持续音', src: cosUrl('/audio/singing-bowl/crystalbowls/bowl1.mp3'), desc: '经典铜钵·浑厚共振', freq: 432, bowlType: 'brass', color: '#8B2500' },
+  { id: 'rec-studio-bowls1', name: '颂钵·工作室录音', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_bowls1.mp3'), desc: '多钵和鸣·层次丰富', freq: 528, bowlType: 'mix', color: '#E74C3C' },
+  { id: 'rec-studio-other', name: '颂钵·他钵录音', src: cosUrl('/audio/singing-bowl/crystalbowls/studio_other_bowls1.mp3'), desc: '独特音色·深度疗愈', freq: 396, bowlType: 'tibetan', color: '#2C3E50' },
+];
+
+// ===== 颂钵播放模式 =====
+
+export type BowlPlayMode = 'synth' | 'recording' | 'hit';
+
+export const BOWL_PLAY_MODES: { value: BowlPlayMode; name: string; icon: string; desc: string }[] = [
+  { value: 'synth', name: '合成音', icon: '波', desc: 'Web Audio 实时合成·无限时长' },
+  { value: 'recording', name: '真钵音', icon: '钵', desc: '真实颂钵录音·自然共鸣' },
+  { value: 'hit', name: '敲击音', icon: '击', desc: '槌击起音·自然衰减' },
+];
