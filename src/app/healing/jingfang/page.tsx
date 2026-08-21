@@ -210,7 +210,7 @@ export default function JingFangClient() {
                         {f.relatedAcupoints.map(code => (
                           <Link
                             key={code}
-                            href={`/meridian?focus=${code}`}
+                            href={`/healing/acupoint`}
                             className="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition-colors"
                           >
                             {code}

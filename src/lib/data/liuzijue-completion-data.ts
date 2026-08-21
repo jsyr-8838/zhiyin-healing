@@ -35,11 +35,11 @@ export type BreathModeConfig = {
 };
 
 export const BREATH_MODES: BreathModeConfig[] = [
-  { id: 'liuzijue',   name: '六字诀',     desc: '嘘呵呼呬吹嘻 · 中医导引',  inhale: 4, hold1: 0, exhale: 6, hold2: 0, icon: '气', color: '#4ADE80' },
+  { id: 'liuzijue',   name: '六字诀',     desc: '嘘呵呼呬吹嘻 · 中医导引',  inhale: 4, hold1: 2, exhale: 6, hold2: 1, icon: '气', color: '#4ADE80' },
   { id: 'box',        name: '四序安澜',   desc: '4-4-4-4 · 专注安神',       inhale: 4, hold1: 4, exhale: 4, hold2: 4, icon: '方', color: '#60A5FA' },
-  { id: 'relax478',   name: '安寝引息',   desc: '4-7-8 · 深度入眠',         inhale: 4, hold1: 7, exhale: 8, hold2: 0, icon: '月', color: '#818CF8' },
-  { id: 'energize446', name: '清神醒息',  desc: '4-4-6 · 清醒明神',         inhale: 4, hold1: 4, exhale: 6, hold2: 0, icon: '阳', color: '#FBBF24' },
-  { id: 'reset333',   name: '轻序稳息',   desc: '3-3-3 · 平复安和',         inhale: 3, hold1: 3, exhale: 3, hold2: 0, icon: '速', color: '#FB7185' },
+  { id: 'relax478',   name: '安寝引息',   desc: '4-7-8 · 深度入眠',         inhale: 4, hold1: 7, exhale: 8, hold2: 1, icon: '月', color: '#818CF8' },
+  { id: 'energize446', name: '清神醒息',  desc: '4-4-6 · 清醒明神',         inhale: 4, hold1: 4, exhale: 6, hold2: 2, icon: '阳', color: '#FBBF24' },
+  { id: 'reset333',   name: '轻序稳息',   desc: '3-3-3 · 平复安和',         inhale: 3, hold1: 3, exhale: 3, hold2: 2, icon: '速', color: '#FB7185' },
 ];
 
 export const COMPLETION_SCIENCE = {

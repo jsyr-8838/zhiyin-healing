@@ -362,10 +362,10 @@ export default function ZhiShiClient() {
             {/* 跳转链接 */}
             {['acupoint', 'dong_acupoint'].includes(selectedNode.type) && (
               <Link
-                href={`/meridian?focus=${selectedNode.id.replace('ACU_', '')}`}
+                href={`/healing/acupoint`}
                 className="block mt-3 text-center py-2 bg-[#c9a94f] text-white text-xs rounded-lg hover:bg-[#b89840] transition-colors"
               >
-                在3D模型中查看
+                在穴位定位中查看
               </Link>
             )}
           </div>

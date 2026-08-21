@@ -18,7 +18,7 @@ import SolarGiftCard from '@/components/cultivation/SolarGiftCard';
 const WUXING_MODULES = [
   { href: '/diagnose', introHref: '/intro/mingbian', icon: Stethoscope, label: '明辨', sub: '体质辨识', wuxing: 'wood', color: 'var(--wood)' },
   { href: '/healing', introHref: '/intro/liaoyu', icon: FlameKindling, label: '疗愈', sub: '五法合一', wuxing: 'fire', color: 'var(--fire)' },
-  { href: '/meridian', introHref: '/intro/jingluo', icon: Bone, label: '经络', sub: '3D穴位', wuxing: 'water', color: 'var(--water)' },
+  { href: '/healing/acupoint', introHref: '/intro/jingluo', icon: Bone, label: '经络', sub: '穴位定位', wuxing: 'water', color: 'var(--water)' },
 ] as const;
 
 // 修为页面入口

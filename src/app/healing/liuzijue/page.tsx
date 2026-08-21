@@ -182,7 +182,7 @@ export default function LiuzijuePage() {
   const healingCanvasRef = useRef<HealingCanvasHandle>(null);
   const audioCueRef = useRef(new WuyinAudioCue());
 
-  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'slow' });
+  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'slow', voiceId: 'zh-CN-YunjianNeural' });
   const ttsRef = useRef(tts);
   ttsRef.current = tts;
 
@@ -687,7 +687,7 @@ export default function LiuzijuePage() {
         )}
 
         {/* -- 练习中字诀（大号）-- */}
-        {mode === 'liuzijue' && isActive && (phase === 'exhale' || phase === 'hold1') && (
+        {mode === 'liuzijue' && isActive && (phase === 'exhale' || phase === 'hold1' || phase === 'hold2') && (
           <div className="font-black font-serif" style={{
             fontSize: 60, color: jueColor,
             textShadow: `0 0 30px ${jueColor}50, 0 0 60px ${jueColor}20`,
@@ -708,8 +708,8 @@ export default function LiuzijuePage() {
         {/* -- 倒计时 -- */}
         {isActive && phaseDuration > 0 && (
           <div className="font-mono tabular-nums font-light" style={{
-            fontSize: mode === 'liuzijue' && (phase === 'exhale' || phase === 'hold1') ? 22 : 48,
-            color: `rgba(92,26,0,${mode === 'liuzijue' && (phase === 'exhale' || phase === 'hold1') ? 0.5 : 0.65})`,
+            fontSize: mode === 'liuzijue' && (phase === 'exhale' || phase === 'hold1' || phase === 'hold2') ? 22 : 48,
+            color: `rgba(92,26,0,${mode === 'liuzijue' && (phase === 'exhale' || phase === 'hold1' || phase === 'hold2') ? 0.5 : 0.65})`,
             textShadow: '0 0 12px rgba(196,163,90,0.15)',
           }}>
             {phaseCountdown}

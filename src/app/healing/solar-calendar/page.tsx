@@ -276,7 +276,7 @@ export default function SolarCalendarPage() {
                     <div className="text-xs text-[#8b7b6b] mt-0.5">当令时辰：{selectedWellness.peakTime}</div>
                   </div>
                   <Link
-                    href={`/meridian?code=${selectedTerm.meridianCode}`}
+                    href={`/healing/meridian-chart`}
                     className="px-3 py-1.5 rounded-full text-xs font-semibold border border-[#5d8a63] text-[#5d8a63] hover:bg-[#5d8a63]/10 transition-colors"
                   >
                     查看经络 →

@@ -44,12 +44,12 @@ export default function SeasonPageClient() {
   const openDetail = (term: SolarTermHealth) => setSelectedTerm(term);
   const closeDetail = () => setSelectedTerm(null);
 
-  const goToAcupoint3D = (term: SolarTermHealth) => {
+  const goToAcupoint = (term: SolarTermHealth) => {
     const code = acupointToFocusCode(term.acupoint);
     if (code) {
-      router.push(`/meridian?focus=${code}`);
+      router.push(`/healing/acupoint`);
     } else {
-      router.push('/meridian');
+      router.push('/healing/acupoint');
     }
   };
 
@@ -89,7 +89,7 @@ export default function SeasonPageClient() {
               查看养生详情
             </button>
             <button
-              onClick={() => goToAcupoint3D(currentTerm)}
+              onClick={() => goToAcupoint(currentTerm)}
               className="bg-white/10 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-white/20 transition"
             >
               穴位3D
@@ -330,7 +330,7 @@ export default function SeasonPageClient() {
               {/* 穴位按摩 → 3D联动 */}
               <div
                 className="bg-purple-50 rounded-2xl p-4 cursor-pointer hover:bg-purple-100 transition"
-                onClick={() => goToAcupoint3D(selectedTerm)}
+                onClick={() => goToAcupoint(selectedTerm)}
               >
                 <div className="flex items-center justify-between mb-1">
                   <h4 className="font-bold text-sm text-purple-800">穴位按摩</h4>
@@ -357,7 +357,7 @@ export default function SeasonPageClient() {
               {/* 底部操作按钮 */}
               <div className="flex gap-3 pb-2">
                 <button
-                  onClick={() => goToAcupoint3D(selectedTerm)}
+                  onClick={() => goToAcupoint(selectedTerm)}
                   className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-2xl font-bold text-sm shadow-md"
                 >
                   穴位3D定位

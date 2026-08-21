@@ -442,7 +442,7 @@ export default function AiEvalPage() {
   }, [currentIndex, questionCount, answers.length, fetchQuestion, sessionStartTime, totalSessionXiuWei, selectedTypes, meridianFilter]);
 
   const goTo3D = useCallback((point: Acupoint) => {
-    router.push(`/meridian?focus=${point.code}`);
+    router.push(`/healing/acupoint`);
   }, [router]);
 
   const persist = persistRef.current;
@@ -820,10 +820,10 @@ export default function AiEvalPage() {
                 查看测评历史
               </Link>
               <button
-                onClick={() => router.push('/meridian')}
+                onClick={() => router.push('/healing/acupoint')}
                 className="w-full py-3.5 bg-white text-gray-700 font-bold rounded-2xl border border-gray-200 shadow-sm hover:bg-gray-50 transition-all active:scale-[0.98]"
               >
-                进入3D经络
+                进入穴位定位
               </button>
             </div>
           </div>

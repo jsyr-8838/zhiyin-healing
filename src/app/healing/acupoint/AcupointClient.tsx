@@ -81,13 +81,13 @@ export default function AcupointClient() {
                 {stats.total}个穴位（{stats.regular}正经+{stats.dong}董氏奇穴）· {XWS_VIDEO_ACUPOINTS.size}个视频
               </p>
             </div>
-            {/* 3D交互入口 */}
+            {/* 经络图解入口 */}
             <Link
-              href="/meridian"
+              href="/healing/meridian-chart"
               className="px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
               style={{ fontWeight: 700 }}
             >
-              3D穴位
+              经络图解
             </Link>
           </div>
         </div>
@@ -282,12 +282,12 @@ export default function AcupointClient() {
                     )}
                   </div>
                 </div>
-                {/* 3D查看链接 */}
+                {/* 经络图解链接 */}
                 <Link
-                  href={`/meridian?focus=${point.code}`}
+                  href={`/healing/meridian-chart`}
                   className="px-2 py-1 bg-[#f5efe6] rounded-lg text-[10px] text-[#8b7355] font-medium hover:bg-[#e8ddd0]/60 transition-colors shrink-0"
                 >
-                  3D
+                  经络
                 </Link>
               </button>
             );

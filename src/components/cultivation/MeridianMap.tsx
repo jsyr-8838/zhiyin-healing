@@ -51,7 +51,7 @@ border: '1px solid rgba(255,255,255,0.6)',
           return (
             <Link
               key={meridian.id}
-              href={isUnlocked ? '/meridian' : '#'}
+              href={isUnlocked ? '/healing/acupoint' : '#'}
               className="flex items-center gap-3 p-2.5 rounded-xl transition-all"
               style={{
                 background: isCompleted ? `${color}06` : 'transparent',

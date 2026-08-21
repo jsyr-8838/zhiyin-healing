@@ -6,7 +6,7 @@ import HealingHeader from '@/components/layout/HealingHeader';
 import PageContainer from '@/components/layout/PageContainer';
 import HealingCanvas, { type HealingCanvasHandle, HEALING_PRESET_WUYIN } from '@/components/healing/HealingCanvas';
 import { fmtTime } from '@/hooks/useTimer';
-import { Play, Pause, Volume2, Timer, Sparkles, Music, RefreshCw, FolderOpen } from 'lucide-react';
+import { Play, Pause, Volume2, Timer, Sparkles, Music, RefreshCw, FolderOpen, Square, Repeat, RepeatOff } from 'lucide-react';
 import {
   FIVE_TONES, BINAURAL_MODES, MODULATIONS, WUYIN_PRESETS,
   type WuYinKey, type BinauralValue, type ModulationValue,
@@ -35,10 +35,10 @@ export default function WuYinPage() {
   // ---- 音频服务状态 ----
   const {
     isPlaying, currentTrack, volume, binauralBeat, modulation,
-    timerMinutes, timerRemaining, isTimerRunning,
+    timerMinutes, timerRemaining, isTimerRunning, isLooping,
     play, pause, stop, togglePlay, setVolume,
     setBinauralBeat, setModulation,
-    setTimer, startTimer, stopTimer,
+    setTimer, startTimer, stopTimer, toggleLoop,
   } = useAudioService();
 
   const { hasDiagnosis, recommendedTone, primaryConstitution } = useHealingRecommendation();
@@ -245,7 +245,7 @@ export default function WuYinPage() {
       )}
 
       {/* Canvas 可视化区域 - 宣纸暖白背景 */}
-      <div className="relative" style={{ height: 220, background: '#FDF8F0' }}>
+      <div className="relative" style={{ height: 280, background: '#FDF8F0' }}>
         <HealingCanvas
           ref={healingCanvasRef}
           energy={audioEnergy}
@@ -290,14 +290,34 @@ export default function WuYinPage() {
             </span>
           </div>
         )}
-        {/* 播放/暂停 */}
-        <div className="absolute bottom-2 left-3">
+        {/* 播放/暂停/停止/循环 */}
+        <div className="absolute bottom-2 left-3 flex items-center gap-2">
           <button
             onClick={() => isPlaying ? stopAll() : (selectedTone ? startPlaying(selectedTone, binauralBeat, modulation as ModulationValue) : startPlaying('gong', 0, 'none'))}
             className="w-10 h-10 rounded-full flex items-center justify-center transition"
             style={{ background: isPlaying ? 'rgba(239,68,68,0.12)' : 'rgba(34,197,94,0.12)' }}
           >
             {isPlaying ? <Pause size={18} style={{ color: '#B91C1C' }} /> : <Play size={18} style={{ color: '#166534' }} />}
+          </button>
+          {/* 停止按钮 */}
+          <button
+            onClick={() => stopAll()}
+            disabled={!isPlaying}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition disabled:opacity-30"
+            style={{ background: 'rgba(92,26,0,0.08)' }}
+          >
+            <Square size={15} style={{ color: '#5C1A00' }} />
+          </button>
+          {/* 循环切换 */}
+          <button
+            onClick={toggleLoop}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition"
+            style={{ background: isLooping ? 'rgba(34,197,94,0.12)' : 'rgba(92,26,0,0.06)' }}
+            title={isLooping ? '循环播放' : '单次播放'}
+          >
+            {isLooping
+              ? <Repeat size={15} style={{ color: '#166534' }} />
+              : <RepeatOff size={15} style={{ color: '#8B7355' }} />}
           </button>
         </div>
       </div>

@@ -326,7 +326,7 @@ export default function QuizPage() {
 
   const goTo3D = useCallback(
     (point: Acupoint) => {
-      router.push(`/meridian?focus=${point.code}`);
+      router.push(`/healing/acupoint`);
     },
     [router]
   );
@@ -351,7 +351,7 @@ export default function QuizPage() {
           {/* Header with back button */}
           <div className="flex items-center gap-3 mb-6">
             <Link
-              href="/meridian"
+              href="/healing/acupoint"
               className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all"
             >
               ←
@@ -727,10 +727,10 @@ export default function QuizPage() {
               再来一轮
             </button>
             <button
-              onClick={() => router.push('/meridian')}
+              onClick={() => router.push('/healing/acupoint')}
               className="w-full py-3.5 bg-white text-gray-700 font-bold rounded-2xl border border-gray-200 shadow-sm hover:bg-gray-50 transition-all active:scale-[0.98]"
             >
-              进入3D经络
+              进入穴位定位
             </button>
           </div>
         </div>

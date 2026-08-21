@@ -139,7 +139,7 @@ export default function JiuliaoClient() {
 
   const handleAcupointClick = useCallback((name: string) => {
     const clean = name.replace(/[(（].*?[)）]/g, '').trim();
-    window.location.href = `/meridian?acupoint=${encodeURIComponent(clean)}`;
+    window.location.href = `/healing/acupoint`;
   }, []);
 
   return (
@@ -556,16 +556,16 @@ export default function JiuliaoClient() {
                 </section>
               )}
 
-              {/* Jump to 3D Meridian */}
+              {/* Jump to Acupoint */}
               <Link
-                href={`/meridian?acupoint=${encodeURIComponent(selectedPrescription.points[0] || '')}`}
+                href={`/healing/acupoint`}
                 className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition hover:opacity-90 mt-2"
                 style={{
                   background: 'linear-gradient(135deg, var(--fire), #8b4513)',
                   color: '#fff',
                 }}
               >
-                查看3D经络穴位
+                查看经络穴位
                 <ChevronRight size={14} />
               </Link>
             </div>

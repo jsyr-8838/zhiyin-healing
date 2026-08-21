@@ -45,8 +45,8 @@ export default function JingluoIntro() {
           desc: '四题型+自定义题量+经脉五行筛选，AI判卷+错题3D联动，学以致用',
         },
       ]}
-      ctaHref="/meridian"
-      ctaLabel="进入经络"
+      ctaHref="/healing/acupoint"
+      ctaLabel="进入穴位定位"
       backHref="/dashboard"
     />
   );

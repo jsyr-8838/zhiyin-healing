@@ -160,7 +160,7 @@ export function generateDailyPractice(
       subLabel: `${acupoint.meridian}`,
       element: primaryElement,
       duration: '~2 分钟',
-      href: '/meridian',
+      href: '/healing/acupoint',
       icon: '穴',
       done: doneSet.has('meridian'),
     },

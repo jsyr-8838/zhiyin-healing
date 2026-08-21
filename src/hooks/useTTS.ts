@@ -21,6 +21,8 @@ interface UseTTSOptions {
   pitch?: number;
   volume?: number;
   lang?: string;
+  /** Override the Edge TTS voice name (e.g. 'zh-CN-YunjianNeural') */
+  voiceId?: string;
 }
 
 interface UseTTSReturn {
@@ -56,6 +58,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     pitch: defaultPitch = 0.85,
     volume = 0.9,
     lang = 'zh-CN',
+    voiceId,
   } = options;
 
   const [gender, setGenderState] = useState<VoiceGender>(defaultGender);
@@ -64,8 +67,8 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   const [usingEdgeTTS, setUsingEdgeTTS] = useState(true);
 
   // 用 ref 保存所有可变值，避免 useCallback 依赖循环
-  const stateRef = useRef({ gender, speed, usingEdgeTTS, defaultPitch, volume, lang });
-  stateRef.current = { gender, speed, usingEdgeTTS, defaultPitch, volume, lang };
+  const stateRef = useRef({ gender, speed, usingEdgeTTS, defaultPitch, volume, lang, voiceId });
+  stateRef.current = { gender, speed, usingEdgeTTS, defaultPitch, volume, lang, voiceId };
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const browserVoicesRef = useRef<SpeechSynthesisVoice[]>([]);
@@ -154,7 +157,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   const speak = useCallback((text: string, rate?: number, _pitch?: number) => {
     const s = stateRef.current;
     const effectiveRate = rate ?? SPEED_MAP[s.speed];
-    const voiceName = EDGE_VOICE_MAP[s.gender];
+    const voiceName = s.voiceId || EDGE_VOICE_MAP[s.gender];
     const g = s.gender;
 
     // 每次新 speak 都使旧异步回调失效

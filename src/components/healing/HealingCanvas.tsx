@@ -139,11 +139,57 @@ const CHAKRAS = [
 
 // ===== 绘制函数：五音 =====
 // waveTime = 可冻结的波浪时间（音乐停时冻结）; e = 全局能量; bandEnergies = 5频段能量
-// 妙曼仙子舞姿效果：每波段独立音频驱动，音乐响时翩翩起舞，音乐停时优雅静止
+// v2增强：中央脉冲圆环 + 能量粒子飞溅 + 引导性节律光效
 function drawWuyin(
   ctx: CanvasRenderingContext2D, w: number, h: number,
   waveTime: number, e: number, bandEnergies: number[],
 ) {
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+
+  // ── 中央脉冲圆环（随能量呼吸） ──
+  if (e > 0.01) {
+    const pulseRadius = Math.min(w, h) * (0.08 + e * 0.12);
+    const pulseAlpha = 0.06 + e * 0.15;
+    // 外圈光晕
+    const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, pulseRadius * 2.5);
+    glowGrad.addColorStop(0, `hsla(42, 60%, 70%, ${pulseAlpha * 0.5})`);
+    glowGrad.addColorStop(0.4, `hsla(42, 50%, 60%, ${pulseAlpha * 0.2})`);
+    glowGrad.addColorStop(1, `hsla(42, 40%, 50%, 0)`);
+    ctx.fillStyle = glowGrad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, pulseRadius * 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 脉冲圆环
+    for (let ring = 0; ring < 3; ring++) {
+      const ringR = pulseRadius * (1 + ring * 0.4 + Math.sin(waveTime * 0.8 + ring) * 0.1);
+      const ringAlpha = pulseAlpha * (1 - ring * 0.3);
+      ctx.beginPath();
+      ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+      ctx.strokeStyle = `hsla(42 + ring * 10, 55%, 65%, ${ringAlpha})`;
+      ctx.lineWidth = 1.5 + e * 2 - ring * 0.5;
+      ctx.stroke();
+    }
+  }
+
+  // ── 能量粒子飞溅 ──
+  if (e > 0.15) {
+    const particleCount = Math.floor(e * 8);
+    for (let pi = 0; pi < particleCount; pi++) {
+      const angle = waveTime * 0.5 + pi * (Math.PI * 2 / particleCount);
+      const dist = Math.min(w, h) * (0.15 + e * 0.2 + Math.sin(waveTime * 2 + pi) * 0.05);
+      const px = cx + Math.cos(angle) * dist;
+      const py = cy + Math.sin(angle) * dist;
+      const psize = 1.5 + e * 2;
+      const palpha = 0.3 + e * 0.3;
+      ctx.beginPath();
+      ctx.arc(px, py, psize, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(42, 60%, 70%, ${palpha})`;
+      ctx.fill();
+    }
+  }
+
   for (let bi = 0; bi < WUYIN_BANDS.length; bi++) {
     const band = WUYIN_BANDS[bi];
     const be = bandEnergies[bi];
@@ -152,8 +198,8 @@ function drawWuyin(
 
     const baseY = band.yRatio * h;
     // 妙曼舞姿：基础振幅极低（静止时近乎平直），音频驱动时大幅舒展
-    const amp = band.amp * (0.12 + combined * 3.0);
-    const alpha = 0.04 + combined * 0.32;
+    const amp = band.amp * (0.12 + combined * 3.5);
+    const alpha = 0.04 + combined * 0.36;
 
     // ── 宽波带（渐变填充） ──
     ctx.beginPath();

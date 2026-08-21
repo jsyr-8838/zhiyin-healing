@@ -218,7 +218,7 @@ export default function BenCaoClient() {
                         {h.relatedAcupoints.map(code => (
                           <Link
                             key={code}
-                            href={`/meridian?focus=${code.replace('ACU_', '')}`}
+                            href={`/healing/acupoint`}
                             className="px-2 py-0.5 rounded-full text-xs bg-purple-50 text-purple-700 border border-purple-100 hover:bg-purple-100 transition-colors"
                           >
                             {code.replace('ACU_', '')}

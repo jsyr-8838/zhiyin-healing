@@ -239,13 +239,13 @@ export default function HealingPage() {
             <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">NEW</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/meridian" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
+            <Link href="/healing/acupoint" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500" />
               <div className="w-11 h-11 rounded-lg mx-auto mb-2 flex items-center justify-center text-white bg-gradient-to-br from-amber-600 to-amber-700">
                 <CircleDot size={20} />
               </div>
-              <h4 className="font-bold text-sm font-serif text-gray-800">3D穴位</h4>
-              <p className="text-[10px] mt-0.5 text-gray-500">571穴·3D交互·董氏奇穴</p>
+              <h4 className="font-bold text-sm font-serif text-gray-800">穴位定位</h4>
+              <p className="text-[10px] mt-0.5 text-gray-500">571穴·董氏奇穴·视频</p>
             </Link>
             <Link href="/healing/jingfang" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-700/60" />

@@ -200,13 +200,13 @@ export interface TherapyPreset {
 }
 
 export const WUYIN_PRESETS: TherapyPreset[] = [
-  { name: '疏肝解郁', icon: '木', tone: 'jiao', beat: 6, mod: 'breathing', timer: 15, desc: '角音·肝胆·西塔波', color: '#27AE60' },
-  { name: '养心安神', icon: '火', tone: 'zhi', beat: 10, mod: 'ocean', timer: 15, desc: '徵音·心小肠·阿尔法波', color: '#E74C3C' },
-  { name: '健脾和胃', icon: '土', tone: 'gong', beat: 10, mod: 'gentle', timer: 20, desc: '宫音·脾胃·阿尔法波', color: '#F39C12' },
-  { name: '清肺润燥', icon: '金', tone: 'shang', beat: 20, mod: 'none', timer: 10, desc: '商音·肺大肠·贝塔波', color: '#3498DB' },
-  { name: '固肾益精', icon: '水', tone: 'yu', beat: 2, mod: 'gentle', timer: 20, desc: '羽音·肾膀胱·德尔塔波', color: '#1ABC9C' },
-  { name: '木火同调', icon: '雷', tone: 'jiao', beat: 6, mod: 'breathing', timer: 15, desc: '角+徵·肝心同调', color: '#8E44AD' },
-  { name: '培土生金', icon: '地', tone: 'gong', beat: 10, mod: 'gentle', timer: 15, desc: '宫+商·脾肺同调', color: '#D4AC0D' },
+  { name: '疏肝解郁', icon: '木', tone: 'jiao', beat: 0, mod: 'none', timer: 15, desc: '角音·肝胆·纯音', color: '#27AE60' },
+  { name: '养心安神', icon: '火', tone: 'zhi', beat: 0, mod: 'none', timer: 15, desc: '徵音·心小肠·纯音', color: '#E74C3C' },
+  { name: '健脾和胃', icon: '土', tone: 'gong', beat: 0, mod: 'none', timer: 20, desc: '宫音·脾胃·纯音', color: '#F39C12' },
+  { name: '清肺润燥', icon: '金', tone: 'shang', beat: 0, mod: 'none', timer: 10, desc: '商音·肺大肠·纯音', color: '#3498DB' },
+  { name: '固肾益精', icon: '水', tone: 'yu', beat: 0, mod: 'none', timer: 20, desc: '羽音·肾膀胱·纯音', color: '#1ABC9C' },
+  { name: '木火同调', icon: '雷', tone: 'jiao', beat: 0, mod: 'none', timer: 15, desc: '角+徵·肝心同调', color: '#8E44AD' },
+  { name: '培土生金', icon: '地', tone: 'gong', beat: 0, mod: 'none', timer: 15, desc: '宫+商·脾肺同调', color: '#D4AC0D' },
 ];
 
 export const SINGING_BOWL_PRESETS: TherapyPreset[] = [

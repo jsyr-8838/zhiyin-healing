@@ -122,6 +122,8 @@ interface AudioServiceState {
   stopTimer: () => void;
   startPrescriptionTimer: () => void;
   setCurrentTime: (t: number) => void;
+  isLooping: boolean;
+  toggleLoop: () => void;
 }
 
 // ===== 内部单例 =====
@@ -443,6 +445,9 @@ export const useAudioService = create<AudioServiceState>()(
       timerRemaining: 0,
       isTimerRunning: false,
 
+      // 循环
+      isLooping: true,
+
       // 持久化
       lastToneKey: null,
       lastMode: 'wuyin',
@@ -580,6 +585,13 @@ export const useAudioService = create<AudioServiceState>()(
         }
         syntheticAnalyser?.setVolume(clamped);
         set({ volume: clamped });
+      },
+
+      toggleLoop: () => {
+        const el = getAudioElement();
+        const next = !el.loop;
+        el.loop = next;
+        set({ isLooping: next });
       },
 
       toggleMute: () => {
