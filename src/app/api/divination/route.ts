@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DIVINATION_SYSTEM_PROMPT } from '@/lib/divination-data';
 import { loadPromptWithFallback, PROMPT_IDS } from '@/lib/evo/prompt-loader';
-import { divine, DIVINATION_METHODS_V2, type DivinationMethod, type DivineResult } from '@/lib/taibu-adapter';
 import { db, generateId, now } from '@/lib/db';
 import { divinationPostSchema, divinationGetSchema, divinationFeedbackSchema, validateOrError } from '@/lib/validators';
 
@@ -20,30 +19,18 @@ export async function POST(request: NextRequest) {
     if ('error' in validation) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
-    const { userId, method, question, inputParams = {}, profile, destinee } = validation.data;
+    const { userId, method, question, inputParams = {}, profile, destinee, divineResult: clientDivineResult } = validation.data;
 
-    // 1. 使用 taibu-core 精确排盘
-    let divineResult: DivineResult;
-    try {
-      divineResult = await divine({
-        method: method as DivinationMethod,
-        question,
-        number: inputParams.number,
-        birthDate: inputParams.birthDate,
-        birthHour: inputParams.birthHour,
-        gender: 'male',
-        seed: Date.now(),
-      });
-    } catch (calcError: unknown) {
-      const msg = calcError instanceof Error ? calcError.message : String(calcError);
-      return NextResponse.json({ error: `排盘失败：${msg}` }, { status: 400 });
+    // 1. 使用客户端传来的排盘结果（taibu-core 已移至客户端运行）
+    if (!clientDivineResult) {
+      return NextResponse.json({ error: '缺少排盘结果，请刷新页面重试' }, { status: 400 });
     }
 
     const divinationResult = {
-      hexagramName: divineResult.summary,
-      hexagramData: divineResult.json as Record<string, unknown>,
-      movingLine: ((divineResult.json as any)?.movingLine as number) || 0,
-      extraInfo: divineResult.extraInfo,
+      hexagramName: clientDivineResult.summary,
+      hexagramData: clientDivineResult.json as Record<string, unknown>,
+      movingLine: ((clientDivineResult.json as any)?.movingLine as number) || 0,
+      extraInfo: clientDivineResult.extraInfo,
     };
 
     // 2. 构建上下文（体质信息 + 历史占卜记录）

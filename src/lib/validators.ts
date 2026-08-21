@@ -151,6 +151,15 @@ export const divinationPostSchema = z.object({
     birthHour: z.number(),
     isLunar: z.boolean().optional().default(false),
   }).optional(),
+  // Client-side divination result (taibu-core runs on client now)
+  divineResult: z.object({
+    method: z.string(),
+    methodName: z.string(),
+    json: z.any(),
+    text: z.string(),
+    summary: z.string(),
+    extraInfo: z.string(),
+  }).optional(),
 });
 
 export const divinationFeedbackSchema = z.object({

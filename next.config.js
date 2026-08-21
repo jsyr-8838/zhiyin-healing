@@ -1,5 +1,8 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Standalone output required for OpenNext/Cloudflare Pages deployment
+  output: "standalone",
+
   // Skip type checking and ESLint during build (known type conflicts in NextAuth etc.)
   typescript: {
     ignoreBuildErrors: true,
@@ -23,6 +26,41 @@ const nextConfig = {
       'date-fns',
       'lodash-es',
     ],
+  },
+
+  // Webpack config: exclude heavy modules from server bundle to reduce handler.mjs size
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // These modules are client-only or have huge data that bloats the server bundle.
+      // taibu-core: ~18MB of pinyin/segmentation data, runs on client via taibu-adapter
+      // lucide-react: icon library, only needed for client rendering
+      // react-icons: same as lucide-react
+      // node-html-to-image / puppeteer / playwright: server-only but not usable on Cloudflare
+      const serverExcludes = [
+        'taibu-core',
+        'lucide-react',
+        'react-icons',
+        '@heroicons/react',
+        'node-html-to-image',
+        'puppeteer',
+        'playwright',
+        'jsdom',
+      ];
+
+      config.externals = config.externals || [];
+      // Use function externals to match sub-paths like 'taibu-core/meihua', 'lucide-react/icons'
+      const existingExternals = Array.isArray(config.externals) ? config.externals : [config.externals];
+      existingExternals.push(({ request }, callback) => {
+        for (const mod of serverExcludes) {
+          if (request === mod || request.startsWith(mod + '/')) {
+            return callback(null, `commonjs ${request}`);
+          }
+        }
+        callback();
+      });
+      config.externals = existingExternals;
+    }
+    return config;
   },
 
   // Image optimization
@@ -100,3 +138,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
