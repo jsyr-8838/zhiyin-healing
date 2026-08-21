@@ -15,6 +15,9 @@ import {
   useAudioService, createBowlTrack,
 } from '@/lib/audio-service';
 import { useHealingRecommendation } from '@/hooks/useHealingRecommendation';
+import {
+  CHAKRA_EXTENDED_FREQS, CATEGORY_INFO, FREQ_BY_CATEGORY, type FreqCategory,
+} from '@/lib/healing-frequencies-data';
 
 /* ================================================================
  *  脉轮调谐 · 宋韵光色系版
@@ -138,6 +141,21 @@ export default function ChakraPage() {
     } else {
       setSelectedChakra(idx);
       startPlaying(chakra.freq, binauralBeat, modulation as ModulationValue);
+    }
+  }, [isPlaying, selectedChakra, binauralBeat, modulation, startPlaying, stopAll]);
+
+  // 通过任意频率播放（扩展频率）
+  const toggleChakraByFreq = useCallback((freq: number) => {
+    // 找到最接近的脉轮
+    const closestChakra = CHAKRAS.reduce((prev, curr) =>
+      Math.abs(curr.freq - freq) < Math.abs(prev.freq - freq) ? curr : prev
+    );
+    const idx = CHAKRAS.indexOf(closestChakra);
+    if (isPlaying && selectedChakra === idx) {
+      stopAll();
+    } else {
+      setSelectedChakra(idx);
+      startPlaying(freq, binauralBeat, modulation as ModulationValue);
     }
   }, [isPlaying, selectedChakra, binauralBeat, modulation, startPlaying, stopAll]);
 
@@ -462,6 +480,102 @@ export default function ChakraPage() {
           </div>
         </div>
 
+        {/* 脉轮补充频率（healing-frequencies 带波长数据） */}
+        <div className="mb-5">
+          <h3 className="font-bold text-sm mb-3" style={{ color: '#5C1A00' }}>脉轮补充频率</h3>
+          <p className="text-[10px] mb-3" style={{ color: '#8B7355' }}>宇宙八度体系·含波长参数</p>
+          <div className="space-y-2">
+            {CHAKRA_EXTENDED_FREQS.map((cf, i) => {
+              const matchingChakra = CHAKRAS.find(c => {
+                const map: Record<string, string> = {
+                  'Earth Star': '', 'Root': 'root', 'Sacral': 'sacral',
+                  'Solar Plexus': 'solar', 'Heart': 'heart', 'Throat': 'throat',
+                  'Third Eye': 'third', 'Crown': 'crown', 'Soul Star': '',
+                };
+                return map[cf.chakra] === c.id;
+              });
+              const color = matchingChakra?.color || '#8B7355';
+              const isPlayable = cf.f > 20;
+              return (
+                <button
+                  key={i}
+                  onClick={() => isPlayable ? toggleChakraByFreq(cf.f) : undefined}
+                  disabled={!isPlayable}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition hover:shadow-sm active:scale-[0.98] disabled:opacity-50"
+                  style={{
+                    background: '#FDF8F0',
+                    borderColor: color + '30',
+                  }}
+                >
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                    style={{ backgroundColor: color + '18', border: `2px solid ${color}`, color }}
+                  >
+                    {cf.cn.charAt(0)}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-xs" style={{ color: '#2C1810' }}>{cf.cn}</span>
+                      <span className="text-[10px]" style={{ color: '#8B7355' }}>{cf.chakra}</span>
+                    </div>
+                    <div className="text-[10px] mt-0.5" style={{ color: '#5C3015' }}>{cf.desc}</div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-sm font-light tabular-nums" style={{ color }}>{cf.f}</div>
+                    <div className="text-[8px]" style={{ color: '#8B7355' }}>
+                      Hz{cf.l > 0 && ` · λ=${cf.l}cm`}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 扩展疗愈频率类别 */}
+        <div className="mb-5">
+          <h3 className="font-bold text-sm mb-3" style={{ color: '#5C1A00' }}>扩展疗愈频率</h3>
+          <p className="text-[10px] mb-3" style={{ color: '#8B7355' }}>healing-frequencies 项目·11类频率</p>
+          <div className="space-y-3">
+            {(Object.keys(FREQ_BY_CATEGORY) as FreqCategory[]).map((cat) => {
+              const info = CATEGORY_INFO[cat];
+              const freqs = FREQ_BY_CATEGORY[cat];
+              return (
+                <div key={cat} className="rounded-xl p-3" style={{ background: '#FDF8F0', border: `1px solid ${info.color}20` }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                      style={{ backgroundColor: info.color + '18', border: `1.5px solid ${info.color}`, color: info.color }}
+                    >
+                      {info.icon}
+                    </div>
+                    <div>
+                      <div className="font-bold text-xs" style={{ color: '#2C1810' }}>{info.cn}</div>
+                      <div className="text-[9px]" style={{ color: '#8B7355' }}>{info.desc}</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {freqs.map((f, j) => (
+                      <button
+                        key={j}
+                        onClick={() => toggleChakraByFreq(f.f)}
+                        className="px-2 py-1 rounded-lg text-[10px] font-mono tabular-nums transition hover:shadow-sm"
+                        style={{
+                          background: info.color + '10',
+                          border: `1px solid ${info.color}30`,
+                          color: '#2C1810',
+                        }}
+                      >
+                        {f.f}Hz
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* 脉轮说明 */}
         <div className="rounded-xl p-4 mb-4" style={{ background: '#FDF8F0', border: '1px solid #EDE4D3' }}>
           <h4 className="font-bold text-sm mb-2" style={{ color: '#5C1A00' }}>脉轮调谐原理</h4>
@@ -471,6 +585,8 @@ export default function ChakraPage() {
             528Hz(脐轮)爱与修复、639Hz(心轮)和谐关系、741Hz(喉轮)直觉觉醒、
             852Hz(眉心轮)精神回归、963Hz(顶轮)宇宙连接。
             双耳节拍通过左右耳频率差诱导脑波同步，配合脉轮频率可深度调谐能量中心。
+            补充频率来自 healing-frequencies 项目（MIT, Olivier Guilieri），包含宇宙八度、
+            器官共振、矿物频率、天使频率等11类疗愈频率。
           </p>
         </div>
       </div>

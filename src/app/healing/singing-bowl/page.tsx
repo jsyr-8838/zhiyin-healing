@@ -22,6 +22,9 @@ import { useHealingRecommendation } from '@/hooks/useHealingRecommendation';
 import { useCultivationStore } from '@/lib/cultivation-store';
 import { XIUWEI_GAINS, type WuxingElement } from '@/lib/cultivation-engine';
 import { getClientUserId } from '@/lib/auth';
+import {
+  NEW_HEALING_FREQS, CATEGORY_INFO, FREQ_BY_CATEGORY, type FreqCategory,
+} from '@/lib/healing-frequencies-data';
 
 /* ================================================================
  *  颂钵音疗 · 宋韵光色系版
@@ -501,6 +504,57 @@ export default function SingingBowlPage() {
               </div>
             )}
 
+            {/* 扩展疗愈频率（healing-frequencies 项目） */}
+            <div className="mb-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles size={16} style={{ color: '#8B2500' }} />
+                <h3 className="font-bold text-sm" style={{ color: '#5C1A00' }}>扩展疗愈频率</h3>
+              </div>
+              <p className="text-[10px] mb-3" style={{ color: '#8B7355' }}>
+                healing-frequencies 项目·11类频率·{NEW_HEALING_FREQS.length}个新增频率
+              </p>
+              <div className="space-y-3">
+                {(Object.keys(FREQ_BY_CATEGORY) as FreqCategory[]).map((cat) => {
+                  const info = CATEGORY_INFO[cat];
+                  const freqs = FREQ_BY_CATEGORY[cat];
+                  return (
+                    <div key={cat} className="rounded-xl p-3" style={{ background: '#FDF8F0', border: `1px solid ${info.color}20` }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                          style={{ backgroundColor: info.color + '18', border: `1.5px solid ${info.color}`, color: info.color }}
+                        >
+                          {info.icon}
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs" style={{ color: '#2C1810' }}>{info.cn}</div>
+                          <div className="text-[9px]" style={{ color: '#8B7355' }}>{info.desc}</div>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {freqs.map((f, j) => (
+                          <button
+                            key={j}
+                            onClick={() => toggleFreq(f.f)}
+                            className="px-2 py-1 rounded-lg text-[10px] font-mono tabular-nums transition hover:shadow-sm"
+                            style={{
+                              background: selectedFreq === f.f ? info.color + '30' : info.color + '10',
+                              border: `1px solid ${info.color}30`,
+                              color: selectedFreq === f.f ? info.color : '#2C1810',
+                              fontWeight: selectedFreq === f.f ? 'bold' : 'normal',
+                            }}
+                          >
+                            {f.f}Hz
+                            <span className="ml-1 text-[8px] opacity-60">{f.cn}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* 双耳节拍 */}
             <div className="mb-5">
               <h3 className="font-bold text-sm mb-3" style={{ color: '#5C1A00' }}>双耳节拍</h3>
@@ -731,6 +785,9 @@ export default function SingingBowlPage() {
             双耳节拍技术通过左右耳频率差诱导脑波同步，德尔塔波助眠、西塔波助冥想、阿尔法波助放松、贝塔波助专注。
             波形调制模拟颂钵敲击后的自然衰减，营造更真实的音疗体验。真钵录音与敲击音色源自真实颂钵，
             环境音叠加层可与主音并行播放，营造沉浸式疗愈氛围。
+            扩展疗愈频率来自 healing-frequencies 项目（MIT, Olivier Guilieri），
+            包含索尔菲吉欧扩展、基础疗愈、器官共振、矿物频率、唵音、宇宙八度、天使频率、
+            特斯拉369、舒曼共振、DNA修复等11类频率。
           </p>
         </div>
       </div>
