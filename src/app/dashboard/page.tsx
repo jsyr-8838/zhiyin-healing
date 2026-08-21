@@ -234,7 +234,7 @@ border: '1px solid rgba(255,255,255,0.6)',
         <div className="grid grid-cols-2 gap-3">
           {[
             { href: '/diagnose', introHref: '/intro/mingbian', icon: Camera, label: 'AI舌诊', sub: '拍照辨舌·体质分析', gradient: 'var(--fire), var(--fire-deep)' },
-            { href: '/diagnosis', icon: MessageCircle, label: 'AI导诊', sub: '随时咨询·智能辨证', gradient: 'var(--earth), var(--earth-deep)' },
+            { href: '/healing/ai-diagnosis', icon: MessageCircle, label: 'AI导诊', sub: '随时咨询·智能辨证', gradient: 'var(--earth), var(--earth-deep)' },
             { href: '/divination', introHref: '/intro/zhiji', icon: Compass, label: '知几', sub: '排盘引擎·知几为先', gradient: 'var(--indigo), #3a5068' },
             { href: '/classics', introHref: '/intro/xuanlan', icon: BookOpen, label: '玄览', sub: '山医命相卜·36部经典', gradient: 'var(--ochre), var(--earth-deep)' },
             { href: '/season', icon: Wind, label: '节气养生', sub: `${solarTerm.name}·${solarTerm.season}季`, gradient: 'var(--water), var(--water-deep)' },

@@ -34,7 +34,7 @@ const QUICK_ENTRIES = [
   { icon: Stethoscope, label: '明辨体质', href: '/diagnose', color: 'from-emerald-500 to-teal-600' },
   { icon: Camera, label: 'AI舌诊', href: '/diagnose', color: 'from-green-500 to-emerald-600' },
   { icon: FlameKindling, label: '疗愈方案', href: '/healing', color: 'from-blue-500 to-indigo-600' },
-  { icon: MessageCircle, label: 'AI导诊', href: '/diagnosis', color: 'from-amber-400 to-orange-500' },
+  { icon: MessageCircle, label: 'AI导诊', href: '/healing/ai-diagnosis', color: 'from-amber-400 to-orange-500' },
   { icon: Compass, label: '知几', href: '/divination', color: 'from-purple-500 to-indigo-600' },
   { icon: BookOpen, label: '玄览', href: '/classics', color: 'from-amber-600 to-orange-700' },
   { icon: ClipboardCheck, label: '每日打卡', href: '/checkin', color: 'from-indigo-500 to-purple-500' },

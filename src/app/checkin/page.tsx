@@ -377,7 +377,7 @@ export default function CheckinPage() {
         {/* AI 分析提示 */}
         {todayCheckin && (
           <Link
-            href="/diagnosis"
+            href="/healing/ai-diagnosis"
             className="block bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-200"
           >
             <div className="flex items-center gap-3">

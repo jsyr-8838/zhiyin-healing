@@ -133,6 +133,11 @@ export default function AuthLoginPage() {
           name: name.trim(),
           gender,
           age: parseInt(age),
+          // ★ 深度集成：携带游客ID，注册后迁移游客修行/体质数据
+          visitorId: (() => {
+            if (typeof window === 'undefined') return undefined;
+            return localStorage.getItem('heytcm-visitor-id') || undefined;
+          })(),
         }),
       });
       const data = await res.json();

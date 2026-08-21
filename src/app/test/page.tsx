@@ -166,7 +166,7 @@ export default function TestPage() {
 
           <div className="flex gap-3 pt-2">
             <button
-              onClick={() => router.push('/diagnosis')}
+              onClick={() => router.push('/healing/ai-diagnosis')}
               className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg hover:shadow-xl transition"
             >
               AI导诊咨询

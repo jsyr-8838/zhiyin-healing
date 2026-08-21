@@ -47,7 +47,7 @@ export const THERAPY_MODULES: ModuleConfig[] = [
 export const LIFESTYLE_MODULES: ModuleConfig[] = [
   { href: '/healing/spine-solar', icon: 'Bone', name: '脊柱身心', desc: '节气↔椎骨↔经络深层关联', element: 'earth' },
   { href: '/healing/essence', icon: 'Droplets', name: '精油图谱', desc: '108精油·五行归经·疗愈方', element: 'water' },
-  { href: '/healing/solar-calendar', icon: 'CalendarHeart', name: '节气养生', desc: '二十四节气·顺时调养', element: 'wood' },
+  { href: '/season', icon: 'CalendarHeart', name: '节气养生', desc: '二十四节气·顺时调养', element: 'wood' },
   { href: '/healing/diet', icon: 'Leaf', name: '节气饮食', desc: '顺天时而食·二十四节气', element: 'earth' },
   { href: '/healing/fitness', icon: 'Dumbbell', name: '运动康复', desc: '8套方案·五行关联', element: 'water' },
   { href: '/healing/tea', icon: 'Coffee', name: '茶道养生', desc: '品茶听乐·五行五音', element: 'wood' },

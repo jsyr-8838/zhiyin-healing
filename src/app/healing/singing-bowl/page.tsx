@@ -18,6 +18,9 @@ import {
   getTracksForBowlFreq, BOWL_TYPE_INFO,
 } from '@/lib/healing-music-catalog';
 import { useHealingRecommendation } from '@/hooks/useHealingRecommendation';
+import { useCultivationStore } from '@/lib/cultivation-store';
+import { XIUWEI_GAINS, type WuxingElement } from '@/lib/cultivation-engine';
+import { getClientUserId } from '@/lib/auth';
 
 /* ================================================================
  *  颂钵音疗 · 宋韵光色系版
@@ -139,6 +142,34 @@ export default function SingingBowlPage() {
       stopAll();
     }
   }, [elapsedSeconds, isPlaying, timerMinutes, stopAll]);
+
+  // ---- 颂钵疗愈≥5分钟：记录修为（深度集成） ----
+  useEffect(() => {
+    if (isPlaying && selectedFreq && elapsedSeconds > 0 && elapsedSeconds % 300 === 0) {
+      // 每5分钟记录一次修为（最多记录2次避免刷分）
+      const currentBowlEl = currentBowl?.element as WuxingElement | undefined;
+      if (!currentBowlEl) return;
+      const gain = XIUWEI_GAINS.songbo_complete;
+      try {
+        useCultivationStore.getState().addXiuWei(currentBowlEl, gain);
+        useCultivationStore.getState().recordPractice('songbo', 300, currentBowlEl, gain);
+        useCultivationStore.getState().completeTodayStep('songbo');
+        // 异步写入 DB
+        fetch('/api/cultivation/practice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: getClientUserId(),
+            category: 'songbo',
+            subCategory: String(selectedFreq),
+            element: currentBowlEl,
+            durationSec: 300,
+          }),
+        }).catch(() => {});
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elapsedSeconds, isPlaying, selectedFreq]);
 
   // ---- 播放状态变化时同步 ----
   useEffect(() => {

@@ -10,6 +10,9 @@ import {
   FlameKindling, Flame, Hand, Ear, Wind, RotateCcw, Check,
   CircleDot, Heart, Sparkles, ShieldCheck, Eye, Coffee, BookOpen,
 } from 'lucide-react';
+import { useCultivationStore } from '@/lib/cultivation-store';
+import { XIUWEI_GAINS, type WuxingElement } from '@/lib/cultivation-engine';
+import { getClientUserId } from '@/lib/auth';
 
 /* ================================================================
  *  灸疗疏导 · 静禅国灸十大操作流程
@@ -244,6 +247,29 @@ export default function GroundingPage() {
 
   const currentStep = STEPS[currentStepIdx];
 
+  // 完成疏导 → 记录修为（灸疗对应土行，火灸温通）
+  const recordMoxaGain = useCallback(() => {
+    try {
+      const gain = XIUWEI_GAINS.moxa_complete;
+      const el: WuxingElement = 'fire';
+      useCultivationStore.getState().addXiuWei(el, gain);
+      useCultivationStore.getState().recordPractice('moxa', Math.floor((Date.now() - phaseStartTime) / 1000), el, gain);
+      useCultivationStore.getState().completeTodayStep('moxa');
+      // 异步写入 DB
+      fetch('/api/cultivation/practice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: getClientUserId(),
+          category: 'moxa',
+          subCategory: 'grounding',
+          element: el,
+          durationSec: Math.floor((Date.now() - phaseStartTime) / 1000),
+        }),
+      }).catch(() => {});
+    } catch {}
+  }, [phaseStartTime]);
+
   // 开始疏导
   const startTherapy = useCallback(() => {
     setPhase('step1');
@@ -273,10 +299,11 @@ export default function GroundingPage() {
       } else {
         // 全部完成
         setPhase('complete');
+        recordMoxaGain();
         speakSlow('十大流程已全部完成。静禅国灸，以禅入灸，以灸养禅，愿您身心安泰。');
       }
     }
-  }, [currentStep, scriptIdx, currentStepIdx]);
+  }, [currentStep, scriptIdx, currentStepIdx, recordMoxaGain]);
 
   // 上一步
   const prevStep = useCallback(() => {

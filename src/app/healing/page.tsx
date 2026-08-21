@@ -308,6 +308,98 @@ export default function HealingPage() {
           </div>
         </div>
 
+        {/* ===== 音频疗愈专区（三模块统一入口） ===== */}
+        <div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-1 h-5 rounded-full bg-blue-500" />
+            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">音频疗愈</h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-blue-500/40 to-transparent" />
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold">3 modules</span>
+          </div>
+          <div className="space-y-3">
+            {/* 五音疗愈 */}
+            <Link href="/healing/wuyin"
+              className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-900 via-cyan-800 to-blue-900" />
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: 'radial-gradient(circle at 15% 50%, rgba(20,184,166,0.4) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(59,130,246,0.3) 0%, transparent 50%)',
+              }} />
+              <div className="relative z-10 p-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-teal-300 border border-white/20 flex-shrink-0">
+                  <Music size={22} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-sm font-serif text-white flex items-center gap-2">
+                    五音疗愈
+                    <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-teal-500/30 text-teal-200 font-normal">角徵宫商羽</span>
+                  </h4>
+                  <p className="text-[10px] text-white/50 mt-0.5">五行脏腑共振 · 实时声波可视化</p>
+                </div>
+                <div className="flex items-center gap-0.5 flex-shrink-0">
+                  {[0.5, 0.8, 1, 0.6, 0.9, 0.4].map((h, i) => (
+                    <div key={i} className="w-1 bg-teal-400/60 rounded-full animate-pulse" style={{ height: `${h * 16}px`, animationDelay: `${i * 150}ms` }} />
+                  ))}
+                </div>
+                <ArrowRight size={16} className="text-teal-300/60 flex-shrink-0" />
+              </div>
+            </Link>
+
+            {/* 天籁 */}
+            <Link href="/healing/mineradio"
+              className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-purple-900 to-slate-900" />
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(139,92,246,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(59,130,246,0.3) 0%, transparent 50%)',
+              }} />
+              <div className="relative z-10 p-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-purple-300 border border-white/20 flex-shrink-0">
+                  <Music2 size={22} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-sm font-serif text-white flex items-center gap-2">
+                    天籁
+                    <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-purple-500/30 text-purple-200 font-normal">LIVE</span>
+                  </h4>
+                  <p className="text-[10px] text-white/50 mt-0.5">天籁无奏 · 万窍自鸣 · 以情胜情</p>
+                </div>
+                <div className="flex items-center gap-0.5 flex-shrink-0">
+                  {[0.4, 0.7, 1, 0.6, 0.8].map((h, i) => (
+                    <div key={i} className="w-1 bg-purple-400/60 rounded-full animate-pulse" style={{ height: `${h * 16}px`, animationDelay: `${i * 200}ms` }} />
+                  ))}
+                </div>
+                <ArrowRight size={16} className="text-purple-300/60 flex-shrink-0" />
+              </div>
+            </Link>
+
+            {/* 知音之境 */}
+            <Link href="/healing/zhi-yin-zhi-jing"
+              className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-gray-800 to-indigo-950" />
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: 'radial-gradient(circle at 25% 50%, rgba(251,191,36,0.3) 0%, transparent 50%), radial-gradient(circle at 75% 40%, rgba(99,102,241,0.3) 0%, transparent 50%)',
+              }} />
+              <div className="relative z-10 p-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-amber-300 border border-white/20 flex-shrink-0">
+                  <Sparkles size={22} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-sm font-serif text-white flex items-center gap-2">
+                    知音之境
+                    <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-amber-500/30 text-amber-200 font-normal">九境沉浸</span>
+                  </h4>
+                  <p className="text-[10px] text-white/50 mt-0.5">口语疗愈解说 · 心率联动 · 睡眠定时</p>
+                </div>
+                <div className="flex items-center gap-0.5 flex-shrink-0">
+                  {[0.3, 0.6, 0.9, 0.5, 0.7, 0.4].map((h, i) => (
+                    <div key={i} className="w-1 bg-amber-400/60 rounded-full animate-pulse" style={{ height: `${h * 16}px`, animationDelay: `${i * 180}ms` }} />
+                  ))}
+                </div>
+                <ArrowRight size={16} className="text-amber-300/60 flex-shrink-0" />
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* ===== 六法疗愈入口 ===== */}
         <div>
           <div className="flex items-center gap-3 mb-3">
@@ -316,35 +408,8 @@ export default function HealingPage() {
             <div className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
           </div>
 
-          {/* 天籁特色入口 */}
-          <Link href="/healing/mineradio"
-            className="block mb-3 rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-purple-900 to-slate-900" />
-            <div className="absolute inset-0 opacity-20" style={{
-              backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(139,92,246,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(59,130,246,0.3) 0%, transparent 50%)',
-            }} />
-            <div className="relative z-10 p-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-purple-300 border border-white/20 flex-shrink-0">
-                <Music2 size={22} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-sm font-serif text-white flex items-center gap-2">
-                  天籁
-                  <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-purple-500/30 text-purple-200 font-normal">LIVE</span>
-                </h4>
-                <p className="text-[10px] text-white/50 mt-0.5">天籁无奏 · 万窍自鸣 · 以情胜情</p>
-              </div>
-              <div className="flex items-center gap-0.5 flex-shrink-0">
-                {[0.4, 0.7, 1, 0.6, 0.8].map((h, i) => (
-                  <div key={i} className="w-1 bg-purple-400/60 rounded-full animate-pulse" style={{ height: `${h * 16}px`, animationDelay: `${i * 200}ms` }} />
-                ))}
-              </div>
-              <ArrowRight size={16} className="text-purple-300/60 flex-shrink-0" />
-            </div>
-          </Link>
-
           <div className="grid grid-cols-2 gap-3">
-            {THERAPY_MODULES.filter(m => m.name !== '天籁').map(m => {
+            {THERAPY_MODULES.filter(m => m.name !== '天籁' && m.name !== '五音疗愈' && m.name !== '知音之境').map(m => {
               const MIcon = ICON_MAP[m.icon];
               return (
               <Link key={m.name} href={m.href}

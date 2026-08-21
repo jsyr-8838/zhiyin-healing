@@ -6,6 +6,9 @@ import HealingHeader from '@/components/layout/HealingHeader';
 import PageContainer from '@/components/layout/PageContainer';
 import { fmtTime } from '@/hooks/useTimer';
 import { Play, Pause, RotateCcw, Volume2, Clock, Sparkles, Music } from 'lucide-react';
+import { useCultivationStore } from '@/lib/cultivation-store';
+import { XIUWEI_GAINS, type WuxingElement } from '@/lib/cultivation-engine';
+import { getClientUserId } from '@/lib/auth';
 
 /* ================================================================
  *  推拿引导 · 渐进放松版
@@ -126,6 +129,39 @@ export default function TuinaGuidePage() {
   // 构建手法队列
   const techniqueQueue = useRef<{ region: BodyRegion; regionName: string; tech: Technique }[]>([]);
 
+  // 推拿完成 → 记录修为（按手法中占比最高的五行元素）
+  const recordTuinaGain = useCallback(() => {
+    try {
+      const queue = techniqueQueue.current;
+      if (queue.length === 0) return;
+      const elCount: Record<string, number> = {};
+      for (const entry of queue) {
+        const elMap: Record<string, WuxingElement> = {
+          木: 'wood', 火: 'fire', 土: 'earth', 金: 'metal', 水: 'water',
+        };
+        const el = elMap[entry.tech.element];
+        if (el) elCount[el] = (elCount[el] || 0) + 1;
+      }
+      const dominant = (Object.entries(elCount).sort((a, b) => b[1] - a[1])[0]?.[0] || 'earth') as WuxingElement;
+      const gain = XIUWEI_GAINS.moxa_complete;
+      useCultivationStore.getState().addXiuWei(dominant, gain);
+      useCultivationStore.getState().recordPractice('tuina', Math.round(queue.reduce((s, e) => s + e.tech.duration, 0)), dominant, gain);
+      useCultivationStore.getState().completeTodayStep('tuina');
+      // 异步写入 DB
+      fetch('/api/cultivation/practice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: getClientUserId(),
+          category: 'tuina',
+          subCategory: 'tuina-guide',
+          element: dominant,
+          durationSec: Math.round(queue.reduce((s, e) => s + e.tech.duration, 0)),
+        }),
+      }).catch(() => {});
+    } catch {}
+  }, []);
+
   const buildQueue = useCallback((regions: BodyRegion[]) => {
     const queue: { region: BodyRegion; regionName: string; tech: Technique }[] = [];
     for (const regionId of regions) {
@@ -169,6 +205,7 @@ export default function TuinaGuidePage() {
             // 完成
             if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
             setIsPlaying(false);
+            recordTuinaGain();
             speakSlow('推拿引导全部完成，愿您身心安泰。');
             return 0;
           }
@@ -187,7 +224,7 @@ export default function TuinaGuidePage() {
     setTimeout(() => {
       speakSlow(`${queue[0].tech.name}，${queue[0].tech.desc}`);
     }, 3000);
-  }, [buildQueue]);
+  }, [buildQueue, recordTuinaGain]);
 
   // 暂停/继续
   const togglePause = useCallback(() => {
@@ -244,6 +281,7 @@ export default function TuinaGuidePage() {
             if (techIdx >= queue.length) {
               if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
               setIsPlaying(false);
+              recordTuinaGain();
               speakSlow('推拿引导全部完成，愿您身心安泰。');
               return 0;
             }
@@ -257,7 +295,7 @@ export default function TuinaGuidePage() {
         });
       }, 1000);
     }
-  }, [isPaused, isPlaying, currentTechIdx, selectedRegions]);
+  }, [isPaused, isPlaying, currentTechIdx, selectedRegions, recordTuinaGain]);
 
   // 清理
   useEffect(() => {

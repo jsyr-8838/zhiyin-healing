@@ -1,11 +1,13 @@
 ﻿'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { getTcmAcupoints, getTcmMeridians, searchTcmAcupoints, type TcmAcupoint, type TcmMeridian } from '@/lib/tcm-acupoint-data';
 import { XWS_VIDEO_ACUPOINTS } from '@/lib/xws-video-names';
 import { ACUPOINT_LOCATION_IMAGES } from '@/lib/acupoint-image-names';
 import { cosUrl } from '@/lib/cos-url';
+import { useCultivationStore } from '@/lib/cultivation-store';
+import { getClientUserId } from '@/lib/auth';
 
 // 五行色
 const ELEMENT_COLORS: Record<string, string> = {
@@ -54,12 +56,91 @@ export default function AcupointClient() {
     return meridians.find(m => m.code === selectedPoint.meridian) || null;
   }, [selectedPoint, meridians]);
 
+  // 经络进度回写去重（按穴位码，避免重复点击刷进度）
+  const viewedPointsRef = useRef<Set<string>>(new Set());
+  // 每条经已查看的穴位码（用于计算贯通度）
+  const viewedByMeridianRef = useRef<Record<string, Set<string>>>({});
+  // 已记录过修为的经络（避免重复给修为）
+  const recordedMeridianUpdateRef = useRef<Record<string, number>>({});
+
+  // 五行中文 → 英文 element 映射
+  const WUXING_EN: Record<string, string> = {
+    '金': 'metal', '水': 'water', '木': 'wood', '火': 'fire', '土': 'earth',
+  };
+
+  // acupoint 代码 → 修为 MeridianMap 的 meridianId（十二正经）
+  const CODE_TO_MERIDIAN_ID: Record<string, string> = {
+    LU: 'lung', LI: 'largeIntestine', ST: 'stomach', SP: 'spleen',
+    HT: 'heart', SI: 'smallIntestine', BL: 'bladder', KI: 'kidney',
+    PC: 'pericardium', TE: 'tripleEnergizer', GB: 'gallbladder', LV: 'liver',
+  };
+
+  // 记录经络修行进度（查看穴位时回写）
+  const recordMeridianProgress = useCallback((point: TcmAcupoint) => {
+    try {
+      if (point.meridian === 'DONG') return; // 董氏奇穴不参与十二正经进度
+      const meridian = meridians.find(m => m.code === point.meridian);
+      if (!meridian) return;
+      const meridianId = CODE_TO_MERIDIAN_ID[point.meridian];
+      if (!meridianId) return;
+
+      const el = (WUXING_EN[meridian.wuxing] || 'earth');
+      const totalPoints = meridian.acupoints.length || 1;
+
+      // 累计该经已查看穴位
+      if (!viewedByMeridianRef.current[meridianId]) {
+        viewedByMeridianRef.current[meridianId] = new Set();
+      }
+      viewedByMeridianRef.current[meridianId].add(point.code);
+      const viewedCount = viewedByMeridianRef.current[meridianId].size;
+
+      // 贯通度 = 已查看穴位 / 该经总穴位
+      const completion = Math.min(100, Math.round((viewedCount / totalPoints) * 100));
+
+      // 修为：首次进入该经时给一次经络查看修为（+3）
+      if (!recordedMeridianUpdateRef.current[meridianId]) {
+        useCultivationStore.getState().addXiuWei(el as any, 3);
+        useCultivationStore.getState().recordPractice('meridian', 30, el as any, 3);
+        useCultivationStore.getState().completeTodayStep('meridian');
+        recordedMeridianUpdateRef.current[meridianId] = completion;
+      }
+
+      // 更新本地 store 经络进度（供 cultivation 页即时显示）
+      useCultivationStore.getState().updateMeridianProg({
+        meridianId,
+        meridianName: meridian.nameZh,
+        element: el as any,
+        completion,
+        isCompleted: completion >= 100,
+      });
+
+      // 异步回写 DB（completion 覆盖式）
+      fetch('/api/cultivation/meridian-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: getClientUserId(),
+          meridianId,
+          meridianName: meridian.nameZh,
+          element: el,
+          viewCount: viewedCount,
+          completion,
+        }),
+      }).catch(() => {});
+    } catch {}
+  }, [meridians]);
+
   const handleSelect = useCallback((point: TcmAcupoint) => {
     setSelectedPoint(prev => prev?.code === point.code ? null : point);
+    // 打开穴位时记录经络进度（同一穴位只记一次）
+    if (!viewedPointsRef.current.has(point.code)) {
+      viewedPointsRef.current.add(point.code);
+      recordMeridianProgress(point);
+    }
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 50);
-  }, []);
+  }, [recordMeridianProgress]);
 
   const stats = useMemo(() => {
     const regular = allPoints.filter(p => p.meridian !== 'DONG');
