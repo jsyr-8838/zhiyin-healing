@@ -29,6 +29,7 @@ export const TREATMENT_MODULES: ModuleConfig[] = [
   { href: '/healing/meridian-chart', icon: 'GitBranch', name: '经络图解', desc: '15条经络·动态图·穴位', element: 'wood' },
   { href: '/healing/ai-diagnosis', icon: 'MessageCircleHeart', name: 'AI导诊', desc: '智能问诊·个性化方案', element: 'fire' },
   { href: '/healing/color-diagnosis', icon: 'Palette', name: '色彩情志', desc: '色诊明辨·五行推荐', element: 'earth' },
+  { href: '/healing/color-challenge', icon: 'Eye', name: '辨色挑战', desc: '色彩辨识·火行修为', element: 'fire' },
   { href: '/jiuliao', icon: 'FlameKindling', name: '灸疗处方', desc: '329方辨证施灸', element: 'earth' },
   { href: '/healing/guasha', icon: 'RotateCw', name: '传统刮痧', desc: '九大体系·全息刮法', element: 'fire' },
   { href: '/tuina', icon: 'Hand', name: '推拿手法', desc: '61种国标手法', element: 'earth' },

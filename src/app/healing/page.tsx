@@ -10,7 +10,7 @@ import {
   MessageCircleHeart, FlameKindling, RotateCw, Hand,
   Wind, Music, Sparkles, Volume2, BarChart3, CircleDot,
   ArrowRight, Sun, Moon, Heart, Zap, Leaf, Dumbbell, Coffee, Wine, Flower2, Palette, Shirt, Music2, Bone,
-  Droplets, CalendarHeart, BookOpen, Target,
+  Droplets, CalendarHeart, BookOpen, Target, Eye,
 } from 'lucide-react';
 import {
   DAILY_QUOTES,
@@ -25,7 +25,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: 
   MessageCircleHeart, FlameKindling, RotateCw, Hand,
   Wind, Music, Sparkles, Volume2, BarChart3, CircleDot,
   ArrowRight, Sun, Moon, Heart, Zap, Leaf, Dumbbell, Coffee, Wine, Flower2, Palette, Shirt, Music2, Bone,
-  Droplets, CalendarHeart, BookOpen, Target,
+  Droplets, CalendarHeart, BookOpen, Target, Eye,
 };
 
 // ===== 时间问候 =====
