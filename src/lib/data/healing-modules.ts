@@ -54,6 +54,7 @@ export const LIFESTYLE_MODULES: ModuleConfig[] = [
   { href: '/healing/wine', icon: 'Wine', name: '酒道品鉴', desc: '药酒养生·五行配伍', element: 'fire' },
   { href: '/healing/flower', icon: 'Flower2', name: '花语养生', desc: '花语寄情·四季花令', element: 'wood' },
   { href: '/healing/wuxing-clothing', icon: 'Shirt', name: '五行穿衣', desc: '日柱五行·相生相克配色', element: 'earth' },
+  { href: '/healing/tcm-study', icon: 'BookOpen', name: '中医学习', desc: '12课程·49课时·修为联动', element: 'earth' },
 ];
 
 export const ELEMENT_STYLE: Record<string, { accent: string; bg: string; text: string; border: string }> = {
