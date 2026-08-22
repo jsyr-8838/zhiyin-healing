@@ -1,691 +1,1069 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomNav from '@/components/BottomNav';
-import { TCM_COURSES, TCM_DAILY_TIPS, type TcmCourse, type TcmLesson } from '@/lib/tcm-study-data';
+import {
+  TCM_LEVELS, TCM_ZONES, TCM_CHAPTERS, TCM_BOSSES, TCM_ACHIEVEMENTS, TCM_DAILY_TIPS,
+  type TcmChapter, type TcmBoss, type TcmQuizQuestion, type TcmSection, type TcmElement, type TcmZone,
+} from '@/lib/tcm-master-data';
 import { useCultivationStore } from '@/lib/cultivation-store';
-import { ELEMENT_COLORS, ELEMENT_NAMES, XIUWEI_GAINS } from '@/lib/cultivation-engine';
-import { ArrowLeft, BookOpen, ChevronRight, ChevronLeft, Check, Award, Flame, Calendar, Sparkles, RotateCw } from 'lucide-react';
+import { ELEMENT_COLORS, ELEMENT_NAMES } from '@/lib/cultivation-engine';
+import {
+  ArrowLeft, ArrowRight, BookOpen, ChevronRight, Check, Award, Flame, Calendar,
+  Sparkles, Lock, Swords, Trophy, User, Heart, Gem, Zap, Star, ChevronLeft,
+  Map as MapIcon, Target, Shield, X, CircleDot, BookMarked,
+} from 'lucide-react';
 
 // ═══════════════════════════════════════
 // 进度管理（localStorage 持久化）
 // ═══════════════════════════════════════
 
-interface StudyProgress {
-  completedLessons: Record<string, number[]>; // courseId → lesson indices
-  quizScores: Record<string, number>;        // courseId → score (0-100)
-  dailyCheckIn: string[];                      // YYYY-MM-DD 列表
-  lastTipDate: string;
+interface GameProgress {
+  xp: number;
+  completedChapters: string[];
+  quizPerfectCount: number;
+  quizScores: Record<string, number>; // chapterId → correct count
+  bossDefeated: string[];
+  unlockedAchievements: string[];
+  dailyCheckIn: string[];
+  streak: number;
+  lastCheckIn: string;
   viewedTips: number[];
+  lastTipDate: string;
 }
 
-const STORAGE_KEY = 'tcm-study-progress';
+const STORAGE_KEY = 'tcm-master-progress';
 
-function loadProgress(): StudyProgress {
-  if (typeof window === 'undefined') return { completedLessons: {}, quizScores: {}, dailyCheckIn: [], lastTipDate: '', viewedTips: [] };
+function loadProgress(): GameProgress {
+  if (typeof window === 'undefined') return defaultProgress();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) { const p = JSON.parse(raw); return { ...defaultProgress(), ...p }; }
   } catch { /* ignore */ }
-  return { completedLessons: {}, quizScores: {}, dailyCheckIn: [], lastTipDate: '', viewedTips: [] };
+  return defaultProgress();
 }
 
-function saveProgress(p: StudyProgress) {
+function defaultProgress(): GameProgress {
+  return {
+    xp: 0, completedChapters: [], quizPerfectCount: 0, quizScores: {},
+    bossDefeated: [], unlockedAchievements: [], dailyCheckIn: [],
+    streak: 0, lastCheckIn: '', viewedTips: [], lastTipDate: '',
+  };
+}
+
+function saveProgress(p: GameProgress) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch { /* ignore */ }
+}
+
+// ═══════════════════════════════════════
+// 等级计算
+// ═══════════════════════════════════════
+
+function getLevel(xp: number): { lv: number; title: string; nextXp: number; progress: number } {
+  let lv = 1, title = TCM_LEVELS[0].title;
+  for (let i = TCM_LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= TCM_LEVELS[i].xpRequired) {
+      lv = TCM_LEVELS[i].lv;
+      title = TCM_LEVELS[i].title;
+      break;
+    }
+  }
+  const curThreshold = TCM_LEVELS[lv - 1].xpRequired;
+  const nextThreshold = lv < TCM_LEVELS.length ? TCM_LEVELS[lv].xpRequired : TCM_LEVELS[lv - 1].xpRequired;
+  const progress = lv < TCM_LEVELS.length
+    ? Math.round(((xp - curThreshold) / (nextThreshold - curThreshold)) * 100)
+    : 100;
+  return { lv, title, nextXp: nextThreshold, progress: Math.min(100, Math.max(0, progress)) };
+}
+
+// ═══════════════════════════════════════
+// 文本渲染（简易 Markdown: **bold** → <strong>）
+// ═══════════════════════════════════════
+
+function renderText(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    // Handle bullet lines (starting with •)
+    if (part.includes('\n')) {
+      const lines = part.split('\n');
+      return lines.map((line, j) => (
+        <span key={`${i}-${j}`}>{line}{j < lines.length - 1 && <br />}</span>
+      ));
+    }
+    return part;
+  });
+}
+
+// ═══════════════════════════════════════
+// Section 渲染器
+// ═══════════════════════════════════════
+
+function SectionRenderer({ section }: { section: TcmSection }) {
+  return (
+    <div className="tcm-section">
+      {section.heading && <h3 className="tcm-sec-heading">{section.heading}</h3>}
+      {section.text && <div className="tcm-sec-text">{renderText(section.text)}</div>}
+      {section.list && (
+        <ul className="tcm-sec-list">
+          {section.list.map((item, i) => <li key={i}>{renderText(item)}</li>)}
+        </ul>
+      )}
+      {section.cards && (
+        <div className="tcm-sec-cards">
+          {section.cards.map((card, i) => (
+            <div key={i} className="tcm-card-item">
+              <span className="tcm-card-icon">{card.icon}</span>
+              <div>
+                <div className="tcm-card-name">{card.name}</div>
+                <div className="tcm-card-desc">{card.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {section.table && (
+        <div className="tcm-sec-table-wrap">
+          <table className="tcm-sec-table">
+            <thead>
+              <tr>{section.table.headers.map((h, i) => <th key={i}>{h}</th>)}</tr>
+            </thead>
+            <tbody>
+              {section.table.rows.map((row, i) => (
+                <tr key={i}>{row.map((cell, j) => <td key={j}>{cell}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ═══════════════════════════════════════
 // 主组件
 // ═══════════════════════════════════════
 
-type View = 'list' | 'course' | 'lesson' | 'quiz' | 'review' | 'progress';
+type View = 'map' | 'zone' | 'chapter' | 'quiz' | 'boss' | 'boss-fight' | 'achievements' | 'profile';
+type Tab = 'map' | 'achievements' | 'profile';
 
 export default function TcmStudyPage() {
-  const [progress, setProgress] = useState<StudyProgress>(loadProgress);
-  const [view, setView] = useState<View>('list');
-  const [activeCourseId, setActiveCourseId] = useState<string>('');
-  const [activeLessonIdx, setActiveLessonIdx] = useState(0);
-  const [tipIdx, setTipIdx] = useState(0);
+  const [progress, setProgress] = useState<GameProgress>(loadProgress);
+  const [view, setView] = useState<View>('map');
+  const [tab, setTab] = useState<Tab>('map');
+  const [activeZoneId, setActiveZoneId] = useState<string>('');
+  const [activeChapterId, setActiveChapterId] = useState<string>('');
+  const [activeBossId, setActiveBossId] = useState<string>('');
   const [showTip, setShowTip] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const { addXiuWei, recordPractice, completeTodayStep } = useCultivationStore();
 
   // 进度持久化
   useEffect(() => { saveProgress(progress); }, [progress]);
+  useEffect(() => { setMounted(true); }, []);
 
-  // 每日一识：按日期选索引
+  // 每日一识
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10);
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    setTipIdx(dayOfYear % TCM_DAILY_TIPS.length);
-    if (progress.lastTipDate !== today) {
-      setShowTip(true);
-    }
+    if (progress.lastTipDate !== today) setShowTip(true);
   }, []);
 
-  // ── 辅助函数 ──
-  const activeCourse = useMemo(() => TCM_COURSES.find(c => c.id === activeCourseId) || null, [activeCourseId]);
+  const levelInfo = useMemo(() => getLevel(progress.xp), [progress.xp]);
 
-  const getCourseProgress = useCallback((courseId: string): number => {
-    const course = TCM_COURSES.find(c => c.id === courseId);
-    if (!course) return 0;
-    const done = progress.completedLessons[courseId]?.length || 0;
-    return Math.round((done / course.lessons.length) * 100);
+  // ── Zone / Chapter 查找 ──
+  const activeZone = useMemo(() => TCM_ZONES.find(z => z.id === activeZoneId) || null, [activeZoneId]);
+  const activeChapter = useMemo(() => TCM_CHAPTERS[activeChapterId] || null, [activeChapterId]);
+  const activeBoss = useMemo(() => TCM_BOSSES.find(b => b.id === activeBossId) || null, [activeBossId]);
+
+  // ── Zone 解锁判断 ──
+  const isZoneUnlocked = useCallback((zone: TcmZone) => levelInfo.lv >= zone.levelRequired, [levelInfo.lv]);
+
+  // ── 章节完成判断 ──
+  const isChapterDone = useCallback((chId: string) => progress.completedChapters.includes(chId), [progress]);
+
+  // ── Zone 完成度 ──
+  const getZoneProgress = useCallback((zone: TcmZone) => {
+    const done = zone.chapters.filter(id => progress.completedChapters.includes(id)).length;
+    return { done, total: zone.chapters.length, pct: zone.chapters.length ? Math.round((done / zone.chapters.length) * 100) : 0 };
   }, [progress]);
 
-  const getTotalProgress = useCallback((): number => {
-    const totalLessons = TCM_COURSES.reduce((s, c) => s + c.lessons.length, 0);
-    const doneLessons = TCM_COURSES.reduce((s, c) => s + (progress.completedLessons[c.id]?.length || 0), 0);
-    return Math.round((doneLessons / totalLessons) * 100);
-  }, [progress]);
-
-  const isLessonDone = useCallback((courseId: string, idx: number): boolean => {
-    return (progress.completedLessons[courseId] || []).includes(idx);
-  }, [progress]);
-
-  const markLessonDone = useCallback((courseId: string, idx: number, element: string) => {
-    setProgress(prev => {
-      const arr = prev.completedLessons[courseId] || [];
-      if (arr.includes(idx)) return prev; // 已完成，不重复
-      return { ...prev, completedLessons: { ...prev.completedLessons, [courseId]: [...arr, idx] } };
-    });
-    // 修为：每完成一课时 +2
-    const el = element as 'wood' | 'fire' | 'earth' | 'metal' | 'water';
-    addXiuWei(el, 2);
-    recordPractice('tcm-study', 120, el, 2);
-    completeTodayStep('tcm-study');
-  }, [addXiuWei, recordPractice, completeTodayStep]);
-
-  const submitQuiz = useCallback((courseId: string, score: number, element: string) => {
-    setProgress(prev => ({
-      ...prev,
-      quizScores: { ...prev.quizScores, [courseId]: Math.max(prev.quizScores[courseId] || 0, score) },
-    }));
-    // 测验满分 +5，及格 +3
-    const el = element as 'wood' | 'fire' | 'earth' | 'metal' | 'water';
-    const gain = score >= 100 ? 5 : score >= 75 ? 4 : score >= 50 ? 3 : 1;
-    addXiuWei(el, gain);
-    recordPractice('tcm-study-quiz', 300, el, gain);
-    completeTodayStep('tcm-study');
-  }, [addXiuWei, recordPractice, completeTodayStep]);
-
-  const dailyCheckIn = useCallback(() => {
+  // ── 每日打卡 ──
+  const handleCheckIn = useCallback(() => {
     const today = new Date().toISOString().slice(0, 10);
     if (progress.dailyCheckIn.includes(today)) return;
-    setProgress(prev => ({ ...prev, dailyCheckIn: [...prev.dailyCheckIn, today] }));
-    // 打卡 +1 修为（土行）
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const newStreak = progress.lastCheckIn === yesterday ? progress.streak + 1 : 1;
+    setProgress(prev => ({
+      ...prev,
+      dailyCheckIn: [...prev.dailyCheckIn, today],
+      streak: newStreak,
+      lastCheckIn: today,
+      xp: prev.xp + 5,
+    }));
     addXiuWei('earth', 1);
+    recordPractice('tcm-study-checkin', 60, 'earth', 1);
     completeTodayStep('tcm-study');
-  }, [progress.dailyCheckIn, addXiuWei, completeTodayStep]);
+  }, [progress, addXiuWei, recordPractice, completeTodayStep]);
 
-  const isTodayCheckedIn = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    return progress.dailyCheckIn.includes(today);
-  }, [progress.dailyCheckIn]);
+  // ── 章节完成 ──
+  const completeChapter = useCallback((chapter: TcmChapter, correctCount: number) => {
+    const isPerfect = correctCount === chapter.quiz.length;
+    const wasAlreadyDone = progress.completedChapters.includes(chapter.id);
 
-  const streakDays = useMemo(() => {
-    if (progress.dailyCheckIn.length === 0) return 0;
-    const sorted = [...progress.dailyCheckIn].sort().reverse();
-    let streak = 1;
-    for (let i = 0; i < sorted.length - 1; i++) {
-      const d1 = new Date(sorted[i]);
-      const d2 = new Date(sorted[i + 1]);
-      const diff = (d1.getTime() - d2.getTime()) / 86400000;
-      if (diff === 1) streak++;
-      else break;
+    setProgress(prev => {
+      const newCompleted = wasAlreadyDone ? prev.completedChapters : [...prev.completedChapters, chapter.id];
+      const newQuizScores = { ...prev.quizScores, [chapter.id]: Math.max(prev.quizScores[chapter.id] || 0, correctCount) };
+      const newPerfect = isPerfect && !wasAlreadyDone ? prev.quizPerfectCount + 1 : prev.quizPerfectCount;
+      const newXp = wasAlreadyDone ? prev.xp : prev.xp + chapter.xpReward;
+
+      return {
+        ...prev,
+        completedChapters: newCompleted,
+        quizScores: newQuizScores,
+        quizPerfectCount: newPerfect,
+        xp: newXp,
+      };
+    });
+
+    // 修为联动
+    if (!wasAlreadyDone) {
+      const el = chapter.element;
+      addXiuWei(el, Math.ceil(chapter.xpReward / 10));
+      recordPractice('tcm-study', 180, el, Math.ceil(chapter.xpReward / 10));
+      completeTodayStep('tcm-study');
     }
-    return streak;
-  }, [progress.dailyCheckIn]);
+    if (isPerfect && !wasAlreadyDone) {
+      addXiuWei(chapter.element, 2);
+    }
+  }, [progress, addXiuWei, recordPractice, completeTodayStep]);
+
+  // ── Boss 击败 ──
+  const defeatBoss = useCallback((boss: TcmBoss) => {
+    const wasDefeated = progress.bossDefeated.includes(boss.id);
+    setProgress(prev => ({
+      ...prev,
+      bossDefeated: wasDefeated ? prev.bossDefeated : [...prev.bossDefeated, boss.id],
+      xp: wasDefeated ? prev.xp : prev.xp + boss.reward.xp,
+      unlockedAchievements: wasDefeated || !boss.reward.achievement
+        ? prev.unlockedAchievements
+        : prev.unlockedAchievements.includes(boss.reward.achievement)
+          ? prev.unlockedAchievements
+          : [...prev.unlockedAchievements, boss.reward.achievement],
+    }));
+
+    if (!wasDefeated) {
+      addXiuWei(boss.element, Math.ceil(boss.reward.xp / 20));
+      recordPractice('tcm-study-boss', 300, boss.element, Math.ceil(boss.reward.xp / 20));
+      completeTodayStep('tcm-study');
+    }
+  }, [progress, addXiuWei, recordPractice, completeTodayStep]);
+
+  // ── 成就检查 ──
+  useEffect(() => {
+    if (!mounted) return;
+    const newAchievements: string[] = [];
+    const check = (id: string, cond: boolean) => {
+      if (cond && !progress.unlockedAchievements.includes(id) && !newAchievements.includes(id)) {
+        newAchievements.push(id);
+      }
+    };
+
+    check('first-step', progress.completedChapters.length >= 1);
+    check('first-quiz', Object.keys(progress.quizScores).length >= 1);
+    check('daily-habit', progress.streak >= 3);
+    check('daily-habit-7', progress.streak >= 7);
+    check('daily-habit-30', progress.streak >= 30);
+    check('quiz-master-10', progress.quizPerfectCount >= 10);
+    check('quiz-master-30', progress.quizPerfectCount >= 30);
+
+    // Zone completions
+    TCM_ZONES.forEach(zone => {
+      const prog = getZoneProgress(zone);
+      const allDone = prog.done === prog.total && prog.total > 0;
+      if (allDone) {
+        if (zone.id === 'yinyang') check('zone-yinyang', true);
+        if (zone.id === 'wuxing') check('zone-wuxing', true);
+        if (zone.id === 'zangfu') check('zone-zangfu', true);
+        if (zone.id === 'jingluoI' || zone.id === 'jingluoII') {
+          const jl1 = TCM_ZONES.find(z => z.id === 'jingluoI')!;
+          const jl2 = TCM_ZONES.find(z => z.id === 'jingluoII')!;
+          const allJl = [...jl1.chapters, ...jl2.chapters].every(id => progress.completedChapters.includes(id));
+          check('zone-jingluo', allJl);
+        }
+        if (zone.id === 'diagnosis') check('zone-diagnosis', true);
+        if (zone.id === 'zhongyao') check('zone-zhongyao', true);
+        if (zone.id === 'fangjI' || zone.id === 'fangjII') {
+          const f1 = TCM_ZONES.find(z => z.id === 'fangjI')!;
+          const f2 = TCM_ZONES.find(z => z.id === 'fangjII')!;
+          const allF = [...f1.chapters, ...f2.chapters].every(id => progress.completedChapters.includes(id));
+          check('zone-fangji', allF);
+        }
+        if (zone.id === 'zhenjiu') check('zone-zhenjiu', true);
+        if (zone.id === 'yangsheng') check('zone-yangsheng', true);
+      }
+    });
+
+    // Boss achievements (already handled on defeat, but double check)
+    progress.bossDefeated.forEach(bid => {
+      const boss = TCM_BOSSES.find(b => b.id === bid);
+      if (boss?.reward.achievement) check(boss.reward.achievement, true);
+    });
+
+    check('all-bosses', progress.bossDefeated.length === TCM_BOSSES.length);
+    check('all-chapters', progress.completedChapters.length === Object.keys(TCM_CHAPTERS).length);
+    check('all-zones', TCM_ZONES.every(z => getZoneProgress(z).done === z.chapters.length));
+    check('lv20', levelInfo.lv >= 20);
+
+    // all-achievements: all others unlocked
+    const otherAchIds = TCM_ACHIEVEMENTS.filter(a => a.id !== 'all-achievements').map(a => a.id);
+    const allOthers = otherAchIds.every(id => progress.unlockedAchievements.includes(id) || newAchievements.includes(id));
+    check('all-achievements', allOthers);
+
+    if (newAchievements.length > 0) {
+      setProgress(prev => ({
+        ...prev,
+        unlockedAchievements: [...prev.unlockedAchievements, ...newAchievements],
+      }));
+    }
+  }, [progress.completedChapters, progress.quizScores, progress.quizPerfectCount,
+      progress.bossDefeated, progress.unlockedAchievements, progress.streak,
+      levelInfo.lv, mounted, getZoneProgress]);
+
+  // ── 导航 ──
+  const goZone = (zoneId: string) => { setActiveZoneId(zoneId); setView('zone'); };
+  const goChapter = (chId: string) => { setActiveChapterId(chId); setView('chapter'); };
+  const goBoss = (bossId: string) => { setActiveBossId(bossId); setView('boss'); };
+  const goBack = () => {
+    if (view === 'chapter' || view === 'quiz' || view === 'boss' || view === 'boss-fight') {
+      setView(activeZoneId ? 'zone' : 'map');
+    } else if (view === 'zone') {
+      setView('map');
+    }
+  };
+
+  const today = new Date().toISOString().slice(0, 10);
+  const checkedInToday = progress.dailyCheckIn.includes(today);
+  const tipIdx = useMemo(() => {
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    return dayOfYear % TCM_DAILY_TIPS.length;
+  }, []);
 
   // ═══════════════════════════════════════
   // 渲染
   // ═══════════════════════════════════════
 
+  if (!mounted) return <PageContainer><div className="min-h-screen" /></PageContainer>;
+
   return (
-    <PageContainer theme="healing" className="pb-24">
-      {/* ===== 顶部 ===== */}
-      <div className="px-5 pt-12 pb-5 text-white" style={{ background: 'linear-gradient(135deg, #5D4037, #3E2723)' }}>
-        <div className="flex items-center gap-3 mb-2">
-          <button onClick={() => view !== 'list' ? setView('list') : window.history.back()} className="text-white/70 hover:text-white">
-            <ArrowLeft size={22} />
-          </button>
-          <h1 className="text-xl font-black font-serif">中医学习</h1>
-          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-bold ml-auto">从零到进阶</span>
-        </div>
-        <p className="text-sm text-white/60 font-serif">12课程 · 49课时 · 48题测验 · 修为联动</p>
+    <PageContainer>
+      <div className="min-h-screen pb-20 tcm-master-page">
+        {/* ── 顶部状态栏 ── */}
+        <header className="tcm-top-bar">
+          <div className="tcm-top-left">
+            {view !== 'map' && (
+              <button onClick={goBack} className="tcm-back-btn" aria-label="返回">
+                <ArrowLeft size={20} />
+              </button>
+            )}
+            <div className="tcm-logo" onClick={() => { setView('map'); setTab('map'); }}>
+              <span className="tcm-logo-icon">☯️</span>
+              <span className="tcm-logo-text">中医通</span>
+            </div>
+          </div>
+          <div className="tcm-top-stats">
+            <div className="tcm-stat-pill">
+              <span className="tcm-stat-icon">⭐</span>
+              <span>Lv.{levelInfo.lv}</span>
+            </div>
+            <div className="tcm-stat-pill">
+              <span className="tcm-stat-icon">💎</span>
+              <span>{progress.xp}</span>
+            </div>
+            <div className="tcm-stat-pill tcm-checkin-pill" onClick={handleCheckIn}
+              style={{ opacity: checkedInToday ? 0.5 : 1, cursor: checkedInToday ? 'default' : 'pointer' }}>
+              <Flame size={14} />
+              <span>{checkedInToday ? `已打卡·${progress.streak}天` : '打卡'}</span>
+            </div>
+          </div>
+        </header>
 
-        {/* 总进度条 */}
-        <div className="mt-3 flex items-center gap-2">
-          <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500" style={{ width: `${getTotalProgress()}%` }} />
-          </div>
-          <span className="text-xs text-amber-300 font-bold">{getTotalProgress()}%</span>
-        </div>
-
-        {/* 连续打卡 */}
-        <div className="mt-2 flex items-center gap-3 text-xs">
-          <div className="flex items-center gap-1 text-orange-300">
-            <Flame size={13} />
-            <span>连续 {streakDays} 天</span>
-          </div>
-          <div className="flex items-center gap-1 text-emerald-300">
-            <Check size={13} />
-            <span>已学 {Object.values(progress.completedLessons).reduce((s, a) => s + a.length, 0)} 课时</span>
-          </div>
-          <div className="flex items-center gap-1 text-amber-300">
-            <Award size={13} />
-            <span>测验 {Object.keys(progress.quizScores).length} / 12</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 pt-4 space-y-4">
-        {/* ===== 每日一识弹窗 ===== */}
-        {showTip && tipIdx < TCM_DAILY_TIPS.length && (
-          <div className="glass-card p-4 relative overflow-hidden ring-2 ring-amber-400/30 animate-in fade-in slide-in-from-top-2 duration-300">
-            <button onClick={() => setShowTip(false)} className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xs">×</button>
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-amber-500 to-amber-600 text-white shrink-0">
-                <Sparkles size={18} />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-amber-700">{TCM_DAILY_TIPS[tipIdx].h}</p>
-                <p className="text-sm text-gray-700 mt-1 leading-relaxed">{TCM_DAILY_TIPS[tipIdx].p}</p>
-              </div>
+        {/* ── 等级进度条 ── */}
+        {view === 'map' && (
+          <div className="tcm-level-bar">
+            <div className="tcm-level-info">
+              <span className="tcm-level-title">{levelInfo.title}</span>
+              {levelInfo.lv < 20 && <span className="tcm-level-next">→ {levelInfo.nextXp} XP</span>}
+            </div>
+            <div className="tcm-xp-track">
+              <div className="tcm-xp-fill" style={{ width: `${levelInfo.progress}%` }} />
             </div>
           </div>
         )}
 
-        {/* ===== 每日打卡 ===== */}
-        <button
-          onClick={dailyCheckIn}
-          disabled={isTodayCheckedIn}
-          className={`w-full rounded-xl p-4 flex items-center gap-3 transition-all ${isTodayCheckedIn ? 'glass-card opacity-70' : 'glass-card hover:shadow-md hover:-translate-y-0.5 ring-1 ring-amber-400/30'}`}
-        >
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isTodayCheckedIn ? 'bg-emerald-500' : 'bg-gradient-to-br from-amber-500 to-amber-600'} text-white`}>
-            {isTodayCheckedIn ? <Check size={20} /> : <Calendar size={20} />}
+        {/* ── 每日一识弹窗 ── */}
+        {showTip && (
+          <div className="tcm-tip-overlay" onClick={() => { setShowTip(false); setProgress(p => ({ ...p, lastTipDate: today })); }}>
+            <div className="tcm-tip-card" onClick={e => e.stopPropagation()}>
+              <button className="tcm-tip-close" onClick={() => { setShowTip(false); setProgress(p => ({ ...p, lastTipDate: today })); }}>
+                <X size={18} />
+              </button>
+              <div className="tcm-tip-badge">每日一识</div>
+              <h3 className="tcm-tip-h">{TCM_DAILY_TIPS[tipIdx].h}</h3>
+              <p className="tcm-tip-p">{TCM_DAILY_TIPS[tipIdx].p}</p>
+              <button className="tcm-tip-btn" onClick={() => { setShowTip(false); setProgress(p => ({ ...p, lastTipDate: today })); handleCheckIn(); }}>
+                知道了，今日打卡
+              </button>
+            </div>
           </div>
-          <div className="flex-1 text-left">
-            <p className="text-sm font-bold font-serif text-gray-800">{isTodayCheckedIn ? '今日已打卡' : '每日学习打卡'}</p>
-            <p className="text-[10px] text-gray-500 mt-0.5">{isTodayCheckedIn ? '已获得 +1 土行修为' : '打卡获得 +1 土行修为'}</p>
-          </div>
-          {!isTodayCheckedIn && <ChevronRight size={16} className="text-gray-400" />}
-        </button>
-
-        {/* ===== 视图：课程列表 ===== */}
-        {view === 'list' && (
-          <CourseList
-            progress={progress}
-            getCourseProgress={getCourseProgress}
-            onOpenCourse={(id) => { setActiveCourseId(id); setView('course'); }}
-          />
         )}
 
-        {/* ===== 视图：课程详情 ===== */}
-        {view === 'course' && activeCourse && (
-          <CourseDetail
-            course={activeCourse}
-            progress={progress}
-            isLessonDone={isLessonDone}
-            onOpenLesson={(idx) => { setActiveLessonIdx(idx); setView('lesson'); }}
+        {/* ── 主内容区 ── */}
+        <main className="tcm-main">
+          {view === 'map' && <MapView
+            isZoneUnlocked={isZoneUnlocked}
+            getZoneProgress={getZoneProgress}
+            onZoneClick={goZone}
+            levelInfo={levelInfo}
+          />}
+          {view === 'zone' && activeZone && <ZoneView
+            zone={activeZone}
+            isChapterDone={isChapterDone}
+            onChapterClick={goChapter}
+            onBossClick={goBoss}
+            bossDefeated={progress.bossDefeated}
+            isUnlocked={isZoneUnlocked(activeZone)}
+          />}
+          {view === 'chapter' && activeChapter && <ChapterView
+            chapter={activeChapter}
             onStartQuiz={() => setView('quiz')}
-            onBack={() => setView('list')}
-          />
+            isDone={isChapterDone(activeChapter.id)}
+          />}
+          {view === 'quiz' && activeChapter && <QuizView
+            chapter={activeChapter}
+            onComplete={(correct) => { completeChapter(activeChapter, correct); }}
+            onBack={() => setView('chapter')}
+          />}
+          {view === 'boss' && activeBoss && <BossIntroView
+            boss={activeBoss}
+            playerLevel={levelInfo.lv}
+            onStart={() => setView('boss-fight')}
+            onBack={goBack}
+            defeated={progress.bossDefeated.includes(activeBoss.id)}
+          />}
+          {view === 'boss-fight' && activeBoss && <BossFightView
+            boss={activeBoss}
+            playerLevel={levelInfo.lv}
+            onWin={() => { defeatBoss(activeBoss); }}
+            onBack={() => setView('boss')}
+          />}
+          {view === 'achievements' && <AchievementsView
+            unlocked={progress.unlockedAchievements}
+          />}
+          {view === 'profile' && <ProfileView
+            progress={progress}
+            levelInfo={levelInfo}
+          />}
+        </main>
+
+        {/* ── 底部 Tab ── */}
+        {(view === 'map' || view === 'achievements' || view === 'profile') && (
+          <nav className="tcm-tabs">
+            <button className={`tcm-tab ${tab === 'map' ? 'active' : ''}`}
+              onClick={() => { setTab('map'); setView('map'); }}>
+              <MapIcon size={18} />
+              <span>修炼地图</span>
+            </button>
+            <button className={`tcm-tab ${tab === 'achievements' ? 'active' : ''}`}
+              onClick={() => { setTab('achievements'); setView('achievements'); }}>
+              <Trophy size={18} />
+              <span>成就墙</span>
+            </button>
+            <button className={`tcm-tab ${tab === 'profile' ? 'active' : ''}`}
+              onClick={() => { setTab('profile'); setView('profile'); }}>
+              <User size={18} />
+              <span>个人档案</span>
+            </button>
+          </nav>
         )}
 
-        {/* ===== 视图：课时学习 ===== */}
-        {view === 'lesson' && activeCourse && (
-          <LessonView
-            course={activeCourse}
-            lessonIdx={activeLessonIdx}
-            isDone={isLessonDone(activeCourse.id, activeLessonIdx)}
-            onMarkDone={() => markLessonDone(activeCourse.id, activeLessonIdx, activeCourse.element)}
-            onPrev={() => setActiveLessonIdx(Math.max(0, activeLessonIdx - 1))}
-            onNext={() => setActiveLessonIdx(Math.min(activeCourse.lessons.length - 1, activeLessonIdx + 1))}
-            onBack={() => setView('course')}
-          />
-        )}
-
-        {/* ===== 视图：测验 ===== */}
-        {view === 'quiz' && activeCourse && (
-          <QuizView
-            course={activeCourse}
-            bestScore={progress.quizScores[activeCourse.id] || 0}
-            onSubmit={(score) => submitQuiz(activeCourse.id, score, activeCourse.element)}
-            onBack={() => setView('course')}
-          />
-        )}
+        <BottomNav />
       </div>
-
-      <BottomNav />
     </PageContainer>
   );
 }
 
 // ═══════════════════════════════════════
-// 子组件：课程列表
+// 修炼地图
 // ═══════════════════════════════════════
 
-function CourseList({
-  progress,
-  getCourseProgress,
-  onOpenCourse,
-}: {
-  progress: StudyProgress;
-  getCourseProgress: (id: string) => number;
-  onOpenCourse: (id: string) => void;
+function MapView({ isZoneUnlocked, getZoneProgress, onZoneClick, levelInfo }: {
+  isZoneUnlocked: (z: TcmZone) => boolean;
+  getZoneProgress: (z: TcmZone) => { done: number; total: number; pct: number };
+  onZoneClick: (id: string) => void;
+  levelInfo: { lv: number; title: string };
 }) {
-  const basicCourses = TCM_COURSES.filter(c => c.level === 'basic');
-  const advCourses = TCM_COURSES.filter(c => c.level === 'advanced');
-
-  const renderCourseCard = (course: TcmCourse) => {
-    const prog = getCourseProgress(course.id);
-    const elementColor = ELEMENT_COLORS[course.element];
-    const quizScore = progress.quizScores[course.id];
-    return (
-      <button
-        key={course.id}
-        onClick={() => onOpenCourse(course.id)}
-        className="glass-card p-4 w-full text-left transition hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden"
-      >
-        <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r" style={{ backgroundColor: elementColor }} />
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-lg flex items-center justify-center text-2xl shrink-0" style={{ backgroundColor: `${elementColor}20`, border: `1px solid ${elementColor}40` }}>
-            {course.icon}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h4 className="font-bold text-sm font-serif text-gray-800 truncate">{course.name}</h4>
-              <span className="text-[8px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: `${elementColor}15`, color: elementColor }}>
-                {ELEMENT_NAMES[course.element]}行
-              </span>
-              {quizScore !== undefined && (
-                <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 shrink-0 font-bold">测验 {quizScore}</span>
-              )}
-            </div>
-            <p className="text-[10px] text-gray-500 mt-0.5 truncate">{course.desc}</p>
-            {/* 进度条 */}
-            <div className="mt-2 flex items-center gap-2">
-              <div className="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${prog}%`, backgroundColor: elementColor }} />
-              </div>
-              <span className="text-[9px] text-gray-400 shrink-0">{course.lessons.length}课时</span>
-            </div>
-          </div>
-          <ChevronRight size={16} className="text-gray-300 shrink-0" />
-        </div>
-      </button>
-    );
-  };
-
   return (
-    <>
-      {/* 基础课程 */}
-      <div>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-1 h-5 rounded-full bg-amber-500" />
-          <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">基础课程</h3>
-          <div className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
-          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">{basicCourses.length}门</span>
-        </div>
-        <div className="space-y-3">{basicCourses.map(renderCourseCard)}</div>
+    <div className="tcm-map-view">
+      <div className="tcm-map-header">
+        <h2>修炼殿堂</h2>
+        <p>探索中医浩瀚知识，从阴阳五行到针灸养生，步步进阶</p>
       </div>
-
-      {/* 进阶课程 */}
-      <div>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-1 h-5 rounded-full bg-red-700" />
-          <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">进阶课程</h3>
-          <div className="flex-1 h-px bg-gradient-to-r from-red-700/40 to-transparent" />
-          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">{advCourses.length}门</span>
-        </div>
-        <div className="space-y-3">{advCourses.map(renderCourseCard)}</div>
+      <div className="tcm-zone-grid">
+        {TCM_ZONES.map((zone, idx) => {
+          const unlocked = isZoneUnlocked(zone);
+          const prog = getZoneProgress(zone);
+          const color = ELEMENT_COLORS[zone.element];
+          return (
+            <div key={zone.id}
+              className={`tcm-zone-card ${unlocked ? 'unlocked' : 'locked'}`}
+              style={{ '--zone-color': color } as React.CSSProperties}
+              onClick={() => unlocked ? onZoneClick(zone.id) : undefined}>
+              <div className="tcm-zone-num">{String(idx + 1).padStart(2, '0')}</div>
+              <div className="tcm-zone-icon" style={{ color: unlocked ? color : '#999' }}>
+                {unlocked ? zone.icon : <Lock size={22} />}
+              </div>
+              <div className="tcm-zone-info">
+                <div className="tcm-zone-name">{zone.name}</div>
+                <div className="tcm-zone-desc">{zone.desc}</div>
+                {unlocked ? (
+                  <div className="tcm-zone-progress">
+                    <div className="tcm-zone-prog-track">
+                      <div className="tcm-zone-prog-fill" style={{ width: `${prog.pct}%`, background: color }} />
+                    </div>
+                    <span className="tcm-zone-prog-text">{prog.done}/{prog.total}</span>
+                  </div>
+                ) : (
+                  <div className="tcm-zone-lock-info">
+                    <Lock size={12} /> 需 Lv.{zone.levelRequired}
+                  </div>
+                )}
+              </div>
+              {unlocked && <ChevronRight size={18} className="tcm-zone-arrow" />}
+            </div>
+          );
+        })}
       </div>
-    </>
+    </div>
   );
 }
 
 // ═══════════════════════════════════════
-// 子组件：课程详情
+// 殿堂详情
 // ═══════════════════════════════════════
 
-function CourseDetail({
-  course,
-  progress,
-  isLessonDone,
-  onOpenLesson,
-  onStartQuiz,
-  onBack,
-}: {
-  course: TcmCourse;
-  progress: StudyProgress;
-  isLessonDone: (courseId: string, idx: number) => boolean;
-  onOpenLesson: (idx: number) => void;
-  onStartQuiz: () => void;
-  onBack: () => void;
+function ZoneView({ zone, isChapterDone, onChapterClick, onBossClick, bossDefeated, isUnlocked }: {
+  zone: TcmZone;
+  isChapterDone: (id: string) => boolean;
+  onChapterClick: (id: string) => void;
+  onBossClick: (id: string) => void;
+  bossDefeated: string[];
+  isUnlocked: boolean;
 }) {
-  const elementColor = ELEMENT_COLORS[course.element];
-  const doneCount = (progress.completedLessons[course.id] || []).length;
-  const quizScore = progress.quizScores[course.id];
+  const color = ELEMENT_COLORS[zone.element];
+  const zoneBoss = TCM_BOSSES.find(b => b.zone === zone.id);
+
+  if (!isUnlocked) {
+    return (
+      <div className="tcm-zone-locked-msg">
+        <Lock size={48} />
+        <h3>殿堂未解锁</h3>
+        <p>需达到 Lv.{zone.levelRequired} 方可进入「{zone.name}」</p>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {/* 课程头部 */}
-      <div className="glass-card p-4 relative overflow-hidden" style={{ borderColor: `${elementColor}30` }}>
-        <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r" style={{ backgroundColor: elementColor }} />
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl shrink-0" style={{ backgroundColor: `${elementColor}20`, border: `1px solid ${elementColor}40` }}>
-            {course.icon}
-          </div>
-          <div>
-            <h3 className="font-bold text-lg font-serif text-gray-800">{course.name}</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{course.desc}</p>
-          </div>
+    <div className="tcm-zone-detail">
+      <div className="tcm-zone-banner" style={{ background: `linear-gradient(135deg, ${color}22, ${color}08)` }}>
+        <span className="tcm-zone-banner-icon">{zone.icon}</span>
+        <div>
+          <h2>{zone.name}</h2>
+          <p>{zone.desc}</p>
         </div>
-        <div className="flex items-center gap-3 text-xs">
-          <span className="px-2 py-1 rounded-full" style={{ backgroundColor: `${elementColor}15`, color: elementColor }}>
-            {ELEMENT_NAMES[course.element]}行修为
-          </span>
-          <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-            {doneCount}/{course.lessons.length} 课时
-          </span>
-          {quizScore !== undefined && (
-            <span className="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold">
-              测验 {quizScore}分
-            </span>
-          )}
+      </div>
+      <div className="tcm-chapter-list">
+        <div className="tcm-chapter-section-label">知识章节</div>
+        {zone.chapters.map((chId, idx) => {
+          const chapter = TCM_CHAPTERS[chId];
+          if (!chapter) return null;
+          const done = isChapterDone(chId);
+          return (
+            <div key={chId} className="tcm-chapter-item" onClick={() => onChapterClick(chId)}>
+              <div className="tcm-chapter-num" style={{ color: done ? '#c9a94f' : '#999' }}>
+                {done ? <Check size={18} /> : idx + 1}
+              </div>
+              <div className="tcm-chapter-content-preview">
+                <div className="tcm-chapter-name">{chapter.icon} {chapter.name}</div>
+                <div className="tcm-chapter-sub">{chapter.content.subtitle}</div>
+                <div className="tcm-chapter-reward">+{chapter.xpReward} XP · {ELEMENT_NAMES[chapter.element]}行修为</div>
+              </div>
+              <ChevronRight size={16} className="tcm-chapter-arrow" />
+            </div>
+          );
+        })}
+      </div>
+      {zoneBoss && (
+        <div className="tcm-boss-entry" onClick={() => onBossClick(zoneBoss.id)}>
+          <div className="tcm-boss-entry-icon" style={{ borderColor: color }}>{zoneBoss.icon}</div>
+          <div className="tcm-boss-entry-info">
+            <div className="tcm-boss-entry-name">⚔️ Boss: {zoneBoss.name}</div>
+            <div className="tcm-boss-entry-desc">{zoneBoss.desc}</div>
+            <div className="tcm-boss-entry-reward">
+              HP {zoneBoss.hp} · +{zoneBoss.reward.xp} XP · +{zoneBoss.reward.gems} 💎
+              {bossDefeated.includes(zoneBoss.id) && <span className="tcm-boss-defeated-tag"> ✓ 已击败</span>}
+            </div>
+          </div>
+          <Swords size={20} style={{ color: bossDefeated.includes(zoneBoss.id) ? '#c9a94f' : '#999' }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// 章节学习
+// ═══════════════════════════════════════
+
+function ChapterView({ chapter, onStartQuiz, isDone }: {
+  chapter: TcmChapter;
+  onStartQuiz: () => void;
+  isDone: boolean;
+}) {
+  const color = ELEMENT_COLORS[chapter.element];
+  const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
+
+  return (
+    <div className="tcm-chapter-view" ref={setScrollEl}>
+      <div className="tcm-chapter-header" style={{ background: `linear-gradient(135deg, ${color}18, ${color}05)` }}>
+        <div className="tcm-chapter-badge" style={{ background: color }}>{chapter.icon}</div>
+        <div className="tcm-chapter-title-area">
+          <h1>{chapter.content.title}</h1>
+          <p>{chapter.content.subtitle}</p>
+          <div className="tcm-chapter-tags">
+            <span className="tcm-tag">{chapter.content.category}</span>
+            <span className="tcm-tag" style={{ background: color, color: '#fff' }}>{ELEMENT_NAMES[chapter.element]}行</span>
+            {isDone && <span className="tcm-tag tcm-tag-done"><Check size={12} /> 已完成</span>}
+          </div>
         </div>
       </div>
 
-      {/* 课时列表 */}
-      <div className="space-y-2">
-        {course.lessons.map((lesson, idx) => {
-          const done = isLessonDone(course.id, idx);
+      <div className="tcm-lesson-content">
+        {chapter.content.sections.map((sec, i) => <SectionRenderer key={i} section={sec} />)}
+        <div className="highlight">
+          <span className="highlight-icon">{chapter.content.highlight.icon}</span>
+          {renderText(chapter.content.highlight.text)}
+        </div>
+      </div>
+
+      <div className="tcm-quiz-cta">
+        <button className="tcm-quiz-btn" onClick={onStartQuiz}>
+          <Target size={18} />
+          {isDone ? '重新闯关' : '开始闯关测试'}
+        </button>
+        <div className="tcm-quiz-info">
+          {chapter.quiz.length}题 · 答对{chapter.quiz.length}题获满分奖励
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// 闯关测试
+// ═══════════════════════════════════════
+
+function QuizView({ chapter, onComplete, onBack }: {
+  chapter: TcmChapter;
+  onComplete: (correct: number) => void;
+  onBack: () => void;
+}) {
+  const [qIdx, setQIdx] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [finished, setFinished] = useState(false);
+
+  const question = chapter.quiz[qIdx];
+  const isLast = qIdx === chapter.quiz.length - 1;
+
+  const handleSelect = (idx: number) => {
+    if (showResult) return;
+    setSelected(idx);
+    setShowResult(true);
+    if (idx === question.ans) setCorrectCount(c => c + 1);
+  };
+
+  const handleNext = () => {
+    if (isLast) {
+      setFinished(true);
+      const finalCorrect = selected === question.ans ? correctCount : correctCount;
+      onComplete(finalCorrect);
+    } else {
+      setQIdx(i => i + 1);
+      setSelected(null);
+      setShowResult(false);
+    }
+  };
+
+  if (finished) {
+    const passed = correctCount >= Math.ceil(chapter.quiz.length * 0.75);
+    const perfect = correctCount === chapter.quiz.length;
+    return (
+      <div className="tcm-quiz-result">
+        <div className={`tcm-quiz-result-icon ${perfect ? 'perfect' : passed ? 'pass' : 'fail'}`}>
+          {perfect ? '🏆' : passed ? '✅' : '📚'}
+        </div>
+        <h2>{perfect ? '满分通关！' : passed ? '闯关成功！' : '继续努力'}</h2>
+        <div className="tcm-quiz-score">
+          <span className="tcm-score-num">{correctCount}</span>
+          <span className="tcm-score-sep">/</span>
+          <span className="tcm-score-total">{chapter.quiz.length}</span>
+        </div>
+        <p className="tcm-quiz-result-msg">
+          {perfect ? '全部正确！获得双倍修为奖励！' : passed ? '通过闯关，章节已标记完成！' : '答对75%以上才能通过，再试试吧！'}
+        </p>
+        <button className="tcm-quiz-btn" onClick={onBack}>返回章节</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="tcm-quiz-view">
+      <div className="tcm-quiz-progress">
+        <div className="tcm-quiz-prog-text">{qIdx + 1} / {chapter.quiz.length}</div>
+        <div className="tcm-quiz-prog-track">
+          <div className="tcm-quiz-prog-fill" style={{ width: `${((qIdx + (showResult ? 1 : 0)) / chapter.quiz.length) * 100}%` }} />
+        </div>
+      </div>
+      <div className="tcm-quiz-question">
+        <h3>{question.q}</h3>
+      </div>
+      <div className="tcm-quiz-options">
+        {question.opts.map((opt, idx) => {
+          let cls = 'tcm-quiz-opt';
+          if (showResult) {
+            if (idx === question.ans) cls += ' correct';
+            else if (idx === selected) cls += ' wrong';
+          }
           return (
-            <button
-              key={idx}
-              onClick={() => onOpenLesson(idx)}
-              className="glass-card p-3 w-full text-left flex items-center gap-3 transition hover:shadow-md hover:-translate-y-0.5"
-            >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${done ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                {done ? <Check size={16} /> : idx + 1}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{lesson.title}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5">课时 {idx + 1}</p>
-              </div>
-              <ChevronRight size={16} className="text-gray-300 shrink-0" />
+            <button key={idx} className={cls} onClick={() => handleSelect(idx)} disabled={showResult}>
+              <span className="tcm-opt-label">{String.fromCharCode(65 + idx)}</span>
+              <span className="tcm-opt-text">{opt}</span>
+              {showResult && idx === question.ans && <Check size={16} className="tcm-opt-icon" />}
+              {showResult && idx === selected && idx !== question.ans && <X size={16} className="tcm-opt-icon" />}
             </button>
           );
         })}
       </div>
-
-      {/* 单元测验按钮 */}
-      <button
-        onClick={onStartQuiz}
-        className="w-full rounded-xl p-4 flex items-center gap-3 transition hover:shadow-md hover:-translate-y-0.5"
-        style={{ background: `linear-gradient(135deg, ${elementColor}15, ${elementColor}08)`, border: `1px solid ${elementColor}30` }}
-      >
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: elementColor }}>
-          <Award size={20} />
-        </div>
-        <div className="flex-1 text-left">
-          <p className="text-sm font-bold font-serif text-gray-800">单元测验</p>
-          <p className="text-[10px] text-gray-500 mt-0.5">{course.quiz.length}题 · 满分获 +5 {ELEMENT_NAMES[course.element]}行修为</p>
-        </div>
-        {quizScore !== undefined && (
-          <span className="text-lg font-black" style={{ color: elementColor }}>{quizScore}</span>
-        )}
-        <ChevronRight size={16} className="text-gray-300 shrink-0" />
-      </button>
-    </>
-  );
-}
-
-// ═══════════════════════════════════════
-// 子组件：课时学习
-// ═══════════════════════════════════════
-
-function LessonView({
-  course,
-  lessonIdx,
-  isDone,
-  onMarkDone,
-  onPrev,
-  onNext,
-  onBack,
-}: {
-  course: TcmCourse;
-  lessonIdx: number;
-  isDone: boolean;
-  onMarkDone: () => void;
-  onPrev: () => void;
-  onNext: () => void;
-  onBack: () => void;
-}) {
-  const lesson: TcmLesson = course.lessons[lessonIdx];
-  const elementColor = ELEMENT_COLORS[course.element];
-
-  return (
-    <>
-      {/* 课时标题栏 */}
-      <div className="flex items-center gap-2 mb-3">
-        <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
-          <ArrowLeft size={20} />
-        </button>
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-gray-400">{course.name} · 课时 {lessonIdx + 1}/{course.lessons.length}</p>
-          <h3 className="font-bold text-sm font-serif text-gray-800 truncate">{lesson.title}</h3>
-        </div>
-        <span className="text-[9px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: `${elementColor}15`, color: elementColor }}>
-          {ELEMENT_NAMES[course.element]}行
-        </span>
-      </div>
-
-      {/* 内容区 */}
-      <div className="glass-card p-5 relative overflow-hidden">
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-r" style={{ backgroundColor: elementColor }} />
-        <div
-          className="tcm-lesson-content prose prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: lesson.content }}
-        />
-      </div>
-
-      {/* 完成按钮 */}
-      {!isDone ? (
-        <button
-          onClick={onMarkDone}
-          className="w-full rounded-xl p-3 flex items-center justify-center gap-2 transition hover:shadow-md text-white font-bold text-sm font-serif"
-          style={{ background: `linear-gradient(135deg, ${elementColor}, ${elementColor}dd)` }}
-        >
-          <Check size={18} />
-          标记完成 · 获 +2 {ELEMENT_NAMES[course.element]}行修为
-        </button>
-      ) : (
-        <div className="w-full rounded-xl p-3 flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm font-serif">
-          <Check size={18} />
-          本课时已完成
+      {showResult && (
+        <div className="tcm-quiz-explain">
+          <div className="tcm-explain-label">{selected === question.ans ? '✅ 回答正确' : '❌ 回答错误'}</div>
+          <p>{question.explain}</p>
+          <button className="tcm-quiz-next-btn" onClick={handleNext}>
+            {isLast ? '查看结果' : '下一题'} <ArrowRight size={16} />
+          </button>
         </div>
       )}
-
-      {/* 上一课/下一课 */}
-      <div className="flex gap-3">
-        <button
-          onClick={onPrev}
-          disabled={lessonIdx === 0}
-          className="flex-1 glass-card p-3 flex items-center justify-center gap-1 text-xs font-medium text-gray-600 transition hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <ChevronLeft size={16} />
-          上一课
-        </button>
-        <button
-          onClick={onNext}
-          disabled={lessonIdx === course.lessons.length - 1}
-          className="flex-1 glass-card p-3 flex items-center justify-center gap-1 text-xs font-medium text-gray-600 transition hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          下一课
-          <ChevronRight size={16} />
-        </button>
-      </div>
-    </>
+    </div>
   );
 }
 
 // ═══════════════════════════════════════
-// 子组件：单元测验
+// Boss 介绍
 // ═══════════════════════════════════════
 
-function QuizView({
-  course,
-  bestScore,
-  onSubmit,
-  onBack,
-}: {
-  course: TcmCourse;
-  bestScore: number;
-  onSubmit: (score: number) => void;
+function BossIntroView({ boss, playerLevel, onStart, onBack, defeated }: {
+  boss: TcmBoss;
+  playerLevel: number;
+  onStart: () => void;
+  onBack: () => void;
+  defeated: boolean;
+}) {
+  const canFight = playerLevel >= boss.levelRequired;
+  return (
+    <div className="tcm-boss-intro">
+      <div className="tcm-boss-intro-avatar" style={{ '--boss-color': ELEMENT_COLORS[boss.element] } as React.CSSProperties}>
+        <span className="tcm-boss-emoji">{boss.icon}</span>
+        <div className="tcm-boss-pulse" />
+      </div>
+      <h2 className="tcm-boss-name">{boss.name}</h2>
+      <p className="tcm-boss-desc">{boss.desc}</p>
+      <div className="tcm-boss-stats">
+        <div className="tcm-boss-stat"><Heart size={16} /> <span>HP {boss.hp}</span></div>
+        <div className="tcm-boss-stat"><Zap size={16} /> <span>{boss.questions.length}题</span></div>
+        <div className="tcm-boss-stat"><Gem size={16} /> <span>+{boss.reward.gems} 💎</span></div>
+      </div>
+      {defeated && <div className="tcm-boss-defeated-banner"><Check size={18} /> 已击败，可重复挑战</div>}
+      {canFight ? (
+        <button className="tcm-boss-fight-btn" onClick={onStart}>
+          <Swords size={20} /> {defeated ? '再次挑战' : '开始战斗'}
+        </button>
+      ) : (
+        <div className="tcm-boss-locked">
+          <Lock size={20} /> 需达到 Lv.{boss.levelRequired} 才能挑战
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// Boss 战斗
+// ═══════════════════════════════════════
+
+function BossFightView({ boss, playerLevel, onWin, onBack }: {
+  boss: TcmBoss;
+  playerLevel: number;
+  onWin: () => void;
   onBack: () => void;
 }) {
-  const [answers, setAnswers] = useState<(number | null)[]>(() => course.quiz.map(() => null));
-  const [submitted, setSubmitted] = useState(false);
-  const elementColor = ELEMENT_COLORS[course.element];
+  const [qIdx, setQIdx] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [bossHp, setBossHp] = useState(boss.hp);
+  const [playerHp, setPlayerHp] = useState(100 + playerLevel * 10);
+  const maxPlayerHp = 100 + playerLevel * 10;
+  const [combo, setCombo] = useState(0);
+  const [battleOver, setBattleOver] = useState(false);
+  const [won, setWon] = useState(false);
 
-  const score = useMemo(() => {
-    if (!submitted) return 0;
-    let correct = 0;
-    course.quiz.forEach((q, i) => { if (answers[i] === q.ans) correct++; });
-    return Math.round((correct / course.quiz.length) * 100);
-  }, [submitted, answers, course.quiz]);
+  const question = boss.questions[qIdx];
+  const damagePerHit = Math.ceil(boss.hp / boss.questions.length);
+  const bossDamage = 15 + Math.floor(boss.hp / 50);
 
-  const allAnswered = answers.every(a => a !== null);
-
-  const handleSubmit = () => {
-    setSubmitted(true);
-    let correct = 0;
-    course.quiz.forEach((q, i) => { if (answers[i] === q.ans) correct++; });
-    const sc = Math.round((correct / course.quiz.length) * 100);
-    onSubmit(sc);
+  const handleSelect = (idx: number) => {
+    if (showResult) return;
+    setSelected(idx);
+    setShowResult(true);
+    if (idx === question.ans) {
+      setCombo(c => c + 1);
+      const dmg = damagePerHit + (combo >= 2 ? Math.ceil(damagePerHit * 0.3) : 0);
+      setBossHp(h => Math.max(0, h - dmg));
+    } else {
+      setCombo(0);
+      setPlayerHp(h => Math.max(0, h - bossDamage));
+    }
   };
 
-  const handleRetry = () => {
-    setAnswers(course.quiz.map(() => null));
-    setSubmitted(false);
+  const handleNext = () => {
+    if (bossHp <= 0) {
+      setBattleOver(true); setWon(true); onWin();
+      return;
+    }
+    if (playerHp <= 0 || qIdx === boss.questions.length - 1) {
+      setBattleOver(true);
+      setWon(bossHp <= 0);
+      if (bossHp <= 0) onWin();
+      return;
+    }
+    setQIdx(i => i + 1);
+    setSelected(null);
+    setShowResult(false);
   };
+
+  if (battleOver) {
+    return (
+      <div className="tcm-boss-result">
+        <div className={`tcm-boss-result-icon ${won ? 'win' : 'lose'}`}>
+          {won ? '🏆' : '💀'}
+        </div>
+        <h2>{won ? '战斗胜利！' : '挑战失败'}</h2>
+        <p>{won ? `击败了 ${boss.name}！获得 ${boss.reward.xp} XP + ${boss.reward.gems} 💎` : '再接再厉，提升等级后再次挑战！'}</p>
+        <button className="tcm-quiz-btn" onClick={onBack}>返回</button>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {/* 测验标题栏 */}
-      <div className="flex items-center gap-2 mb-3">
-        <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
-          <ArrowLeft size={20} />
-        </button>
-        <div className="flex-1">
-          <p className="text-[10px] text-gray-400">{course.name}</p>
-          <h3 className="font-bold text-sm font-serif text-gray-800">单元测验</h3>
+    <div className="tcm-boss-fight">
+      {/* Boss HP Bar */}
+      <div className="tcm-battle-hp-section">
+        <div className="tcm-battle-boss-hp">
+          <div className="tcm-battle-hp-label">{boss.icon} {boss.name}</div>
+          <div className="tcm-battle-hp-bar boss">
+            <div className="tcm-battle-hp-fill boss" style={{ width: `${(bossHp / boss.hp) * 100}%` }} />
+            <span className="tcm-battle-hp-text">{bossHp} / {boss.hp}</span>
+          </div>
         </div>
-        {bestScore > 0 && !submitted && (
-          <span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">最高 {bestScore}分</span>
-        )}
+        <div className="tcm-battle-player-hp">
+          <div className="tcm-battle-hp-label">❤️ 我方</div>
+          <div className="tcm-battle-hp-bar player">
+            <div className="tcm-battle-hp-fill player" style={{ width: `${(playerHp / maxPlayerHp) * 100}%` }} />
+            <span className="tcm-battle-hp-text">{playerHp} / {maxPlayerHp}</span>
+          </div>
+        </div>
+        {combo >= 2 && <div className="tcm-combo-badge">🔥 {combo} 连击！伤害+30%</div>}
       </div>
 
-      {/* 题目列表 */}
-      <div className="space-y-4">
-        {course.quiz.map((item, qi) => (
-          <div key={qi} className="glass-card p-4 relative overflow-hidden">
-            <div className="absolute left-0 top-0 bottom-0 w-0.5" style={{ backgroundColor: elementColor }} />
-            <p className="text-sm font-bold text-gray-800 mb-3 pl-2">
-              <span className="text-gray-400 mr-1">Q{qi + 1}.</span>
-              {item.q}
-            </p>
-            <div className="space-y-2 pl-2">
-              {item.opts.map((opt, oi) => {
-                const isSelected = answers[qi] === oi;
-                const isCorrect = item.ans === oi;
-                const showResult = submitted;
-                let cls = 'border border-gray-200 bg-white/50 text-gray-700';
-                if (showResult && isCorrect) {
-                  cls = 'border border-emerald-300 bg-emerald-50 text-emerald-800';
-                } else if (showResult && isSelected && !isCorrect) {
-                  cls = 'border border-red-300 bg-red-50 text-red-800';
-                } else if (isSelected) {
-                  cls = 'border-2 text-gray-800';
-                  if (isSelected) cls = cls.replace('border-gray-200', '');
-                  cls += ` text-white`;
-                }
+      {/* Question */}
+      <div className="tcm-battle-question">
+        <div className="tcm-battle-q-num">第 {qIdx + 1} / {boss.questions.length} 题</div>
+        <h3>{question.q}</h3>
+      </div>
+      <div className="tcm-quiz-options">
+        {question.opts.map((opt, idx) => {
+          let cls = 'tcm-quiz-opt';
+          if (showResult) {
+            if (idx === question.ans) cls += ' correct';
+            else if (idx === selected) cls += ' wrong';
+          }
+          return (
+            <button key={idx} className={cls} onClick={() => handleSelect(idx)} disabled={showResult}>
+              <span className="tcm-opt-label">{String.fromCharCode(65 + idx)}</span>
+              <span className="tcm-opt-text">{opt}</span>
+              {showResult && idx === question.ans && <Check size={16} className="tcm-opt-icon" />}
+              {showResult && idx === selected && idx !== question.ans && <X size={16} className="tcm-opt-icon" />}
+            </button>
+          );
+        })}
+      </div>
+      {showResult && (
+        <div className="tcm-quiz-explain">
+          <div className="tcm-explain-label">{selected === question.ans ? '✅ 命中！' : '❌ 被反击！'}</div>
+          <p>{question.explain}</p>
+          <button className="tcm-quiz-next-btn" onClick={handleNext}>
+            {qIdx === boss.questions.length - 1 || bossHp <= 0 ? '战斗结算' : '下一招'} <ArrowRight size={16} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// 成就墙
+// ═══════════════════════════════════════
+
+function AchievementsView({ unlocked }: { unlocked: string[] }) {
+  const tiers: { key: string; label: string; color: string }[] = [
+    { key: 'bronze', label: '青铜', color: '#b87333' },
+    { key: 'silver', label: '白银', color: '#c0c0c0' },
+    { key: 'gold', label: '黄金', color: '#ffd700' },
+    { key: 'platinum', label: '铂金', color: '#e5e4e2' },
+  ];
+
+  return (
+    <div className="tcm-achievements-view">
+      <div className="tcm-ach-header">
+        <h2>成就墙</h2>
+        <p>已解锁 {unlocked.length} / {TCM_ACHIEVEMENTS.length}</p>
+        <div className="tcm-ach-progress-bar">
+          <div className="tcm-ach-progress-fill" style={{ width: `${(unlocked.length / TCM_ACHIEVEMENTS.length) * 100}%` }} />
+        </div>
+      </div>
+      {tiers.map(tier => {
+        const achs = TCM_ACHIEVEMENTS.filter(a => a.tier === tier.key);
+        return (
+          <div key={tier.key} className="tcm-ach-tier">
+            <div className="tcm-ach-tier-label" style={{ color: tier.color }}>{tier.label}级</div>
+            <div className="tcm-ach-grid">
+              {achs.map(ach => {
+                const isUnlocked = unlocked.includes(ach.id);
                 return (
-                  <button
-                    key={oi}
-                    onClick={() => { if (!submitted) { const na = [...answers]; na[qi] = oi; setAnswers(na); } }}
-                    disabled={submitted}
-                    className={`w-full text-left p-3 rounded-lg text-sm transition-all ${showResult ? cls : isSelected ? 'border-2 text-white' : 'border border-gray-200 bg-white/50 text-gray-700 hover:bg-white'}`}
-                    style={isSelected && !showResult ? { backgroundColor: elementColor, borderColor: elementColor } : undefined}
-                  >
-                    <span className="font-bold mr-2">{String.fromCharCode(65 + oi)}.</span>
-                    {opt}
-                    {showResult && isCorrect && <Check size={14} className="inline ml-2 text-emerald-600" />}
-                  </button>
+                  <div key={ach.id} className={`tcm-ach-card ${isUnlocked ? 'unlocked' : 'locked'}`}
+                    style={{ '--ach-color': tier.color } as React.CSSProperties}>
+                    <div className="tcm-ach-icon">{isUnlocked ? ach.icon : '🔒'}</div>
+                    <div className="tcm-ach-info">
+                      <div className="tcm-ach-name">{ach.name}</div>
+                      <div className="tcm-ach-desc">{ach.desc}</div>
+                      <div className="tcm-ach-cond">{ach.condition}</div>
+                    </div>
+                  </div>
                 );
               })}
             </div>
-            {/* 解析 */}
-            {submitted && (
-              <div className="mt-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
-                <p className="text-[10px] font-bold text-blue-600 mb-1">解析</p>
-                <p className="text-xs text-gray-600 leading-relaxed">{item.explain}</p>
-              </div>
-            )}
           </div>
-        ))}
+        );
+      })}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// 个人档案
+// ═══════════════════════════════════════
+
+function ProfileView({ progress, levelInfo }: {
+  progress: GameProgress;
+  levelInfo: { lv: number; title: string; nextXp: number; progress: number };
+}) {
+  const totalChapters = Object.keys(TCM_CHAPTERS).length;
+  const totalBosses = TCM_BOSSES.length;
+  const totalAchs = TCM_ACHIEVEMENTS.length;
+
+  return (
+    <div className="tcm-profile-view">
+      <div className="tcm-profile-card">
+        <div className="tcm-profile-avatar">
+          <div className="tcm-profile-rank-circle" style={{ background: `conic-gradient(#c9a94f ${levelInfo.progress}%, #3333 0)` }}>
+            <div className="tcm-profile-rank-inner">
+              <span className="tcm-profile-lv-num">{levelInfo.lv}</span>
+              <span className="tcm-profile-lv-label">Lv</span>
+            </div>
+          </div>
+        </div>
+        <h2 className="tcm-profile-title">{levelInfo.title}</h2>
+        <div className="tcm-profile-xp">
+          <Zap size={14} /> {progress.xp} XP{levelInfo.lv < 20 && ` / ${levelInfo.nextXp} XP`}
+        </div>
       </div>
 
-      {/* 提交/结果 */}
-      {!submitted ? (
-        <button
-          onClick={handleSubmit}
-          disabled={!allAnswered}
-          className="w-full rounded-xl p-4 flex items-center justify-center gap-2 transition hover:shadow-md text-white font-bold text-sm font-serif disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ background: `linear-gradient(135deg, ${elementColor}, ${elementColor}dd)` }}
-        >
-          <Award size={18} />
-          {allAnswered ? '提交测验' : `还需回答 ${answers.filter(a => a === null).length} 题`}
-        </button>
-      ) : (
-        <>
-          {/* 成绩展示 */}
-          <div className="glass-card p-6 text-center relative overflow-hidden">
-            <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: elementColor }} />
-            <div className="text-5xl font-black font-serif" style={{ color: score >= 75 ? elementColor : '#999' }}>
-              {score}
-              <span className="text-xl text-gray-400">分</span>
+      <div className="tcm-profile-stats">
+        <div className="tcm-profile-stat-item">
+          <div className="tcm-stat-icon-wrap"><BookMarked size={20} /></div>
+          <div className="tcm-stat-value">{progress.completedChapters.length}<span>/{totalChapters}</span></div>
+          <div className="tcm-stat-label">章节完成</div>
+        </div>
+        <div className="tcm-profile-stat-item">
+          <div className="tcm-stat-icon-wrap"><Target size={20} /></div>
+          <div className="tcm-stat-value">{progress.quizPerfectCount}</div>
+          <div className="tcm-stat-label">满分次数</div>
+        </div>
+        <div className="tcm-profile-stat-item">
+          <div className="tcm-stat-icon-wrap"><Swords size={20} /></div>
+          <div className="tcm-stat-value">{progress.bossDefeated.length}<span>/{totalBosses}</span></div>
+          <div className="tcm-stat-label">Boss击败</div>
+        </div>
+        <div className="tcm-profile-stat-item">
+          <div className="tcm-stat-icon-wrap"><Trophy size={20} /></div>
+          <div className="tcm-stat-value">{progress.unlockedAchievements.length}<span>/{totalAchs}</span></div>
+          <div className="tcm-stat-label">成就解锁</div>
+        </div>
+        <div className="tcm-profile-stat-item">
+          <div className="tcm-stat-icon-wrap"><Flame size={20} /></div>
+          <div className="tcm-stat-value">{progress.streak}</div>
+          <div className="tcm-stat-label">连续打卡</div>
+        </div>
+        <div className="tcm-profile-stat-item">
+          <div className="tcm-stat-icon-wrap"><Calendar size={20} /></div>
+          <div className="tcm-stat-value">{progress.dailyCheckIn.length}</div>
+          <div className="tcm-stat-label">累计打卡</div>
+        </div>
+      </div>
+
+      <div className="tcm-profile-zones">
+        <h3>殿堂进度</h3>
+        {TCM_ZONES.map(zone => {
+          const done = zone.chapters.filter(id => progress.completedChapters.includes(id)).length;
+          const pct = zone.chapters.length ? Math.round((done / zone.chapters.length) * 100) : 0;
+          const color = ELEMENT_COLORS[zone.element];
+          return (
+            <div key={zone.id} className="tcm-profile-zone-item">
+              <span className="tcm-profile-zone-icon">{zone.icon}</span>
+              <span className="tcm-profile-zone-name">{zone.name}</span>
+              <div className="tcm-profile-zone-bar">
+                <div className="tcm-profile-zone-fill" style={{ width: `${pct}%`, background: color }} />
+              </div>
+              <span className="tcm-profile-zone-pct">{done}/{zone.chapters.length}</span>
             </div>
-            <p className="text-sm text-gray-500 mt-2 font-serif">
-              {score === 100 ? '满分通关！+5 修为' : score >= 75 ? '优秀！+4 修为' : score >= 50 ? '及格 +3 修为' : '继续努力 +1 修为'}
-            </p>
-            <p className="text-[10px] text-gray-400 mt-1">
-              {course.quiz.filter((q, i) => answers[i] === q.ans).length} / {course.quiz.length} 题正确
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleRetry}
-              className="flex-1 glass-card p-3 flex items-center justify-center gap-2 text-sm font-medium text-gray-600 transition hover:shadow-md"
-            >
-              <RotateCw size={16} />
-              重新测验
-            </button>
-            <button
-              onClick={onBack}
-              className="flex-1 rounded-xl p-3 flex items-center justify-center gap-2 text-white text-sm font-bold font-serif transition hover:shadow-md"
-              style={{ backgroundColor: elementColor }}
-            >
-              <BookOpen size={16} />
-              返回课程
-            </button>
-          </div>
-        </>
-      )}
-    </>
+          );
+        })}
+      </div>
+    </div>
   );
 }
