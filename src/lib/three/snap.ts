@@ -26,8 +26,9 @@ export function snapPointsToSurface(
 
   const directions = targets.map((target) => {
     const d = target.clone();
-    // Midline points: prefer anterior (+Z) or posterior (−Z) from authored z.
-    if (Math.abs(d.x) < 0.02 && Math.abs(d.z) < 0.02) {
+    // Midline points (X≈0): prefer anterior (+Z) or posterior (−Z) from authored z.
+    // Only check X — let Z magnitude inform front/back but not trigger lateral mode.
+    if (Math.abs(d.x) < 0.02) {
       return new THREE.Vector3(0, 0, target.z >= 0 ? 1 : -1);
     }
     // Prefer lateral direction in XZ, keep some Y so limbs resolve correctly.
