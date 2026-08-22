@@ -84,7 +84,7 @@ export function AcupointApp() {
   // Clear keepSelection after meridian update has been applied by BodyViewer.
   useEffect(() => {
     if (keepSelection) {
-      const t = setTimeout(() => setKeepSelection(false), 500);
+      const t = setTimeout(() => setKeepSelection(false), 1000);
       return () => clearTimeout(t);
     }
   }, [keepSelection]);

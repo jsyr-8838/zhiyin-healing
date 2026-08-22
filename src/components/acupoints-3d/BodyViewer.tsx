@@ -66,20 +66,22 @@ export function BodyViewer({
   }, []);
 
   useEffect(() => {
-    viewerRef.current?.setMeridian(meridian, showBilateral, keepSelection);
-  }, [meridian, showBilateral, keepSelection]);
+    viewerRef.current?.setMeridian(meridian, showBilateral, keepSelectionRef.current);
+  }, [meridian, showBilateral]);
 
   // Focus the selected point AFTER meridian has been applied.
   // When keepSelection is true (search-jump), defer focus slightly so
   // setMeridian finishes rebuilding hotspots first.
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
   useEffect(() => {
     if (!selected) return;
-    if (keepSelection) {
-      const t = setTimeout(() => viewerRef.current?.focusPoint(selected), 150);
+    if (keepSelectionRef.current) {
+      const t = setTimeout(() => viewerRef.current?.focusPoint(selectedRef.current!), 150);
       return () => clearTimeout(t);
     }
     viewerRef.current?.focusPoint(selected);
-  }, [selected, keepSelection]);
+  }, [selected]);
 
   const calloutRef = useCallback((node: HTMLDivElement | null) => {
     viewerRef.current?.attachCallout(node);
