@@ -1,13 +1,10 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "zhiyin-healing"
-compatibility_date = "2025-09-25"
-compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
-main = ".open-next/worker.js"
+name = "zhiyin"
+compatibility_date = "2026-08-20"
+compatibility_flags = ["nodejs_compat"]
 
-# Assets are served from the .open-next/assets directory
-[assets]
-directory = ".open-next/assets"
-binding = "ASSETS"
+# Pages build output directory (required for `wrangler pages deploy` to honor this file)
+pages_build_output_dir = ".open-next/assets"
 
 # D1 Database binding (free, serverless SQLite)
 [[d1_databases]]
@@ -18,7 +15,3 @@ database_id = "d44c1d6f-0ce5-4dc6-8d91-43eece14f5d6"
 # Observability
 [observability]
 enabled = true
-
-# Smart Placement
-[placement]
-mode = "smart"

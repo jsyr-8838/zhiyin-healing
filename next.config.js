@@ -35,16 +35,29 @@ const nextConfig = {
       // taibu-core: ~18MB of pinyin/segmentation data, runs on client via taibu-adapter
       // lucide-react: icon library, only needed for client rendering
       // react-icons: same as lucide-react
+      // lunar-javascript: ~425KB calendar/astronomy data, only used in client-only pages (diagnose/wuxing)
       // node-html-to-image / puppeteer / playwright: server-only but not usable on Cloudflare
       const serverExcludes = [
         'taibu-core',
         'lucide-react',
         'react-icons',
         '@heroicons/react',
+        'lunar-javascript',
         'node-html-to-image',
         'puppeteer',
         'playwright',
         'jsdom',
+      ];
+
+      // Modules to completely null-out on server (replace with empty stub)
+      const serverNullModules = [
+        'sharp',
+        'canvas',
+        '@react-pdf',
+        'pdf-lib',
+        'docx',
+        'exceljs',
+        'pdfjs-dist',
       ];
 
       config.externals = config.externals || [];
@@ -56,9 +69,22 @@ const nextConfig = {
             return callback(null, `commonjs ${request}`);
           }
         }
+        // Null-out heavy native modules that can't run on Cloudflare
+        for (const mod of serverNullModules) {
+          if (request === mod || request.startsWith(mod + '/')) {
+            return callback(null, `commonjs ${request}`);
+          }
+        }
         callback();
       });
       config.externals = existingExternals;
+
+      // Also use IgnorePlugin for sharp to prevent it from being bundled
+      const webpack = require('webpack');
+      config.plugins = config.plugins || [];
+      config.plugins.push(new webpack.IgnorePlugin({
+        resourceRegExp: /^(sharp|canvas)$/,
+      }));
     }
     return config;
   },

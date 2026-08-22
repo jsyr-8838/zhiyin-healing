@@ -26,6 +26,7 @@ export const DAILY_QUOTES: Array<{ text: string; author: string }> = [
 export const TREATMENT_MODULES: ModuleConfig[] = [
   { href: '/healing/acupoint', icon: 'CircleDot', name: '穴位定位', desc: '416穴·高清图·经络筛选', element: 'metal' },
   { href: '/healing/acupoint-challenge', icon: 'Target', name: '穴位挑战', desc: '571穴·看图找穴·修为', element: 'metal' },
+  { href: '/healing/acupoints-3d', icon: 'Box', name: '立体明堂', desc: '3D人体·十四经·交互取穴', element: 'metal' },
   { href: '/healing/meridian-chart', icon: 'GitBranch', name: '经络图解', desc: '15条经络·动态图·穴位', element: 'wood' },
   { href: '/healing/ai-diagnosis', icon: 'MessageCircleHeart', name: 'AI导诊', desc: '智能问诊·个性化方案', element: 'fire' },
   { href: '/healing/color-diagnosis', icon: 'Palette', name: '色彩情志', desc: '色诊明辨·五行推荐', element: 'earth' },
