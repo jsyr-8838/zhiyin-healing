@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import {
   Play, Pause, Square, ChevronDown, Volume2, VolumeX,
-  SkipBack, SkipForward, Timer, Waves, Wind,
+  SkipBack, SkipForward, Timer, Waves, Wind, X,
 } from 'lucide-react';
 import {
   useAudioService, getAnalyserNode,
@@ -33,7 +33,7 @@ function FullScreenPlayer() {
     timerMinutes, timerRemaining,
     activePrescription, prescriptionIndex,
     queue, queueIndex, playMode,
-    togglePlay, stop, setVolume, toggleMute,
+    togglePlay, stop, closePlayer, setVolume, toggleMute,
     next, prev, setBinauralBeat, setModulation,
     stopPrescription,
   } = useAudioService();
@@ -51,16 +51,16 @@ function FullScreenPlayer() {
   const trackColor = currentTrack.color || GOLD;
   const volPercent = Math.round(volume * 100);
 
-  // ===== 迷你播放器 =====
+  // ===== 迷你播放器（国风暖色版） =====
   const MiniPlayer = (
     <div
-      className="fixed left-2 right-2 z-50 flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-all duration-300 active:scale-[0.98]"
+      className="fixed left-2 right-2 z-50 flex items-center gap-2.5 px-3 py-2.5 cursor-pointer transition-all duration-300 active:scale-[0.98]"
       style={{
-        bottom: 80, // BottomNav 高度
-        background: 'rgba(12,10,26,0.85)',
-        borderRadius: 16,
-        border: `1px solid rgba(196,163,90,0.15)`,
-        boxShadow: `0 4px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(196,163,90,0.08)`,
+        bottom: 80,
+        background: 'linear-gradient(135deg, #FDF8F0 0%, #F5EFE0 100%)',
+        borderRadius: 14,
+        border: '1px solid rgba(196,163,90,0.25)',
+        boxShadow: '0 4px 20px rgba(140,120,80,0.15), inset 0 1px 0 rgba(255,255,255,0.5)',
       }}
       onClick={() => setExpanded(true)}
       onTouchStart={(e) => setTouchStartY(e.touches[0].clientY)}
@@ -70,13 +70,13 @@ function FullScreenPlayer() {
       }}
     >
       {/* 色条 */}
-      <div className="w-1 h-8 rounded-full flex-shrink-0" style={{ background: trackColor }} />
+      <div className="w-1 h-7 rounded-full flex-shrink-0" style={{ background: trackColor }} />
 
       {/* 曲目信息 */}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-white/90 truncate">{currentTrack.title}</div>
-        <div className="text-[10px] text-white/40 truncate">
-          {currentTrack.instrument && <span className="text-white/50">{currentTrack.instrument}</span>}
+        <div className="text-sm font-medium truncate" style={{ color: '#5C1A00' }}>{currentTrack.title}</div>
+        <div className="text-[10px] truncate" style={{ color: '#8B7355' }}>
+          {currentTrack.instrument && <span>{currentTrack.instrument}</span>}
           {currentTrack.instrument && currentTrack.subtitle ? ' · ' : ''}
           {currentTrack.subtitle}
         </div>
@@ -84,7 +84,7 @@ function FullScreenPlayer() {
 
       {/* 方案进度 */}
       {activePrescription && (
-        <div className="text-[10px] text-amber-400/70 flex-shrink-0">
+        <div className="text-[10px] flex-shrink-0" style={{ color: '#B8860B' }}>
           {prescriptionIndex + 1}/{activePrescription.items.length}
         </div>
       )}
@@ -92,18 +92,33 @@ function FullScreenPlayer() {
       {/* 播放/暂停 */}
       <button
         onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-        className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition"
-        style={{ background: isPlaying ? 'rgba(239,68,68,0.25)' : 'rgba(34,197,94,0.25)' }}
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition active:scale-90"
+        style={{
+          background: isPlaying ? 'rgba(193,97,88,0.15)' : 'rgba(93,138,99,0.15)',
+          border: `1px solid ${isPlaying ? 'rgba(193,97,88,0.3)' : 'rgba(93,138,99,0.3)'}`,
+        }}
       >
         {isPlaying
-          ? <Pause size={16} className="text-red-300" />
-          : <Play size={16} className="text-green-300 ml-0.5" />
+          ? <Pause size={14} style={{ color: '#B91C1C' }} />
+          : <Play size={14} style={{ color: '#166534', marginLeft: 1 }} />
         }
+      </button>
+
+      {/* 关闭按钮 */}
+      <button
+        onClick={(e) => { e.stopPropagation(); closePlayer(); }}
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition active:scale-90"
+        style={{
+          background: 'rgba(140,120,80,0.08)',
+          border: '1px solid rgba(140,120,80,0.15)',
+        }}
+      >
+        <X size={14} style={{ color: '#8B7355' }} />
       </button>
 
       {/* 进度条动画 */}
       {isPlaying && (
-        <div className="absolute bottom-0 left-4 right-4 h-0.5 rounded-full overflow-hidden">
+        <div className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full animate-pulse"
             style={{

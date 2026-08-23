@@ -55,6 +55,8 @@ export interface AudioTrack {
   instrument?: string;
   /** 关联的目录曲目 ID */
   catalogTrackId?: string;
+  /** 不循环播放（敲击音等短音效） */
+  noLoop?: boolean;
 }
 
 export interface PrescriptionItem {
@@ -107,6 +109,7 @@ interface AudioServiceState {
   pause: () => void;
   togglePlay: () => void;
   stop: () => void;
+  closePlayer: () => void;
   setVolume: (v: number) => void;
   toggleMute: () => void;
   setBinauralBeat: (v: BinauralValue) => void;
@@ -513,7 +516,7 @@ export const useAudioService = create<AudioServiceState>()(
   // 同一首歌且当前暂停 → resume
   if (get().currentTrack?.id === track.id && get().isPlaying === false) {
     syntheticAnalyser?.setPlaying(true);
-    el.play().catch(() => {});
+    el.play().catch(err => console.error('[audio-service] resume play() failed:', err));
     set({ isPlaying: true });
     return;
   }
@@ -530,7 +533,7 @@ export const useAudioService = create<AudioServiceState>()(
   el.load(); // [FIX] 显式触发加载
   const targetVol = get().isMuted ? 0 : get().volume;
   el.volume = 0; // 从0开始淡入
-  el.loop = true; // 五音/颂钵循环播放
+  el.loop = !track.noLoop; // 敲击音不循环，其余循环
 
   // [FIX] play() 加 catch，失败时恢复音量并重试
   el.play().then(() => {
@@ -538,7 +541,8 @@ export const useAudioService = create<AudioServiceState>()(
   }).catch((err) => {
     console.warn('[audio-service] play() rejected, retrying:', err);
     el.volume = targetVol;
-    el.play().then(() => fadeAudio(targetVol, 1)).catch(() => {
+    el.play().then(() => fadeAudio(targetVol, 1)).catch((err2) => {
+      console.error('[audio-service] play() failed after retry:', err2);
       el.volume = targetVol;
     });
   });
@@ -575,7 +579,7 @@ export const useAudioService = create<AudioServiceState>()(
             const ambientEl = getAmbientAudioElement();
             ambientEl.src = soundscape.src;
             ambientEl.volume = 0;
-            ambientEl.play().then(() => fadeAmbient(get().ambientVolume, 1.5)).catch(() => {});
+            ambientEl.play().then(() => fadeAmbient(get().ambientVolume, 1.5)).catch(err => console.error('[audio-service] ambient play() failed:', err));
           }
         }
       },
@@ -634,6 +638,41 @@ export const useAudioService = create<AudioServiceState>()(
         timerInterval = null;
       }
     });
+      },
+
+      closePlayer: () => {
+        const el = getAudioElement();
+        syntheticAnalyser?.setPlaying(false);
+        // 停止环境音
+        if (ambientAudioElement && !ambientAudioElement.paused) {
+          fadeAmbient(0, 1).then(() => { ambientAudioElement?.pause(); });
+        }
+        // 清理计时器
+        if (prescriptionTimerInterval) {
+          clearInterval(prescriptionTimerInterval);
+          prescriptionTimerInterval = null;
+        }
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        // 快速淡出并停止
+        fadeAudio(0, 0.5).then(() => {
+          el.pause();
+          el.currentTime = 0;
+        }).catch(() => {
+          el.pause();
+          el.currentTime = 0;
+        });
+        // 清除当前曲目 → 迷你播放器消失
+        set({
+          isPlaying: false,
+          currentTrack: null,
+          currentTime: 0,
+          isTimerRunning: false,
+          activePrescription: null,
+          prescriptionIndex: 0,
+        });
       },
 
       setVolume: (v: number) => {

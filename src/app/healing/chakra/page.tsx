@@ -52,7 +52,7 @@ export default function ChakraPage() {
   const {
     isPlaying, currentTrack, volume, binauralBeat, modulation,
     timerMinutes, timerRemaining, isTimerRunning,
-    play, pause, stop, togglePlay, setVolume,
+    play, pause, stop, closePlayer, togglePlay, setVolume,
     setBinauralBeat, setModulation,
     setTimer, startTimer, stopTimer,
   } = useAudioService();
@@ -179,8 +179,8 @@ export default function ChakraPage() {
     return () => {
       if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
-      // 切页时停止音频播放
-      stop();
+      // 切页时完全关闭播放器（清除 currentTrack → 迷你播放器消失）
+      closePlayer();
     };
   }, []);
 

@@ -105,21 +105,40 @@ export async function GET(
     const auth = await getB2Auth();
 
     // Build B2 download URL: downloadUrl/bucketName/fileName?Authorization=token
-    // Encode each path segment individually to preserve / separators
     const encodedPath = filePath.split('/').map(seg => encodeURIComponent(seg)).join('/');
-
     const downloadUrl = `${auth.downloadUrl}/file/${B2_BUCKET}/${encodedPath}?Authorization=${encodeURIComponent(auth.downloadAuthToken)}`;
 
-    // 302 redirect to the B2 download URL
-    return NextResponse.redirect(downloadUrl, {
-      headers: {
-        'Cache-Control': 'public, max-age=3600, immutable',
-      },
-    });
+    // Stream through server (B2 US endpoint may be unreachable in China)
+    const reqHeaders: HeadersInit = {};
+    const range = request.headers.get('range');
+    if (range) reqHeaders['range'] = range;
+
+    const b2Res = await fetch(downloadUrl, { headers: reqHeaders });
+
+    if (!b2Res.ok) {
+      console.error('[B2 proxy] fetch failed:', b2Res.status, b2Res.statusText);
+      return NextResponse.json(
+        { error: 'B2 fetch failed' },
+        { status: b2Res.status }
+      );
+    }
+
+    // Pass through response headers
+    const resHeaders = new Headers();
+    const ct = b2Res.headers.get('content-type');
+    if (ct) resHeaders.set('Content-Type', ct);
+    const cl = b2Res.headers.get('content-length');
+    if (cl) resHeaders.set('Content-Length', cl);
+    const cr = b2Res.headers.get('content-range');
+    if (cr) resHeaders.set('Content-Range', cr);
+    resHeaders.set('Cache-Control', 'public, max-age=3600, immutable');
+    resHeaders.set('Accept-Ranges', 'bytes');
+
+    return new NextResponse(b2Res.body, { status: b2Res.status, headers: resHeaders });
   } catch (err) {
     console.error('[B2 proxy] Error:', err);
     return NextResponse.json(
-      { error: 'Failed to generate media URL' },
+      { error: 'Failed to fetch media' },
       { status: 500 }
     );
   }
@@ -129,5 +148,31 @@ export async function HEAD(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return GET(request, { params });
+  const { path: pathSegments } = await params;
+  const filePath = pathSegments.map(decodeURIComponent).join('/');
+  if (!filePath) {
+    return NextResponse.json({ error: 'No file path' }, { status: 400 });
+  }
+  try {
+    const auth = await getB2Auth();
+    const encodedPath = filePath.split('/').map(seg => encodeURIComponent(seg)).join('/');
+    const downloadUrl = `${auth.downloadUrl}/file/${B2_BUCKET}/${encodedPath}?Authorization=${encodeURIComponent(auth.downloadAuthToken)}`;
+
+    const b2Res = await fetch(downloadUrl, { method: 'HEAD' });
+    if (!b2Res.ok) {
+      return NextResponse.json({ error: 'B2 HEAD failed' }, { status: b2Res.status });
+    }
+
+    const resHeaders = new Headers();
+    const ct = b2Res.headers.get('content-type');
+    if (ct) resHeaders.set('Content-Type', ct);
+    const cl = b2Res.headers.get('content-length');
+    if (cl) resHeaders.set('Content-Length', cl);
+    resHeaders.set('Cache-Control', 'public, max-age=3600, immutable');
+    resHeaders.set('Accept-Ranges', 'bytes');
+
+    return new NextResponse(null, { status: 200, headers: resHeaders });
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  }
 }

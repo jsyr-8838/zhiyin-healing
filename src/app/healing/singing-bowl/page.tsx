@@ -41,7 +41,7 @@ export default function SingingBowlPage() {
   const {
     isPlaying, currentTrack, volume, binauralBeat, modulation,
     timerMinutes, timerRemaining, isTimerRunning,
-    play, pause, stop, togglePlay, setVolume,
+    play, pause, stop, closePlayer, togglePlay, setVolume,
     setBinauralBeat, setModulation,
     setTimer, startTimer, stopTimer,
     ambientSoundId, ambientVolume, setAmbientSound, setAmbientVolume,
@@ -127,6 +127,7 @@ export default function SingingBowlPage() {
         id: hit.id, title: hit.name, subtitle: hit.desc,
         src: hit.src, mode: 'singing-bowl', bowlFreq: hit.freq,
         color: hit.color, artwork: '/icon-512.png',
+        noLoop: true,
       };
     }
 
@@ -243,8 +244,8 @@ export default function SingingBowlPage() {
     return () => {
       if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
-      // 切页时停止音频播放
-      stop();
+      // 切页时完全关闭播放器（清除 currentTrack → 迷你播放器消失）
+      closePlayer();
     };
   }, []);
 
@@ -639,7 +640,7 @@ export default function SingingBowlPage() {
                     onClick={() => {
                       setSelectedRecordingId(rec.id);
                       setSelectedFreq(rec.freq);
-                      if (isPlaying) startBowl({ recordingId: rec.id });
+                      startBowl({ recordingId: rec.id });
                     }}
                     className="flex items-center gap-3 p-3 rounded-xl border text-left transition hover:shadow-md active:scale-95"
                     style={{
@@ -684,7 +685,7 @@ export default function SingingBowlPage() {
                     onClick={() => {
                       setSelectedHitId(hit.id);
                       setSelectedFreq(hit.freq);
-                      if (isPlaying) startBowl({ hitId: hit.id });
+                      startBowl({ hitId: hit.id });
                     }}
                     className="flex items-center gap-2 p-2.5 rounded-lg border text-left transition hover:shadow-sm active:scale-95"
                     style={{
