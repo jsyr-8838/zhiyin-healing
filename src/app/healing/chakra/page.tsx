@@ -179,6 +179,8 @@ export default function ChakraPage() {
     return () => {
       if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
+      // 切页时停止音频播放
+      stop();
     };
   }, []);
 
@@ -187,7 +189,7 @@ export default function ChakraPage() {
   const volPercent = Math.round(volume * 100);
 
   return (
-    <PageContainer theme="healing">
+    <PageContainer theme="healing" noShanshui>
       {/* Header */}
       <HealingHeader
         title="脉轮调谐"
@@ -202,7 +204,7 @@ export default function ChakraPage() {
       )}
 
       {/* Canvas 可视化区域 */}
-      <div className="relative" style={{ height: 240, background: '#FDF8F0' }}>
+      <div className="relative" style={{ height: 240, background: 'linear-gradient(180deg, #FDF8F0 0%, #F5EFE0 100%)', borderRadius: 12, margin: '8px 8px 0', boxShadow: 'inset 0 0 12px rgba(196,168,112,0.08)' }}>
         <HealingCanvas
           ref={healingCanvasRef}
           energy={audioEnergy}
@@ -248,8 +250,13 @@ export default function ChakraPage() {
         <div className="absolute bottom-2 left-3">
           <button
             onClick={() => isPlaying ? stopAll() : (selectedChakra !== null ? startPlaying(CHAKRAS[selectedChakra].freq, binauralBeat, modulation as ModulationValue) : startPlaying(528, 10, 'ocean'))}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition"
-            style={{ background: isPlaying ? 'rgba(239,68,68,0.12)' : 'rgba(34,197,94,0.12)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center transition active:scale-90"
+            style={{
+              background: isPlaying
+                ? 'linear-gradient(135deg, #c2615830, #c2615815)'
+                : 'linear-gradient(135deg, #5d8a6330, #5d8a6315)',
+              border: `1px solid ${isPlaying ? '#c2615850' : '#5d8a6350'}`,
+            }}
           >
             {isPlaying ? <Pause size={18} style={{ color: '#B91C1C' }} /> : <Play size={18} style={{ color: '#166534' }} />}
           </button>
@@ -257,7 +264,7 @@ export default function ChakraPage() {
       </div>
 
       {/* 音量滑块 */}
-      <div className="px-4 py-3 flex items-center gap-3" style={{ background: 'linear-gradient(to right, #F5EFE0, #EDE4D3)' }}>
+      <div className="px-4 py-3 flex items-center gap-3 mx-2" style={{ background: 'linear-gradient(to right, #F5EFE0, #EDE4D3)', borderRadius: 12, marginTop: 4 }}>
         <Volume2 size={16} style={{ color: '#8B7355' }} />
         <input
           type="range" min={0} max={100} value={volPercent}

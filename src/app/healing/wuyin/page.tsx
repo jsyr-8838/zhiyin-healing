@@ -222,6 +222,8 @@ export default function WuYinPage() {
     return () => {
       if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
+      // 切页时停止音频播放
+      stop();
     };
   }, []);
 
@@ -230,7 +232,7 @@ export default function WuYinPage() {
   const volPercent = Math.round(volume * 100);
 
   return (
-    <PageContainer theme="healing">
+    <PageContainer theme="healing" noShanshui>
       {/* Header */}
       <HealingHeader
         title="五音疗愈"
@@ -245,7 +247,7 @@ export default function WuYinPage() {
       )}
 
       {/* Canvas 可视化区域 - 宣纸暖白背景 */}
-      <div className="relative" style={{ height: 280, background: '#FDF8F0' }}>
+      <div className="relative" style={{ height: 280, background: 'linear-gradient(180deg, #FDF8F0 0%, #F5EFE0 100%)', borderRadius: 12, margin: '8px 8px 0', boxShadow: 'inset 0 0 12px rgba(196,168,112,0.08)' }}>
         <HealingCanvas
           ref={healingCanvasRef}
           energy={audioEnergy}
@@ -294,8 +296,13 @@ export default function WuYinPage() {
         <div className="absolute bottom-2 left-3 flex items-center gap-2">
           <button
             onClick={() => isPlaying ? stopAll() : (selectedTone ? startPlaying(selectedTone, binauralBeat, modulation as ModulationValue) : startPlaying('gong', 0, 'none'))}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition"
-            style={{ background: isPlaying ? 'rgba(239,68,68,0.12)' : 'rgba(34,197,94,0.12)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center transition active:scale-90"
+            style={{
+              background: isPlaying
+                ? 'linear-gradient(135deg, #c2615830, #c2615815)'
+                : 'linear-gradient(135deg, #5d8a6330, #5d8a6315)',
+              border: `1px solid ${isPlaying ? '#c2615850' : '#5d8a6350'}`,
+            }}
           >
             {isPlaying ? <Pause size={18} style={{ color: '#B91C1C' }} /> : <Play size={18} style={{ color: '#166534' }} />}
           </button>
@@ -303,27 +310,30 @@ export default function WuYinPage() {
           <button
             onClick={() => stopAll()}
             disabled={!isPlaying}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition disabled:opacity-30"
-            style={{ background: 'rgba(92,26,0,0.08)' }}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition disabled:opacity-30 active:scale-90"
+            style={{ background: 'rgba(92,26,0,0.06)', border: '1px solid rgba(92,26,0,0.1)' }}
           >
-            <Square size={15} style={{ color: '#5C1A00' }} />
+            <Square size={14} style={{ color: '#5C1A00' }} />
           </button>
           {/* 循环切换 */}
           <button
             onClick={toggleLoop}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition"
-            style={{ background: isLooping ? 'rgba(34,197,94,0.12)' : 'rgba(92,26,0,0.06)' }}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition active:scale-90"
+            style={{
+              background: isLooping ? 'rgba(34,197,94,0.1)' : 'rgba(92,26,0,0.04)',
+              border: `1px solid ${isLooping ? 'rgba(34,197,94,0.2)' : 'rgba(92,26,0,0.08)'}`,
+            }}
             title={isLooping ? '循环播放' : '单次播放'}
           >
             {isLooping
-              ? <Repeat size={15} style={{ color: '#166534' }} />
-              : <RepeatOff size={15} style={{ color: '#8B7355' }} />}
+              ? <Repeat size={14} style={{ color: '#166534' }} />
+              : <RepeatOff size={14} style={{ color: '#8B7355' }} />}
           </button>
         </div>
       </div>
 
       {/* 音量滑块 */}
-      <div className="px-4 py-3 flex items-center gap-3" style={{ background: 'linear-gradient(to right, #F5EFE0, #EDE4D3)' }}>
+      <div className="px-4 py-3 flex items-center gap-3 mx-2" style={{ background: 'linear-gradient(to right, #F5EFE0, #EDE4D3)', borderRadius: 12, marginTop: 4 }}>
         <Volume2 size={16} style={{ color: '#8B7355' }} />
         <input
           type="range" min={0} max={100} value={volPercent}

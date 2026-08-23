@@ -154,6 +154,7 @@
   display: inline-block;
   transition: transform 0.3s ease, text-shadow 0.3s ease;
   font-weight: 900;
+  white-space: nowrap;
 }
 .hero-char:hover {
   transform: translateY(-4px) scale(1.05);

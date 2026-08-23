@@ -21,6 +21,7 @@ type PageTheme = 'healing' | 'diagnose' | 'home' | 'divination' | 'classics' | '
 interface PageContainerProps {
   theme?: PageTheme;
   className?: string;
+  noShanshui?: boolean;
   children: ReactNode;
 }
 
@@ -70,6 +71,7 @@ const THEME_SHANSHUI: Record<string, {
 export default function PageContainer({
   theme = 'healing',
   className = '',
+  noShanshui = false,
   children,
 }: PageContainerProps) {
   const ss = THEME_SHANSHUI[theme];
@@ -77,7 +79,7 @@ export default function PageContainer({
   return (
     <div className={`min-h-screen flex flex-col pb-20 relative ${THEME_BG[theme]} ${className}`}>
       {/* ═══ 国风山水楼台素描装饰层（最底层 z-0） ═══ */}
-      {ss && (
+      {ss && !noShanshui && (
         <>
           {/* 顶部：云雾松亭仙鹤 — 页面最上方 */}
           <div

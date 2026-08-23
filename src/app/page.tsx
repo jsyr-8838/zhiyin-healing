@@ -103,7 +103,7 @@ export default function LandingPage() {
             </div>
 
             {/* ═══ 核心标题 — 五行分色 ═══ */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl leading-[1.15] mb-4 tracking-wider" style={{ fontFamily: "'Noto Serif SC', 'Source Han Serif SC', serif" }}>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl leading-[1.2] mb-4 tracking-wider whitespace-nowrap" style={{ fontFamily: "'Noto Serif SC', 'Source Han Serif SC', serif" }}>
               <span className="hero-char" style={{ color: 'var(--wood)' }}>听</span>
               <span className="hero-char" style={{ color: 'var(--earth)' }}>五</span>
               <span className="hero-char" style={{ color: 'var(--water)' }}>音</span>
@@ -120,7 +120,7 @@ export default function LandingPage() {
               <div className="h-px w-16 md:w-24" style={{ background: 'linear-gradient(to right, transparent, var(--earth), transparent)' }} />
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl leading-[1.15] mb-8 tracking-wider" style={{ fontFamily: "'Noto Serif SC', 'Source Han Serif SC', serif" }}>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl leading-[1.2] mb-8 tracking-wider whitespace-nowrap" style={{ fontFamily: "'Noto Serif SC', 'Source Han Serif SC', serif" }}>
               <span className="hero-char" style={{ color: 'var(--metal)' }}>养</span>
               <span className="hero-char" style={{ color: 'var(--earth)' }}>五</span>
               <span className="hero-char" style={{ color: 'var(--wood)' }}>脏</span>
@@ -131,7 +131,7 @@ export default function LandingPage() {
             </h1>
 
             {/* 副标题 — 古法今释 */}
-            <p className="text-base md:text-lg max-w-xl mx-auto mb-10 leading-loose tracking-wider" style={{ color: 'var(--ink-light)', fontFamily: "'Noto Serif SC', serif", opacity: 0.75 }}>
+            <p className="text-sm md:text-lg max-w-xl mx-auto mb-10 leading-loose tracking-wider" style={{ color: 'var(--ink-light)', fontFamily: "'Noto Serif SC', serif", opacity: 0.75 }}>
               角音疏肝 · 徵音养心 · 宫音健脾 · 商音清肺 · 羽音固肾
             </p>
 
