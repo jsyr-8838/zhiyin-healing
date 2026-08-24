@@ -12,7 +12,7 @@ import {
   type WuYinKey, type BinauralValue, type ModulationValue,
 } from '@/lib/five-tone-data';
 import {
-  useAudioService, createWuyinTrack,
+  useAudioService, createWuyinTrack, type AudioTrack,
 } from '@/lib/audio-service';
 import {
   getTracksForTone, INSTRUMENT_INFO, type InstrumentType,
@@ -39,6 +39,7 @@ export default function WuYinPage() {
     play, pause, stop, closePlayer, togglePlay, setVolume,
     setBinauralBeat, setModulation,
     setTimer, startTimer, stopTimer, toggleLoop,
+    setQueue, setPlayMode, playQueue,
   } = useAudioService();
 
   const { hasDiagnosis, recommendedTone, primaryConstitution } = useHealingRecommendation();
@@ -106,11 +107,13 @@ export default function WuYinPage() {
       const freqData = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(freqData);
       let sum = 0;
-      for (let i = 0; i < 64; i++) sum += freqData[i];
-      const avg = sum / 64 / 255;
-      setAudioEnergy(prev => prev * 0.8 + avg * 0.2);
+      for (let i = 0; i < 128; i++) sum += freqData[i];
+      const avg = sum / 128 / 255;
+      // 增强能量响应：低音量时也有足够可视化驱动力
+      const boosted = Math.min(1, avg * 1.8);
+      setAudioEnergy(prev => prev * 0.75 + boosted * 0.25);
     };
-    energyIntervalRef.current = setInterval(poll, 80);
+    energyIntervalRef.current = setInterval(poll, 60);
     return () => {
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
     };
@@ -124,20 +127,34 @@ export default function WuYinPage() {
     const xwsTrack = xwsTracksCache.find(t => t.id === (trackId || selectedTrackId));
     let track;
     if (extTrack) {
-      // External track: use variantSrc since it's not in local catalog
       track = createWuyinTrack(toneKey, extTrack.src);
       track.id = extTrack.id;
       track.title = `${extTrack.title} — ${extTrack.subtitle}`;
       track.instrument = extTrack.instrument;
     } else if (xwsTrack) {
-      // XWS track: use src from adapter
       track = createWuyinTrack(toneKey, xwsTrack.src);
       track.id = xwsTrack.id;
       track.title = `${xwsTrack.title} — ${xwsTrack.subtitle}`;
     } else {
       track = createWuyinTrack(toneKey, undefined, trackId || selectedTrackId || undefined);
     }
+
+    // ★ 构建同音调播放队列，自动切歌
+    const queueTracks: AudioTrack[] = availableTracks.map(t => {
+      if (extendedTracks.find(et => et.id === t.id)) {
+        const tr = createWuyinTrack(toneKey, (t as any).src || t.src);
+        tr.id = t.id;
+        tr.title = `${t.title} — ${t.subtitle}`;
+        tr.instrument = t.instrument;
+        return tr;
+      }
+      return createWuyinTrack(toneKey, undefined, t.id);
+    });
+    const startIdx = Math.max(0, queueTracks.findIndex(t => t.id === track.id));
+    setPlayMode('sequence');
+    setQueue(queueTracks, startIdx);
     play(track);
+
     if (beat !== binauralBeat) setBinauralBeat(beat);
     if (mod !== modulation) setModulation(mod);
     setElapsedSeconds(0);

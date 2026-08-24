@@ -4,17 +4,18 @@ import { useState } from 'react';
 import BottomNav from '@/components/BottomNav';
 import HealingHeader from '@/components/layout/HealingHeader';
 import PageContainer from '@/components/layout/PageContainer';
-import { Sparkles, Calculator, Star, RefreshCw } from 'lucide-react';
+import { Sparkles, Calculator, Star, RefreshCw, Moon, Sun, BookOpen, Heart, Compass, Lightbulb } from 'lucide-react';
 import {
-  calculateNumerology, getStarRating, getNumberKeyword,
+  calculateNumerology, getStarRating, getNumberKeyword, isChineseName,
   type NumerologyProfile, type NumerologyResult,
 } from '@/lib/numerology-engine';
-import { getMeaning } from '@/lib/numerology-data';
+import { getMeaning, generateLifeGuidance, type LifeGuidance } from '@/lib/numerology-data';
 
 /* ================================================================
  *  灵数命理 · 宋韵宣纸风格
  *  基于 motivational-numerology (MIT, Sally Faubion & Olivier Guilieri)
  *  7大维度：品格·灵魂渴望·隐藏议程·态度·个性·命运·神圣使命
+ *  支持：中文名字(笔画) + 农历日期 + 自然语言解读
  * ================================================================ */
 
 // 数字对应的配色
@@ -29,7 +30,9 @@ export default function NumerologyPage() {
   const [birthMonth, setBirthMonth] = useState('');
   const [birthDay, setBirthDay] = useState('');
   const [birthYear, setBirthYear] = useState('');
+  const [isLunar, setIsLunar] = useState(false);
   const [profile, setProfile] = useState<NumerologyProfile | null>(null);
+  const [guidance, setGuidance] = useState<LifeGuidance | null>(null);
   const [calculated, setCalculated] = useState(false);
 
   const handleCalculate = () => {
@@ -39,13 +42,15 @@ export default function NumerologyPage() {
     const y = parseInt(birthYear, 10);
     if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > 2100) return;
 
-    const result = calculateNumerology({ name: name.trim(), birthMonth: m, birthDay: d, birthYear: y });
+    const result = calculateNumerology({ name: name.trim(), birthMonth: m, birthDay: d, birthYear: y, isLunar });
     setProfile(result);
+    setGuidance(generateLifeGuidance(result));
     setCalculated(true);
   };
 
   const handleReset = () => {
     setProfile(null);
+    setGuidance(null);
     setCalculated(false);
     setName('');
     setBirthMonth('');
@@ -54,6 +59,7 @@ export default function NumerologyPage() {
   };
 
   const canCalculate = name.trim() && birthMonth && birthDay && birthYear;
+  const chineseName = isChineseName(name);
 
   return (
     <PageContainer theme="healing">
@@ -64,8 +70,9 @@ export default function NumerologyPage() {
         <div className="flex items-start gap-2">
           <Sparkles size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#8B2500' }} />
           <p className="text-[10px] leading-relaxed" style={{ color: '#5C3015' }}>
-            灵数学（Numerology）源于古希腊数学家毕达哥拉斯，认为数字是宇宙的基础语言。
-            输入姓名和生日，计算7个生命维度数字，探索你的天赋、灵魂渴望与命运方向。
+            灵数学源于古希腊数学家毕达哥拉斯，认为数字是宇宙的语言。
+            输入姓名和生日，计算7个生命维度数字，探索你的天赋、内心渴望与人生方向。
+            支持中文名字（按笔画计算）和农历生日。
           </p>
         </div>
       </div>
@@ -77,13 +84,13 @@ export default function NumerologyPage() {
             {/* 姓名输入 */}
             <div>
               <label className="text-xs font-bold mb-2 block" style={{ color: '#5C1A00' }}>
-                姓名（英文或拼音）
+                姓名（中文或英文拼音）
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                placeholder="如：Zhang San"
+                placeholder="如：张三 或 Zhang San"
                 className="w-full px-4 py-3 rounded-xl text-sm outline-none transition"
                 style={{
                   background: '#FDF8F0',
@@ -92,7 +99,9 @@ export default function NumerologyPage() {
                 }}
               />
               <p className="text-[10px] mt-1" style={{ color: '#8B7355' }}>
-                请输入英文或拼音姓名，字母将按毕达哥拉斯体系转换为数字
+                {chineseName
+                  ? '检测到中文名字，将按笔画数计算灵数'
+                  : '支持中文名字或英文拼音，字母将按毕达哥拉斯体系转换为数字'}
               </p>
             </div>
 
@@ -101,6 +110,31 @@ export default function NumerologyPage() {
               <label className="text-xs font-bold mb-2 block" style={{ color: '#5C1A00' }}>
                 生日
               </label>
+              {/* 公历/农历切换 */}
+              <div className="flex gap-2 mb-2">
+                <button
+                  onClick={() => setIsLunar(false)}
+                  className="flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5"
+                  style={{
+                    background: !isLunar ? '#8B2500' : '#FDF8F0',
+                    color: !isLunar ? '#FDF8F0' : '#5C1A00',
+                    border: `1px solid ${!isLunar ? '#8B2500' : '#EDE4D3'}`,
+                  }}
+                >
+                  <Sun size={12} /> 公历
+                </button>
+                <button
+                  onClick={() => setIsLunar(true)}
+                  className="flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5"
+                  style={{
+                    background: isLunar ? '#8B2500' : '#FDF8F0',
+                    color: isLunar ? '#FDF8F0' : '#5C1A00',
+                    border: `1px solid ${isLunar ? '#8B2500' : '#EDE4D3'}`,
+                  }}
+                >
+                  <Moon size={12} /> 农历
+                </button>
+              </div>
               <div className="flex gap-2">
                 <div className="flex-1">
                   <input
@@ -139,6 +173,11 @@ export default function NumerologyPage() {
                   />
                 </div>
               </div>
+              {isLunar && (
+                <p className="text-[10px] mt-1" style={{ color: '#8B6914' }}>
+                  农历日期请直接输入数字，如腊月十五输入月=12日=15
+                </p>
+              )}
             </div>
 
             {/* 计算按钮 */}
@@ -162,13 +201,13 @@ export default function NumerologyPage() {
             <div className="rounded-xl p-4" style={{ background: '#FDF8F0', border: '1px solid #EDE4D3' }}>
               <h4 className="font-bold text-xs mb-2" style={{ color: '#5C1A00' }}>七维灵数说明</h4>
               <div className="space-y-1.5 text-[10px]" style={{ color: '#5C3015' }}>
-                <div><span className="font-bold" style={{ color: '#8B2500' }}>品格</span>：名字所有字母→外在表现与天赋</div>
-                <div><span className="font-bold" style={{ color: '#8B2500' }}>灵魂渴望</span>：元音→内心深处的渴望</div>
-                <div><span className="font-bold" style={{ color: '#8B2500' }}>隐藏议程</span>：辅音→潜意识行为模式</div>
-                <div><span className="font-bold" style={{ color: '#8B2500' }}>态度</span>：月+日→面对世界的自然态度</div>
-                <div><span className="font-bold" style={{ color: '#8B2500' }}>个性</span>：日→第一印象</div>
-                <div><span className="font-bold" style={{ color: '#8B2500' }}>命运</span>：月+日+年→一生总体方向</div>
-                <div><span className="font-bold" style={{ color: '#8B2500' }}>神圣使命</span>：命运+品格→灵性终极使命</div>
+                <div><span className="font-bold" style={{ color: '#8B2500' }}>品格</span>：名字所有字母/笔画 → 你外在的样子和天赋</div>
+                <div><span className="font-bold" style={{ color: '#8B2500' }}>灵魂渴望</span>：元音 → 你心里真正想要什么</div>
+                <div><span className="font-bold" style={{ color: '#8B2500' }}>隐藏议程</span>：辅音 → 你自己都没意识到的行为习惯</div>
+                <div><span className="font-bold" style={{ color: '#8B2500' }}>态度</span>：月+日 → 你面对世界时的自然反应</div>
+                <div><span className="font-bold" style={{ color: '#8B2500' }}>个性</span>：日 → 别人对你的第一印象</div>
+                <div><span className="font-bold" style={{ color: '#8B2500' }}>命运</span>：月+日+年 → 你这辈子的大方向</div>
+                <div><span className="font-bold" style={{ color: '#8B2500' }}>神圣使命</span>：命运+品格 → 你灵性上的终极任务</div>
               </div>
             </div>
           </div>
@@ -176,7 +215,7 @@ export default function NumerologyPage() {
       )}
 
       {/* 结果展示 */}
-      {calculated && profile && (
+      {calculated && profile && guidance && (
         <div className="px-4 pt-4 pb-28" style={{ background: 'linear-gradient(170deg, #FDF8F0 0%, #F5EFE0 50%, #EDE4D3 100%)' }}>
           {/* 重新计算按钮 */}
           <div className="flex justify-end mb-4">
@@ -188,6 +227,50 @@ export default function NumerologyPage() {
               <RefreshCw size={12} />
               重新计算
             </button>
+          </div>
+
+          {/* ===== 人生解读卡（自然语言） ===== */}
+          <div className="mb-5 rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, #5C1A00 0%, #8B2500 100%)' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <BookOpen size={16} style={{ color: '#E0C060' }} />
+              <h3 className="font-bold text-sm" style={{ color: '#E0C060' }}>你的人生解读</h3>
+            </div>
+            {/* 一句话总结 */}
+            <p className="text-sm leading-relaxed mb-4 font-bold" style={{ color: '#FDF8F0' }}>
+              {guidance.summary}
+            </p>
+            {/* 你是怎样的人 */}
+            <div className="mb-3 p-3 rounded-xl" style={{ background: 'rgba(253,248,240,0.08)' }}>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Heart size={12} style={{ color: '#E0C060' }} />
+                <span className="text-xs font-bold" style={{ color: '#E0C060' }}>你是怎样的人</span>
+              </div>
+              <p className="text-[11px] leading-relaxed" style={{ color: '#F5EFE0' }}>{guidance.whoYouAre}</p>
+            </div>
+            {/* 优势 */}
+            <div className="mb-3 p-3 rounded-xl" style={{ background: 'rgba(253,248,240,0.08)' }}>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Star size={12} style={{ color: '#E0C060' }} />
+                <span className="text-xs font-bold" style={{ color: '#E0C060' }}>你的优势</span>
+              </div>
+              <p className="text-[11px] leading-relaxed" style={{ color: '#F5EFE0' }}>{guidance.yourStrengths}</p>
+            </div>
+            {/* 注意 */}
+            <div className="mb-3 p-3 rounded-xl" style={{ background: 'rgba(253,248,240,0.08)' }}>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Compass size={12} style={{ color: '#E0C060' }} />
+                <span className="text-xs font-bold" style={{ color: '#E0C060' }}>需要注意</span>
+              </div>
+              <p className="text-[11px] leading-relaxed" style={{ color: '#F5EFE0' }}>{guidance.watchOut}</p>
+            </div>
+            {/* 下一步 */}
+            <div className="p-3 rounded-xl" style={{ background: 'rgba(224,192,96,0.12)', border: '1px solid rgba(224,192,96,0.2)' }}>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Lightbulb size={12} style={{ color: '#E0C060' }} />
+                <span className="text-xs font-bold" style={{ color: '#E0C060' }}>下一步怎么办</span>
+              </div>
+              <p className="text-[11px] leading-relaxed" style={{ color: '#F5EFE0' }}>{guidance.nextSteps}</p>
+            </div>
           </div>
 
           {/* 七维灵数卡片 */}
@@ -306,11 +389,11 @@ export default function NumerologyPage() {
           <div className="mt-4 rounded-xl p-4" style={{ background: '#FDF8F0', border: '1px solid #EDE4D3' }}>
             <h4 className="font-bold text-xs mb-2" style={{ color: '#5C1A00' }}>灵数学原理</h4>
             <p className="text-[10px] leading-relaxed" style={{ color: '#5C3015' }}>
-              灵数学（Numerology）源于古希腊数学家毕达哥拉斯的"万物皆数"哲学。
-              每个字母按 Pythagorean 体系对应数字 1-9，通过数字缩减法（反复相加至 1-9 或大师数字 11/22）获得核心频率。
-              元音揭示灵魂渴望，辅音映射潜意识，生日数字指向命运方向。
-              本工具基于 motivational-numerology 项目（MIT, Sally Faubion & Olivier Guilieri）改写。
-              灵数仅供娱乐和自我探索参考，不代表科学结论。
+              灵数学源于古希腊数学家毕达哥拉斯的"万物皆数"哲学。
+              每个字母或汉字笔画对应数字 1-9，通过数字缩减法获得核心频率。
+              元音揭示内心渴望，辅音映射潜意识，生日数字指向人生方向。
+              中文名字按康熙字典笔画计算，农历日期按实际数字计算。
+              灵数仅供自我探索参考，不代表科学结论。
             </p>
           </div>
         </div>

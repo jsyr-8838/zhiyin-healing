@@ -117,6 +117,21 @@ export const DESTINY_MEANINGS: Record<number, NumberMeaning> = {
   22: { number: 22, keyword: '大师之命', description: '你的命运是将宏大梦想变为现实。你的人生道路指向创造影响深远的成就。', strengths: '大师建造·宏大愿景', challenges: '需学会分解目标与自我关怀' },
 };
 
+// ===== 神圣使命 (Divine Purpose) — 命运+品格 =====
+export const DIVINE_MEANINGS: Record<number, NumberMeaning> = {
+  1: { number: 1, keyword: '灵性先驱', description: '你此生的灵性使命是成为先驱者。用你的勇气和独立精神，照亮前方的路，让更多人敢于走出舒适圈。你的存在本身，就是对"勇敢做自己"最好的示范。', strengths: '灵性独立·开拓引领', challenges: '需学会在孤独中找到力量' },
+  2: { number: 2, keyword: '灵性和事佬', description: '你此生的灵性使命是成为和平的桥梁。在冲突中找到共通点，在分歧中创造理解。你天生懂得如何让对立的两端握手，这是你送给世界的礼物。', strengths: '灵性协调·桥梁连结', challenges: '需学会在调和他人时照顾自己' },
+  3: { number: 3, keyword: '灵性表达者', description: '你此生的灵性使命是用创造力和表达力启发他人。无论写、说、画还是唱，你传达的不仅是信息，更是一种让人重新看见生活之美的力量。', strengths: '灵性创造·启发表达', challenges: '需学会把灵感落实到行动' },
+  4: { number: 4, keyword: '灵性建造者', description: '你此生的灵性使命是建造坚实的根基。不是靠华丽的语言，而是靠一步一个脚印的行动，让那些飘在空中的美好理想，真正在地上生根。', strengths: '灵性稳定·踏实建造', challenges: '需学会在秩序中留出弹性' },
+  5: { number: 5, keyword: '灵性探险家', description: '你此生的灵性使命是体验和分享自由。你走过的路、尝过的滋味、犯过的错，都是给后来人的地图。你的故事，就是你的教导。', strengths: '灵性自由·体验分享', challenges: '需学会在变化中保持内心的锚' },
+  6: { number: 6, keyword: '灵性守护者', description: '你此生的灵性使命是用爱守护。不是大爱无疆的那种空话，而是在你身边的人需要的时候，你确实伸出了手。你的温暖，改变过很多人的人生。', strengths: '灵性关爱·守护奉献', challenges: '需学会在付出中接受' },
+  7: { number: 7, keyword: '灵性智者', description: '你此生的灵性使命是探索和传递智慧。你不急于给出答案，而是帮助人们学会提问。你说的每一句真话，都在帮别人也对自己说真话。', strengths: '灵性洞察·智慧传递', challenges: '需学会把"知道"变成"做到"' },
+  8: { number: 8, keyword: '灵性丰盛者', description: '你此生的灵性使命是证明物质和灵性可以共存。你可以在世俗中成功，同时不失内心的清明。你的存在告诉人们：富足不是罪，贫穷也不是美德。', strengths: '灵性丰盛·物质平衡', challenges: '需学会用力量服务更大的善' },
+  9: { number: 9, keyword: '灵性圆满者', description: '你此生的灵性使命是活出圆满。不是完美，而是完整——好的坏的都经历过了，最后还能对这个世界说一句"谢谢你"。你的圆满，是给所有人的祝福。', strengths: '灵性圆满·博爱慈悲', challenges: '需学会放下，让它自然来去' },
+  11: { number: 11, keyword: '灵性灯塔', description: '你此生的灵性使命是成为光。你不需要做什么特别的事，你只需要活出你自己最真实的样子，就已经在照亮别人了。你的直觉和灵感，来自一个更高的地方。', strengths: '灵性觉醒·光照他人', challenges: '需学会保护自己的能量场' },
+  22: { number: 22, keyword: '灵性大师', description: '你此生的灵性使命是把梦想变成现实。不是小打小闹的梦想，是那种能改变很多人生活的宏大愿景。你拥有这个能力，关键是相信自己，然后开始第一步。', strengths: '大师建造·愿景落地', challenges: '需学会把大事拆成小事来做' },
+};
+
 // ===== 便捷查找 =====
 
 export function getMeaning(dimension: NumerologyDimension, value: number): NumberMeaning | undefined {
@@ -127,7 +142,40 @@ export function getMeaning(dimension: NumerologyDimension, value: number): Numbe
     attitude: ATTITUDE_MEANINGS,
     personality: PERSONALITY_MEANINGS,
     destiny: DESTINY_MEANINGS,
-    divine: DESTINY_MEANINGS, // 神圣使命复用命运数据
+    divine: DIVINE_MEANINGS,
   };
   return map[dimension]?.[value];
 }
+
+// ===== 自然语言解读生成器 =====
+// 把专业术语翻译成大白话，让体验者看得懂、知道下一步怎么做
+
+export interface LifeGuidance {
+  /** 一句话总结 */
+  summary: string;
+  /** 你是怎样的人 */
+  whoYouAre: string;
+  /** 你的优势在哪 */
+  yourStrengths: string;
+  /** 你需要注意什么 */
+  watchOut: string;
+  /** 下一步建议 */
+  nextSteps: string;
+}
+
+export function generateLifeGuidance(profile: NumerologyProfile): LifeGuidance {
+  const c = getMeaning('character', profile.character.value);
+  const s = getMeaning('soul', profile.soul.value);
+  const d = getMeaning('destiny', profile.destiny.value);
+  const dv = getMeaning('divine', profile.divine.value);
+  const a = getMeaning('attitude', profile.attitude.value);
+
+  return {
+    summary: `${c?.keyword || ''}的你，内心渴望${s?.keyword || ''}，人生方向指向${d?.keyword || ''}，灵性使命是成为${dv?.keyword || ''}。`,
+    whoYouAre: `从名字来看，你是一个${c?.description || '独特的人'}。别人第一眼看到的你，是${a?.keyword || '独特的'}。但你内心深处，其实${s?.description || '有着自己的渴望'}。`,
+    yourStrengths: `你最大的优势是${c?.strengths || ''}。在人际关系中，你天生${a?.strengths || '有自己的方式'}。这些不是学来的，是你与生俱来的。`,
+    watchOut: `需要注意的是${c?.challenges || ''}。内心层面，你容易${s?.challenges || '忽略自己的需求'}。知道了这些，就不用再走弯路。`,
+    nextSteps: `你的人生大方向是${d?.description || '不断成长的'}。具体来说，${dv?.description || '找到你的灵性使命'}。现在的你，可以尝试：多倾听内心的声音，少在意外界的评判；把手头的事做好，但别忘了抬头看路。幸福不是终点，是你走对方向时自然出现的感觉。`,
+  };
+}
+

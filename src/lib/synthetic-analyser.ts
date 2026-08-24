@@ -35,7 +35,14 @@ export class SyntheticAnalyser {
 
   private freqs: TrackFrequencies = { mainFreq: 432, subFreq: 528, overtoneFreq: 852 };
   private isPlaying = false;
-  private volume = 0.7;
+  private volume = 0.85;
+  // 可视化增益倍数：即使音量较低，可视化仍然保持足够的能量
+  private visBoost = 1.6;
+
+  /** 设置可视化增益（0.5~3.0，值越大可视化越强） */
+  setVisBoost(boost: number): void {
+    this.visBoost = Math.max(0.5, Math.min(3.0, boost));
+  }
 
   // 内部时钟（每帧递增）
   private frame = 0;
@@ -81,7 +88,8 @@ export class SyntheticAnalyser {
     }
 
     const t = this.frame * 0.016; // ~60fps 时间步长
-    const vol = this.volume;
+    const vol = Math.max(this.volume, 0.3); // 最低保留30%可视化能量
+    const vb = this.visBoost;
 
     // ── 节奏调制：模拟音乐呼吸感 ──
     // 慢速呼吸（0.15Hz = ~6.7秒周期）+ 中速脉动（0.5Hz = 2秒周期）
@@ -93,30 +101,30 @@ export class SyntheticAnalyser {
 
     // ── 1. 低频环境噪声（bins 0-8，模拟低频氛围）──
     for (let i = 0; i < 8 && i < len; i++) {
-      const baseNoise = 15 + 10 * Math.sin(t * 0.3 + i * 0.5);
-      array[i] = Math.max(0, Math.min(255, baseNoise * vol * slowPulse));
+      const baseNoise = 20 + 12 * Math.sin(t * 0.3 + i * 0.5);
+      array[i] = Math.max(0, Math.min(255, baseNoise * vol * slowPulse * vb));
     }
 
     // ── 2. 主频率峰值（高斯钟形）──
-    this.addPeak(array, len, this.mainBin, 200, 3, vol * slowPulse * fastPulse, t);
+    this.addPeak(array, len, this.mainBin, 220, 3, vol * slowPulse * fastPulse * vb, t);
     // 主频泛音（2x, 3x, 4x, 5x）
-    this.addPeak(array, len, this.mainBin * 2, 90, 4, vol * slowPulse * fastPulse * 0.7, t);
-    this.addPeak(array, len, this.mainBin * 3, 50, 5, vol * slowPulse * fastPulse * 0.5, t);
-    this.addPeak(array, len, this.mainBin * 4, 30, 6, vol * slowPulse * fastPulse * 0.35, t);
-    this.addPeak(array, len, this.mainBin * 5, 20, 7, vol * slowPulse * fastPulse * 0.25, t);
+    this.addPeak(array, len, this.mainBin * 2, 100, 4, vol * slowPulse * fastPulse * 0.7 * vb, t);
+    this.addPeak(array, len, this.mainBin * 3, 55, 5, vol * slowPulse * fastPulse * 0.5 * vb, t);
+    this.addPeak(array, len, this.mainBin * 4, 35, 6, vol * slowPulse * fastPulse * 0.35 * vb, t);
+    this.addPeak(array, len, this.mainBin * 5, 25, 7, vol * slowPulse * fastPulse * 0.25 * vb, t);
 
     // ── 3. 副频率峰值 ──
-    this.addPeak(array, len, this.subBin, 160, 3, vol * fastPulse, t);
-    this.addPeak(array, len, this.subBin * 2, 70, 4, vol * fastPulse * 0.6, t);
-    this.addPeak(array, len, this.subBin * 3, 35, 5, vol * fastPulse * 0.4, t);
+    this.addPeak(array, len, this.subBin, 180, 3, vol * fastPulse * vb, t);
+    this.addPeak(array, len, this.subBin * 2, 80, 4, vol * fastPulse * 0.6 * vb, t);
+    this.addPeak(array, len, this.subBin * 3, 40, 5, vol * fastPulse * 0.4 * vb, t);
 
     // ── 4. 泛音频率峰值 ──
-    this.addPeak(array, len, this.overtoneBin, 130, 3, vol * slowPulse, t);
-    this.addPeak(array, len, this.overtoneBin * 2, 55, 4, vol * slowPulse * 0.5, t);
+    this.addPeak(array, len, this.overtoneBin, 150, 3, vol * slowPulse * vb, t);
+    this.addPeak(array, len, this.overtoneBin * 2, 65, 4, vol * slowPulse * 0.5 * vb, t);
 
     // ── 5. 随机微抖动（模拟自然声学波动）──
     for (let i = 0; i < len; i++) {
-      const flutter = (Math.random() - 0.5) * 8 * vol;
+      const flutter = (Math.random() - 0.5) * 10 * vol;
       array[i] = Math.max(0, Math.min(255, array[i] + flutter));
     }
 

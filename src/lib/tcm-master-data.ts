@@ -1,6 +1,6 @@
 // tcm-master-data.ts — 中医通 · 游戏化学习平台完整数据源
 // 涵盖：阴阳五行、藏象、气血津液、经络、病因病机、诊断、中药、方剂、针灸推拿、养生
-// 含：20级等级体系、13修炼殿堂、49+知识章节、闯关题库、Boss数据、成就数据
+// 含：20级等级体系、13修炼秘境、49+知识章节、闯关题库、Boss数据、成就数据
 
 // ═══════════════════════════════════════
 // 类型定义
@@ -43,7 +43,7 @@ export interface TcmQuizQuestion {
   explain: string;
 }
 
-/** 修炼殿堂 */
+/** 修炼秘境 */
 export interface TcmZone {
   id: string;
   name: string;
@@ -99,17 +99,17 @@ export interface TcmTip {
 export const TCM_LEVELS: TcmLevel[] = [
   { lv: 1,  title: '初学者',     xpRequired: 0,     reward: '解锁阴阳基础' },
   { lv: 2,  title: '入门弟子',   xpRequired: 100,   reward: '+1❤️生命' },
-  { lv: 3,  title: '医道学徒',   xpRequired: 250,   reward: '解锁五行殿堂' },
+  { lv: 3,  title: '医道学徒',   xpRequired: 250,   reward: '解锁五行之境' },
   { lv: 4,  title: '草药学生',   xpRequired: 450,   reward: '+50💎' },
-  { lv: 5,  title: '岐黄门生',   xpRequired: 700,   reward: '解锁藏象殿堂' },
+  { lv: 5,  title: '岐黄门生',   xpRequired: 700,   reward: '解锁藏象秘境' },
   { lv: 6,  title: '杏林学子',   xpRequired: 1000,  reward: '+2❤️生命' },
-  { lv: 7,  title: '悬壶学人',   xpRequired: 1400,  reward: '解锁经络殿堂' },
+  { lv: 7,  title: '悬壶学人',   xpRequired: 1400,  reward: '解锁经络通途' },
   { lv: 8,  title: '仁心医者',   xpRequired: 1900,  reward: '+100💎' },
-  { lv: 9,  title: '国医传承',   xpRequired: 2500,  reward: '解锁病因殿堂' },
-  { lv: 10, title: '杏林高手',   xpRequired: 3200,  reward: '解锁诊断殿堂' },
-  { lv: 11, title: '医道精英',   xpRequired: 4000,  reward: '解锁中药殿堂' },
-  { lv: 12, title: '国手门徒',   xpRequired: 5000,  reward: '解锁方剂殿堂' },
-  { lv: 13, title: '医林大家',   xpRequired: 6200,  reward: '解锁针灸殿堂' },
+  { lv: 9,  title: '国医传承',   xpRequired: 2500,  reward: '解锁病因探秘' },
+  { lv: 10, title: '杏林高手',   xpRequired: 3200,  reward: '解锁诊断之术' },
+  { lv: 11, title: '医道精英',   xpRequired: 4000,  reward: '解锁百草药圃' },
+  { lv: 12, title: '国手门徒',   xpRequired: 5000,  reward: '解锁方剂之道' },
+  { lv: 13, title: '医林大家',   xpRequired: 6200,  reward: '解锁针灸玄门' },
   { lv: 14, title: '岐黄圣手',   xpRequired: 7500,  reward: '+200💎' },
   { lv: 15, title: '中医大师',   xpRequired: 9000,  reward: '解锁Boss终极战' },
   { lv: 16, title: '国医宗师',   xpRequired: 11000, reward: '特殊成就头衔' },
@@ -120,27 +120,27 @@ export const TCM_LEVELS: TcmLevel[] = [
 ];
 
 // ═══════════════════════════════════════
-// 修炼地图：各殿堂
+// 修炼地图：各秘境
 // ═══════════════════════════════════════
 
 export const TCM_ZONES: TcmZone[] = [
   {
-    id: 'yinyang',   name: '阴阳殿堂',   icon: '☯️',
+    id: 'yinyang',   name: '阴阳之道',   icon: '☯️',
     element: 'water', levelRequired: 1,
     desc: '探索阴阳对立统一之道，万物之纲纪',
-    chapters: ['yinyang-basic','yinyang-law','yinyang-apply']
+    chapters: ['yinyang-basic','yinyang-law','yinyang-apply','yinyang-clinic']
   },
   {
-    id: 'wuxing',    name: '五行殿堂',   icon: '🌊',
+    id: 'wuxing',    name: '五行之境',   icon: '🌊',
     element: 'wood',  levelRequired: 3,
     desc: '木火土金水，生克制化，五行相通',
-    chapters: ['wuxing-basic','wuxing-sheng','wuxing-ke','wuxing-apply']
+    chapters: ['wuxing-basic','wuxing-sheng','wuxing-ke','wuxing-apply','wuxing-clinic']
   },
   {
-    id: 'zangfu',    name: '藏象殿堂',   icon: '❤️',
+    id: 'zangfu',    name: '藏象秘境',   icon: '❤️',
     element: 'fire',  levelRequired: 5,
     desc: '五脏六腑，奇恒之腑，内外相应',
-    chapters: ['five-zang','six-fu','qi-heng','zangfu-relation']
+    chapters: ['five-zang','six-fu','qi-heng','zangfu-relation','zangfu-organ-clock']
   },
   {
     id: 'qixue',     name: '气血津液',   icon: '💧',
@@ -149,58 +149,58 @@ export const TCM_ZONES: TcmZone[] = [
     chapters: ['qi-basic','blood-basic','jinye-basic','essence']
   },
   {
-    id: 'jingluoI',  name: '经络殿堂·上', icon: '⚡',
+    id: 'jingluoI',  name: '经络通途·上', icon: '⚡',
     element: 'wood',  levelRequired: 7,
     desc: '十二正经，人体经脉之海',
-    chapters: ['jl-basic','jl-12jing','jl-liuhe']
+    chapters: ['jl-basic','jl-12jing','jl-liuhe','jl-meridian-clock']
   },
   {
-    id: 'jingluoII', name: '经络殿堂·下', icon: '🌀',
+    id: 'jingluoII', name: '经络通途·下', icon: '🌀',
     element: 'metal', levelRequired: 7,
     desc: '奇经八脉，别络经筋，腧穴入门',
     chapters: ['jl-qijing','jl-shuxue','jl-apply']
   },
   {
-    id: 'bingyin',   name: '病因殿堂',   icon: '🌪️',
+    id: 'bingyin',   name: '病因探秘',   icon: '🌪️',
     element: 'metal', levelRequired: 9,
     desc: '六淫七情饮食劳逸，致病之源',
     chapters: ['liuyin','qiqing','other-cause','pathogenesis']
   },
   {
-    id: 'diagnosis', name: '诊断殿堂',   icon: '🔍',
+    id: 'diagnosis', name: '诊断之术',   icon: '🔍',
     element: 'earth', levelRequired: 10,
     desc: '望闻问切四诊，辨证论治之基',
-    chapters: ['four-exams','bianzheng','pulse','tongue']
+    chapters: ['four-exams','bianzheng','pulse','tongue','diagnosis-clinic']
   },
   {
-    id: 'zhongyao',  name: '中药殿堂',   icon: '🌿',
+    id: 'zhongyao',  name: '百草药圃',   icon: '🌿',
     element: 'wood',  levelRequired: 11,
     desc: '本草纲目，四气五味，君臣佐使',
-    chapters: ['herb-basic','herb-nature','herb-category','herb-famous']
+    chapters: ['herb-basic','herb-nature','herb-category','herb-famous','herb-processing']
   },
   {
-    id: 'fangjI',    name: '方剂殿堂·上', icon: '⚗️',
+    id: 'fangjI',    name: '方剂之道·上', icon: '⚗️',
     element: 'fire',  levelRequired: 12,
     desc: '经典名方，解表剂、泻下剂、和解剂',
     chapters: ['formula-basic','jiebiaoJ','xiaxia','hejie']
   },
   {
-    id: 'fangjII',   name: '方剂殿堂·下', icon: '🏺',
+    id: 'fangjII',   name: '方剂之道·下', icon: '🏺',
     element: 'earth', levelRequired: 12,
     desc: '清热·祛湿·温里·补益·安神名方',
     chapters: ['qingre','qushi','wenli','buyi']
   },
   {
-    id: 'zhenjiu',   name: '针灸殿堂',   icon: '🪡',
+    id: 'zhenjiu',   name: '针灸玄门',   icon: '🪡',
     element: 'metal', levelRequired: 13,
     desc: '经络腧穴，针法灸法，临床应用',
-    chapters: ['acupoints','needling','moxibustion','acupuncture-apply']
+    chapters: ['acupoints','needling','moxibustion','acupuncture-apply','acupuncture-clinic']
   },
   {
-    id: 'yangsheng', name: '养生殿堂',   icon: '🧘',
+    id: 'yangsheng', name: '养生之道',   icon: '🧘',
     element: 'earth', levelRequired: 1,
     desc: '天人合一，四时养生，身心和谐',
-    chapters: ['yangsheng-basic','four-season','diet-therapy','qigong']
+    chapters: ['yangsheng-basic','four-season','diet-therapy','qigong','yangsheng-emotion']
   },
 ];
 
@@ -2320,6 +2320,405 @@ export const TCM_CHAPTERS: Record<string, TcmChapter> = {
     ]
   },
 
+  /* ── 阴阳临床实战 ── */
+  'yinyang-clinic': {
+    id: 'yinyang-clinic', name: '阴阳实战', icon: '🏥', zone: 'yinyang', xpReward: 45, element: 'water',
+    content: {
+      title: '阴阳学说临床实战', subtitle: '从理论到临床，阴阳辨证真实案例', category: '哲学基础',
+      sections: [
+        { heading: '📋 阴阳辨证的临床思维', text: `阴阳辨证是八纲辨证的总纲，临床中一切辨证最终都要归结到阴阳。
+
+**第一步：分阴阳**——先判断总体是阴证还是阳证。阳证多见热、实、表；阴证多见寒、虚、里。
+
+**第二步：定虚实**——在阴阳基础上进一步分虚实。阳虚则寒（虚寒），阴虚则热（虚热）；阳盛则热（实热），阴盛则寒（实寒）。
+
+**第三步：明病位**——结合脏腑经络，确定病变所在。
+
+**第四步：立治法**——损其有余，补其不足，以平为期。` },
+        { heading: '🌡️ 虚寒与虚热的鉴别', cards: [
+          { icon:'🥶', name:'阳虚（虚寒）', desc:'畏寒肢冷、面色苍白、小便清长、舌淡胖苔白、脉沉迟无力。治宜温补阳气，"益火之源以消阴翳"' },
+          { icon:'🥵', name:'阴虚（虚热）', desc:'五心烦热、潮热盗汗、口干咽燥、舌红少苔、脉细数。治宜滋阴降火，"壮水之主以制阳光"' },
+          { icon:'🔥', name:'阳盛（实热）', desc:'壮热面赤、烦渴引饮、大便秘结、舌红苔黄、脉洪数有力。治宜清热泻火，"热者寒之"' },
+          { icon:'❄️', name:'阴盛（实寒）', desc:'畏寒肢冷、腹冷痛、下利清谷、舌淡苔白滑、脉沉紧。治宜温中散寒，"寒者热之"' },
+        ]},
+        { heading: '🩺 典型案例', text: `**案例一：阳虚水泛**
+患者男65岁，畏寒肢冷十余年，下肢浮肿，夜尿频多，舌淡胖有齿痕，脉沉细。
+分析：肾阳虚衰，不能化气行水，水液泛溢肌肤。
+治法：温肾助阳，化气行水。方用真武汤（附子、茯苓、白术、生姜、白芍）。
+
+**案例二：阴虚火旺**
+患者女48岁，潮热盗汗半年，五心烦热，口干不欲饮，舌红少苔，脉细数。
+分析：肾阴不足，不能制阳，虚火上炎。
+治法：滋阴降火。方用知柏地黄丸（知母、黄柏+六味地黄丸）。` },
+        { heading: '⚠️ 临床注意事项', list: [
+          '阴阳辨证要先别总纲，再分寒热虚实',
+          '注意阴阳转化——久寒可以化热，久热可以转寒',
+          '阳虚日久可致阴虚，阴虚日久亦可损及阳——阴阳互损',
+          '用药须中病即止，过用温热药伤阴，过用寒凉药伤阳',
+        ]},
+      ],
+      highlight: { icon: '🔑', text: '阴阳辨证四步法：分阴阳→定虚实→明病位→立治法。记住"益火之源以消阴翳，壮水之主以制阳光"。' }
+    },
+    quiz: [
+      { q: '"益火之源以消阴翳"治法适用于？', opts: ['阴虚火旺', '阳虚则寒', '阴盛则寒', '阳盛则热'], ans: 1, explain: '此为王冰所注——阳虚阴盛者，补阳以消阴寒。' },
+      { q: '真武汤主治的证候是？', opts: ['阴虚火旺', '阳虚水泛', '气血两虚', '肝郁脾虚'], ans: 1, explain: '真武汤温肾助阳、化气行水——治阳虚水泛。' },
+      { q: '知柏地黄丸适用于？', opts: ['肾阳虚', '肾阴虚火旺', '脾胃虚寒', '肝气郁结'], ans: 1, explain: '六味地黄丸加知母黄柏——滋阴降火，治阴虚火旺。' },
+      { q: '阴阳互损最终可导致？', opts: ['阴阳两虚', '阳气偏盛', '阴气偏盛', '阴阳不交'], ans: 0, explain: '阳损及阴、阴损及阳——最终阴阳两虚。' },
+    ]
+  },
+
+  /* ── 五行临床应用 ── */
+  'wuxing-clinic': {
+    id: 'wuxing-clinic', name: '五行实战', icon: '🌿', zone: 'wuxing', xpReward: 50, element: 'wood',
+    content: {
+      title: '五行学说临床应用', subtitle: '五行生克在辨证论治中的实战运用', category: '哲学基础',
+      sections: [
+        { heading: '🔄 五行传变规律', text: `五行学说指导临床，核心在于理解疾病传变规律。
+
+**相生传变**——"母病及子"和"子盗母气"
+• 母病及子：如肾（水）虚导致肝（木）虚，即"水不涵木"
+• 子盗母气：如心（火）亢导致肝（木）虚，即"子盗母气"
+
+**相克传变**——"相乘"和"相侮"
+• 相乘（过度克制）：如肝（木）气郁结乘脾（土），即"木旺乘土"
+• 相侮（反向克制）：如脾（土）虚不能制水，反被肾（水）侮，即"土虚水侮"` },
+        { heading: '🫀 五脏与五行对应', table: {
+          headers: ['五行', '脏（里）', '腑（表）', '五官', '五体', '五志', '五色', '五味', '季节'],
+          rows: [
+            ['木', '肝', '胆', '目', '筋', '怒', '青', '酸', '春'],
+            ['火', '心', '小肠', '舌', '脉', '喜', '赤', '苦', '夏'],
+            ['土', '脾', '胃', '口', '肉', '思', '黄', '甘', '长夏'],
+            ['金', '肺', '大肠', '鼻', '皮毛', '悲', '白', '辛', '秋'],
+            ['水', '肾', '膀胱', '耳', '骨', '恐', '黑', '咸', '冬'],
+          ]
+        }},
+        { heading: '💊 五行治则治法', cards: [
+          { icon:'🤱', name:'虚则补其母', desc:'如肺（金）虚补脾（土）——"培土生金"法。脾为肺之母，补脾以益肺' },
+          { icon:'⚔️', name:'实则泻其子', desc:'如肝（木）实泻心（火）——"泻心以泻肝"法。心为肝之子，泻子以泻母' },
+          { icon:'🌱', name:'抑强扶弱', desc:'如"抑木扶土"——肝旺乘脾时，疏肝健脾，使木土和谐' },
+          { icon:'⚖️', name:'佐金平木', desc:'肺（金）虚不能制肝（木），肝木偏亢——补肺平肝，使金能制木' },
+        ]},
+        { heading: '🩺 临床案例', text: `**案例：木旺乘土（肝郁脾虚）**
+患者女42岁，两胁胀痛，腹胀便溏，情绪急躁，舌淡红苔白，脉弦细。
+分析：肝气郁结（木旺），横逆犯脾（乘土），脾失健运。
+治法：疏肝健脾——逍遥散（柴胡、当归、白芍、白术、茯苓、甘草、薄荷、生姜）。
+方解：柴胡疏肝解郁（抑木），白术茯苓健脾（扶土），当归白芍养血柔肝。` },
+      ],
+      highlight: { icon: '🔑', text: '五行治法口诀：虚则补其母，实则泻其子。培土生金、抑木扶土、佐金平木、泻南补北——五行在方剂中的精妙运用。' }
+    },
+    quiz: [
+      { q: '"水不涵木"指哪种传变？', opts: ['母病及子', '子盗母气', '相乘', '相侮'], ans: 0, explain: '肾（水）为肝（木）之母，肾虚不能滋养肝——母病及子。' },
+      { q: '逍遥散的治法体现了？', opts: ['培土生金', '抑木扶土', '佐金平木', '泻南补北'], ans: 1, explain: '逍遥散疏肝（抑木）健脾（扶土）——治木旺乘土。' },
+      { q: '"培土生金"法适用于？', opts: ['肝郁脾虚', '肺虚脾弱', '心肾不交', '肝火上炎'], ans: 1, explain: '脾（土）为肺（金）之母——补脾以益肺。' },
+      { q: '五志中"恐"对应的脏是？', opts: ['肝', '心', '脾', '肾'], ans: 3, explain: '肾在志为恐——恐伤肾，肾主恐惧。' },
+    ]
+  },
+
+  /* ── 脏腑子午流注 ── */
+  'zangfu-organ-clock': {
+    id: 'zangfu-organ-clock', name: '脏腑时辰', icon: '🕐', zone: 'zangfu', xpReward: 50, element: 'fire',
+    content: {
+      title: '脏腑与时辰养生', subtitle: '子午流注——十二脏腑的当令时辰', category: '藏象学说',
+      sections: [
+        { heading: '🕐 子午流注概述', text: `子午流注是中医时间医学的重要内容，认为人体气血在十二经脉中流注有固定时辰，每个脏腑都有当令（气血最旺盛）的时间。
+
+一天十二时辰，对应十二经脉，气血流注周而复始，如环无端。掌握脏腑当令时辰，可以指导日常养生——在脏腑旺盛时顺势调养，在脏腑衰弱时注意休息。` },
+        { heading: '⏰ 十二时辰对应表', table: {
+          headers: ['时辰', '时间', '当令经脉', '脏腑', '养生要点'],
+          rows: [
+            ['子', '23-1点', '足少阳胆经', '胆', '宜入睡，利于胆汁代谢'],
+            ['丑', '1-3点', '足厥阴肝经', '肝', '深度睡眠，肝血归藏解毒'],
+            ['寅', '3-5点', '手太阴肺经', '肺', '肺经当令，宜安睡养肺气'],
+            ['卯', '5-7点', '手阳明大肠经', '大肠', '宜起床排便，排肠中废物'],
+            ['辰', '7-9点', '足阳明胃经', '胃', '宜吃早餐，胃经当令消化好'],
+            ['巳', '9-11点', '足太阴脾经', '脾', '宜运化吸收，脾主运化水谷'],
+            ['午', '11-13点', '手少阴心经', '心', '宜午餐后小憩，养心神'],
+            ['未', '13-15点', '手太阳小肠经', '小肠', '小肠泌别清浊，吸收营养'],
+            ['申', '15-17点', '足太阳膀胱经', '膀胱', '宜多饮水，膀胱排尿排毒'],
+            ['酉', '17-19点', '足少阴肾经', '肾', '宜休息养肾，肾藏精'],
+            ['戌', '19-21点', '手厥阴心包经', '心包', '宜散步放松，心包代心受邪'],
+            ['亥', '21-23点', '手少阳三焦经', '三焦', '宜安睡，三焦通调水道'],
+          ]
+        }},
+        { heading: '💡 时辰养生要点', list: [
+          '子时（23点前入睡）：胆经当令，"凡十一藏取决于胆"，早睡养胆气',
+          '丑时深睡：肝经当令，肝脏解毒修复，熬夜最伤肝',
+          '辰时吃好早餐：胃经当令，消化吸收最佳时间',
+          '午时小憩：心经当令，"子午觉"养心安神',
+          '酉时养肾：肾经当令，适当休息，不可过度劳累',
+        ]},
+        { heading: '🔗 子午流注的临床意义', text: `**指导用药**：根据药物归经和脏腑当令时辰选择服药时间，如补肾药宜在酉时（17-19点）服用。
+
+**指导针灸**：子午流注针法以时间为主要条件选穴开穴，"按时取穴"。
+
+**指导养生**：顺应脏腑气血盛衰节律，在当令时辰调养对应脏腑，事半功倍。` },
+      ],
+      highlight: { icon: '🕐', text: '记住关键时辰：子时必睡（养胆），丑时深睡（养肝），辰时好早餐（养胃），午时小憩（养心），酉时静养（养肾）。' }
+    },
+    quiz: [
+      { q: '子时（23-1点）当令的是？', opts: ['肝经', '胆经', '胃经', '心经'], ans: 1, explain: '子时足少阳胆经当令——"凡十一藏取决于胆"。' },
+      { q: '辰时（7-9点）宜做什么？', opts: ['入睡', '吃早餐', '运动', '冥想'], ans: 1, explain: '辰时胃经当令——宜吃早餐，消化吸收最佳。' },
+      { q: '补肾药宜在哪个时辰服用？', opts: ['卯时', '午时', '酉时', '亥时'], ans: 2, explain: '酉时（17-19点）肾经当令——服药效果最佳。' },
+      { q: '"子午觉"指的是？', opts: ['子时和午时各睡', '只睡子时', '只睡午时', '整天睡'], ans: 0, explain: '子时熟睡养胆，午时小憩养心——子午觉养生法。' },
+    ]
+  },
+
+  /* ── 经络子午流注 ── */
+  'jl-meridian-clock': {
+    id: 'jl-meridian-clock', name: '经络流注', icon: '⏰', zone: 'jingluoI', xpReward: 50, element: 'wood',
+    content: {
+      title: '十二经脉气血流注', subtitle: '肺大胃脾心小肠，膀肾包焦胆肝乡', category: '经络学说',
+      sections: [
+        { heading: '🔄 气血流注顺序', text: `十二经脉气血流注有固定顺序，起于手太阴肺经，终于足厥阴肝经，再回到肺经，如环无端。
+
+**流注口诀**："肺大胃脾心小肠，膀肾包焦胆肝乡"
+
+手太阴肺经（寅）→ 手阳明大肠经（卯）→ 足阳明胃经（辰）→ 足太阴脾经（巳）→ 手少阴心经（午）→ 手太阳小肠经（未）→ 足太阳膀胱经（申）→ 足少阴肾经（酉）→ 手厥阴心包经（戌）→ 手少阳三焦经（亥）→ 足少阳胆经（子）→ 足厥阴肝经（丑）→ 回到肺经` },
+        { heading: '📊 流注规律', list: [
+          '从肺经开始：肺朝百脉，气血由此开始流注全身',
+          '表里相接：阴经接阳经（肺→大肠），阳经接阴经（脾→心）',
+          '同名经相接：手经接足经（大肠→胃），足经接手经（膀胱→肾）',
+          '昼夜循环：24小时气血在十二经脉中循环一周',
+        ]},
+        { heading: '🧭 走向规律', text: `**手三阴**：从胸走手（肺、心包、心经）
+**手三阳**：从手走头（大肠、三焦、小肠经）
+**足三阳**：从头走足（胃、胆、膀胱经）
+**足三阴**：从足走腹（脾、肝、肾经）
+
+口诀："手之三阴从胸走手，手之三阳从手走头，足之三阳从头走足，足之三阴从足走腹。"` },
+        { heading: '🏥 流注的临床应用', text: `**诊断**：根据发病时辰判断病在何经。如凌晨1-3点易醒，考虑肝经问题。
+
+**治疗**：子午流注针法——按气血盛衰时辰取穴，"按时开穴"。
+
+**养生**：在气血最旺时辰调养对应经脉，如寅时（3-5点）不宜剧烈运动，因肺经当令需养肺气。` },
+      ],
+      highlight: { icon: '⏰', text: '流注口诀：肺大胃脾心小肠，膀肾包焦胆肝乡。走向口诀：手三阴胸走手，手三阳手走头，足三阳头走足，足三阴足走腹。' }
+    },
+    quiz: [
+      { q: '气血流注起于哪条经？', opts: ['手阳明大肠经', '手太阴肺经', '足阳明胃经', '足太阴脾经'], ans: 1, explain: '起于手太阴肺经——肺朝百脉，为气血流注之始。' },
+      { q: '足三阴经的走向是？', opts: ['从胸走手', '从手走头', '从头走足', '从足走腹'], ans: 3, explain: '足三阴从足走腹——脾、肝、肾经。' },
+      { q: '手三阳经的走向是？', opts: ['从胸走手', '从手走头', '从头走足', '从足走腹'], ans: 1, explain: '手三阳从手走头——大肠、三焦、小肠经。' },
+      { q: '凌晨1-3点易醒考虑哪经问题？', opts: ['肺经', '肝经', '胆经', '胃经'], ans: 1, explain: '丑时（1-3点）肝经当令——此时易醒需考虑肝经。' },
+    ]
+  },
+
+  /* ── 诊断临床实战 ── */
+  'diagnosis-clinic': {
+    id: 'diagnosis-clinic', name: '诊断实战', icon: '🔬', zone: 'diagnosis', xpReward: 55, element: 'earth',
+    content: {
+      title: '四诊合参临床实战', subtitle: '从理论到病案——真实辨证思维训练', category: '诊断学',
+      sections: [
+        { heading: '🩺 四诊合参的思维方式', text: `四诊合参不是简单地把四个诊法的结果拼在一起，而是要有主次、有逻辑地综合分析。
+
+**望诊为先**：患者一进门，先望其神、色、形、态。望神是第一位的——"得神者昌，失神者亡"。
+
+**闻诊辅助**：听声音（语声、呼吸、咳嗽）、嗅气味（口气、体味），为辨证提供佐证。
+
+**问诊为本**：十问歌（寒热汗头身、便食胸耳目、渴旧因）是收集信息的主要手段。
+
+**切诊印证**：脉诊和按诊，印证前三诊的判断，确定病性和病位。` },
+        { heading: '📋 八纲辨证流程', text: `**第一步：辨表里**——病在表还是里？判断病位深浅。
+• 表证：发热恶寒同时并见，脉浮，头痛身痛
+• 里证：但热不寒或但寒不热，脉沉，脏腑症状
+
+**第二步：辨寒热**——病性属寒还是热？
+• 寒证：恶寒喜暖，面色白，口不渴，小便清长，舌淡苔白，脉迟
+• 热证：发热喜凉，口渴饮冷，面红目赤，小便短赤，舌红苔黄，脉数
+
+**第三步：辨虚实**——正气与邪气的盛衰？
+• 虚证：久病体质虚弱，精神萎靡，脉虚无力
+• 实证：新病体质未衰，精神亢奋，脉实有力
+
+**第四步：归阴阳**——总括前三步，确定证候性质。` },
+        { heading: '🔍 常见证型鉴别', table: {
+          headers: ['证型', '寒热', '虚实', '表里', '核心症状', '舌脉', '治法'],
+          rows: [
+            ['风寒表证', '寒', '实', '表', '恶寒重发热轻、头身痛', '舌淡苔薄白、脉浮紧', '辛温解表'],
+            ['风热表证', '热', '实', '表', '发热重恶寒轻、咽痛', '舌红苔薄黄、脉浮数', '辛凉解表'],
+            ['里实证', '热', '实', '里', '壮热便秘腹痛拒按', '舌红苔黄厚、脉沉实', '泻热通便'],
+            ['里虚寒证', '寒', '虚', '里', '畏寒肢冷腹隐痛喜温', '舌淡苔白、脉沉迟无力', '温中散寒'],
+            ['阴虚证', '热', '虚', '里', '五心烦热潮热盗汗', '舌红少苔、脉细数', '滋阴降火'],
+          ]
+        }},
+        { heading: '🩺 病案分析', text: `**病案**
+患者男35岁，发热3天，体温38.5°C，恶寒，无汗，头痛身痛，鼻塞流清涕，咳嗽痰白，舌淡红苔薄白，脉浮紧。
+
+**辨证分析**：
+- 望诊：舌淡红苔薄白——提示寒证
+- 问诊：发热恶寒并见、无汗——表证；痰白清稀——寒证
+- 切诊：脉浮紧——浮主表，紧主寒
+
+**辨证**：风寒表实证。
+**治法**：辛温解表，宣肺散寒。
+**方药**：麻黄汤（麻黄、桂枝、杏仁、甘草）。` },
+      ],
+      highlight: { icon: '🔬', text: '四诊合参口诀：望闻问切依次行，先辨表里定病位，再别寒热明病性，后分虚实断邪正，最终归阴阳立治法。' }
+    },
+    quiz: [
+      { q: '发热恶寒同时并见说明？', opts: ['里证', '表证', '寒证', '热证'], ans: 1, explain: '"有一分恶寒便有一分表证"——发热恶寒并见是表证特征。' },
+      { q: '脉浮紧多见于？', opts: ['表热证', '表寒证', '里热证', '里寒证'], ans: 1, explain: '浮主表、紧主寒——浮紧脉主风寒表证。' },
+      { q: '风寒表实证宜用？', opts: ['银翘散', '麻黄汤', '桂枝汤', '桑菊饮'], ans: 1, explain: '麻黄汤辛温解表、宣肺散寒——治风寒表实证。' },
+      { q: '五心烦热、舌红少苔、脉细数见于？', opts: ['气虚', '血虚', '阴虚', '阳虚'], ans: 2, explain: '五心烦热+舌红少苔+脉细数——典型阴虚火旺证。' },
+    ]
+  },
+
+  /* ── 中药炮制与配伍 ── */
+  'herb-processing': {
+    id: 'herb-processing', name: '中药炮制', icon: '🔥', zone: 'zhongyao', xpReward: 50, element: 'wood',
+    content: {
+      title: '中药炮制与配伍禁忌', subtitle: '修制·水制·火制·配伍十八反十九畏', category: '中药学',
+      sections: [
+        { heading: '🔥 中药炮制目的', text: `炮制是中药在入药前的加工处理，目的是：
+• 减毒：如川乌、草乌经炮制后降低毒性
+•增效：如延胡索醋炙增强止痛效果
+• 改变药性：如生地黄清热凉血，熟地黄滋阴补血
+• 便于制剂：如矿物药煅后易于粉碎
+• 便于贮藏：如桑螵蛸蒸后杀死虫卵
+• 矫味矫臭：如僵蚕麸炒减少腥味` },
+        { heading: '🛠️ 炮制方法', cards: [
+          { icon:'✂️', name:'修制', desc:'净制（洗净去杂）、切制（切片切段）、粉碎（捣碎研粉）——基本处理' },
+          { icon:'💧', name:'水制', desc:'洗、泡、润、漂、水飞——如水飞朱砂使其细净，漂海藻去咸味' },
+          { icon:'🔥', name:'火制', desc:'炒（清炒、麸炒、土炒）、炙（蜜炙、酒炙、醋炙、盐炙）、煅、煨——最常用' },
+          { icon:'♨️', name:'水火共制', desc:'蒸、煮、炖——如熟地黄九蒸九晒，何首乌黑豆汁蒸' },
+        ]},
+        { heading: '⚠️ 十八反', text: `十八反是中药配伍禁忌的核心，歌诀：
+"本草明言十八反，半蒌贝蔹及攻乌，藻戟遂芫俱战草，诸参辛芍叛藜芦。"
+
+即：
+• 乌头反：半夏、瓜蒌、贝母、白蔹、白及
+• 甘草反：海藻、大戟、甘遂、芫花
+• 藜芦反：人参、沙参、丹参、玄参、苦参、细辛、芍药` },
+        { heading: '⚠️ 十九畏', text: `十九畏也是配伍禁忌，歌诀：
+"硫黄原是火中精，朴硝一见便相争。水银莫与砒霜见，狼毒最怕密陀僧。巴豆性烈最为上，偏与牵牛不顺情。丁香莫与郁金见，牙硝难合京三棱。川乌草乌不顺犀，人参最怕五灵脂。官桂善能调冷气，若逢石脂便相欺。"
+
+即：
+• 硫黄畏朴硝、水银畏砒霜、狼毒畏密陀僧
+• 巴豆畏牵牛、丁香畏郁金、牙硝畏三棱
+• 川乌草乌畏犀角、人参畏五灵脂、肉桂畏石脂` },
+        { heading: '💊 常用炮制举例', list: [
+          '蜜炙：蜜炙黄芪→增强补气作用；蜜炙麻黄→减弱发汗、增强平喘',
+          '醋炙：醋炙延胡索→增强止痛；醋炙柴胡→增强疏肝',
+          '酒炙：酒炙大黄→减弱泻下、增强清热；酒炙当归→增强活血',
+          '盐炙：盐炙杜仲→引药入肾、增强补肝肾',
+          '炒炭：地榆炭→增强止血；蒲黄炭→增强止血',
+        ]},
+      ],
+      highlight: { icon: '⚠️', text: '十八反歌："半蒌贝蔹及攻乌，藻戟遂芫战甘草，诸参辛芍叛藜芦"。十九畏歌："丁香莫与郁金见，人参最怕五灵脂"。' }
+    },
+    quiz: [
+      { q: '十八反中与甘草相反的是？', opts: ['人参、细辛', '海藻、大戟、甘遂、芫花', '半夏、贝母', '丁香、郁金'], ans: 1, explain: '"藻戟遂芫俱战草"——海藻、大戟、甘遂、芫花反甘草。' },
+      { q: '延胡索醋炙的目的是？', opts: ['减毒', '增强止痛', '改变药性', '便于粉碎'], ans: 1, explain: '醋炙延胡索——醋能增强延胡索止痛效果（醋引药入肝）。' },
+      { q: '生地黄与熟地黄的区别？', opts: ['品种不同', '炮制方法不同', '产地不同', '没有区别'], ans: 1, explain: '生地黄清热凉血，熟地黄经九蒸九晒后变滋阴补血——炮制改变药性。' },
+      { q: '十九畏中"人参最怕"什么？', opts: ['五灵脂', '藜芦', '朴硝', '牵牛'], ans: 0, explain: '"人参最怕五灵脂"——十九畏配伍禁忌。' },
+    ]
+  },
+
+  /* ── 针灸临床实战 ── */
+  'acupuncture-clinic': {
+    id: 'acupuncture-clinic', name: '针灸实战', icon: '🎯', zone: 'zhenjiu', xpReward: 55, element: 'metal',
+    content: {
+      title: '针灸临床实战', subtitle: '常见病的针灸选穴与配伍', category: '针灸学',
+      sections: [
+        { heading: '🎯 选穴原则', text: `针灸选穴遵循以下基本原则：
+
+**近部取穴**：在病变局部或附近取穴。如胃痛取中脘、梁门；头痛取太阳、风池。
+
+**远部取穴**："经络所过，主治所及"，在病变远端取穴。如胃痛取足三里（胃经合穴）；牙痛取合谷（大肠经原穴——"面口合谷收"）。
+
+**辨证取穴**：根据辨证选穴。如肝郁气滞取太冲（肝经原穴）；脾胃虚弱取足三里、三阴交。
+
+**对症取穴**：根据特定功效选穴。如发热取大椎（退热要穴）；昏迷取人中（醒脑开窍）。` },
+        { heading: '📋 常见病症选穴', table: {
+          headers: ['病症', '主穴', '配穴', '治法'],
+          rows: [
+            ['头痛', '百会、太阳、风池', '前额+印堂；偏头+外关；后头+天柱', '疏经通络止痛'],
+            ['胃痛', '中脘、足三里、内关', '肝气犯胃+太冲；脾胃虚寒+关元、气海', '和胃止痛'],
+            ['腰痛', '肾俞、委中、阿是穴', '寒湿+腰阳关；瘀血+膈俞', '温经通络'],
+            ['失眠', '神门、内关、安眠穴', '心脾两虚+心俞、脾俞；肝郁化火+太冲', '宁心安神'],
+            ['眩晕', '百会、风池、太冲', '气血不足+足三里、三阴交；肝阳上亢+太溪', '平肝定眩'],
+          ]
+        }},
+        { heading: '🪡 针刺手法要点', list: [
+          '进针速度要快，减少疼痛——"进针如行军，快而准"',
+          '得气是关键：患者感觉酸麻胀重，医者感觉针下沉紧——"气至而有效"',
+          '补法：进针慢、出针快、按压针孔——"紧按慢提"为补',
+          '泻法：进针快、出针慢、不按压针孔——"紧提慢按"为泻',
+          '留针时间：一般15-30分钟，慢性病可延长',
+        ]},
+        { heading: '🔥 艾灸临床应用', text: `**艾灸适用证**：虚证、寒证、瘀证。如脾胃虚寒灸中脘、足三里；肾阳虚灸关元、命门；痛经灸三阴交、关元。
+
+**灸法分类**：
+• 温和灸：距皮肤2-3cm熏灸，以温热舒适为度
+• 雀啄灸：如鸟雀啄食，一起一落，用于急救
+• 隔姜灸：姜片上放艾炷，温胃散寒
+• 隔蒜灸：蒜片上放艾炷，消肿拔毒
+• 隔盐灸：食盐填脐上灸，回阳救逆
+
+**禁忌**：实热证不宜灸；面部穴位少灸；孕妇腹部腰骶部禁灸。` },
+      ],
+      highlight: { icon: '🎯', text: '选穴四原则：近部取穴、远部取穴、辨证取穴、对症取穴。记住"面口合谷收，肚腹三里留，腰背委中求，头项寻列缺"。' }
+    },
+    quiz: [
+      { q: '"面口合谷收"体现哪种选穴原则？', opts: ['近部取穴', '远部取穴', '辨证取穴', '对症取穴'], ans: 1, explain: '合谷属大肠经，在手上远离面部——远部取穴，经络所过主治所及。' },
+      { q: '胃痛的主穴不包括？', opts: ['中脘', '足三里', '内关', '百会'], ans: 3, explain: '百会属督脉，升提阳气——非胃痛主穴。' },
+      { q: '针刺得气的表现是？', opts: ['疼痛出血', '酸麻胀重', '皮肤发红', '头晕恶心'], ans: 1, explain: '得气表现为酸麻胀重感——"气至而有效"。' },
+      { q: '隔盐灸的作用是？', opts: ['消肿拔毒', '回阳救逆', '温胃散寒', '疏经通络'], ans: 1, explain: '隔盐灸填脐中——回阳救逆，用于亡阳虚脱。' },
+    ]
+  },
+
+  /* ── 情志养生 ── */
+  'yangsheng-emotion': {
+    id: 'yangsheng-emotion', name: '情志养生', icon: '🧠', zone: 'yangsheng', xpReward: 45, element: 'earth',
+    content: {
+      title: '情志调摄养生', subtitle: '七情致病与调神养心之道', category: '养生学',
+      sections: [
+        { heading: '🧠 七情与五脏', text: `七情指喜、怒、忧、思、悲、恐、惊七种情志活动，与五脏相应。
+
+正常情志活动是人体对外界刺激的反应，不会致病。但突然、强烈或持久的情志刺激，超过人体调节范围，就会导致脏腑气血功能紊乱而发病。
+
+**七情与五脏对应**：
+• 心在志为喜——喜则气缓
+• 肝在志为怒——怒则气上
+• 脾在志为思——思则气结
+• 肺在志为悲——悲则气消
+• 肾在志为恐——恐则气下` },
+        { heading: '⚠️ 七情致病特点', cards: [
+          { icon:'😄', name:'喜伤心', desc:'过喜则心气涣散，神不守舍。如"范进中举"后疯癫。适度喜悦有益心神' },
+          { icon:'😡', name:'怒伤肝', desc:'大怒则肝气上逆，气血并走于上。可见头痛眩晕、面红目赤，甚则呕血' },
+          { icon:'🤔', name:'思伤脾', desc:'思虑过度则气机郁结。可见食欲不振、脘腹胀满、便溏乏力' },
+          { icon:'😢', name:'悲伤肺', desc:'悲忧过度则肺气消耗。可见气短懒言、意志消沉' },
+          { icon:'😨', name:'恐伤肾', desc:'惊恐则气下伤肾。可见二便失禁、腰膝酸软、遗精滑泄' },
+        ]},
+        { heading: '🌿 情志调摄方法', text: `**以情胜情法**：利用情志之间的制约关系来调节情志。
+• 悲胜怒（金克木）：用悲忧来制约愤怒
+• 恐胜喜（水克火）：用恐惧来制约过喜
+• 怒胜思（木克土）：用愤怒来制约过度思虑
+• 喜胜忧（火克金）：用喜悦来制约悲忧
+• 思胜恐（土克水）：用思考来制约恐惧
+
+**静心安神法**：冥想、调息、放松——使心神安定，情志平和。
+
+**运动调畅法**：太极拳、八段锦、散步——通过运动舒展气机，调畅情志。
+
+**药食调理法**：疏肝解郁用玫瑰花茶、佛手；养心安神用百合、莲子；健脾益智用山药、茯苓。` },
+        { heading: '💡 日常调摄要点', list: [
+          '保持平和心态：不过度悲喜，情绪稳定是最好的养生',
+          '适当宣泄：情绪不宜过度压抑，适当表达释放',
+          '移情易性：通过阅读、音乐、旅行转移不良情绪',
+          '顺应四时：春养肝（戒怒）、夏养心（戒过喜）、长夏养脾（戒过思）、秋养肺（戒过悲）、冬养肾（戒过恐）',
+          '良好睡眠：子时前入睡，充足睡眠是情志调和的基础',
+        ]},
+      ],
+      highlight: { icon: '🧠', text: '情志养生口诀：怒伤肝、喜伤心、思伤脾、悲伤肺、恐伤肾。调神养心，以情胜情，移情易性，顺应四时。' }
+    },
+    quiz: [
+      { q: '"怒则气上"导致的主要症状？', opts: ['气短懒言', '面红目赤头痛', '二便失禁', '食欲不振'], ans: 1, explain: '怒则气上——肝气上逆，气血并走于上，见面红目赤头痛。' },
+      { q: '以情胜情中"喜胜"什么？', opts: ['怒', '思', '悲', '恐'], ans: 2, explain: '喜属火、悲属金，火克金——喜胜忧（悲）。' },
+      { q: '思虑过度最易伤哪个脏？', opts: ['心', '肝', '脾', '肺'], ans: 2, explain: '脾在志为思——思则气结，伤脾。' },
+      { q: '春季情志养生应注重？', opts: ['戒过喜', '戒怒', '戒过悲', '戒过恐'], ans: 1, explain: '春应肝，肝在志为怒——春季养生应戒怒，保持心情舒畅。' },
+    ]
+  },
+
 };
 
 // ═══════════════════════════════════════
@@ -2455,20 +2854,20 @@ export const TCM_ACHIEVEMENTS: TcmAchievement[] = [
   { id: 'first-step',      name: '初入杏林', icon: '🌱', desc: '完成第一个知识章节', condition: '完成任意1个章节', tier: 'bronze' },
   { id: 'first-quiz',      name: '初次答题', icon: '✏️', desc: '完成第一次闯关测试', condition: '完成任意1次测验', tier: 'bronze' },
   { id: 'daily-habit',     name: '每日一识', icon: '📅', desc: '连续打卡3天', condition: '连续打卡3天', tier: 'bronze' },
-  { id: 'zone-yinyang',    name: '阴阳入门', icon: '☯️', desc: '通关阴阳殿堂全部章节', condition: '完成阴阳殿堂所有章节', tier: 'bronze' },
+  { id: 'zone-yinyang',    name: '阴阳入门', icon: '☯️', desc: '通关阴阳之道全部章节', condition: '完成阴阳之道所有章节', tier: 'bronze' },
 
   // 白银级
   { id: 'quiz-master-10',  name: '答题达人', icon: '🎯', desc: '闯关测试累计10次满分', condition: '测验满分10次', tier: 'silver' },
-  { id: 'zone-wuxing',     name: '五行通晓', icon: '🌊', desc: '通关五行殿堂', condition: '完成五行殿堂所有章节', tier: 'silver' },
-  { id: 'zone-zangfu',     name: '脏腑精通', icon: '❤️', desc: '通关藏象殿堂', condition: '完成藏象殿堂所有章节', tier: 'silver' },
+  { id: 'zone-wuxing',     name: '五行通晓', icon: '🌊', desc: '通关五行之境', condition: '完成五行之境所有章节', tier: 'silver' },
+  { id: 'zone-zangfu',     name: '脏腑精通', icon: '❤️', desc: '通关藏象秘境', condition: '完成藏象秘境所有章节', tier: 'silver' },
   { id: 'boss-yinyang',    name: '阴阳判官·胜', icon: '⚖️', desc: '击败Boss阴阳判官', condition: '击败阴阳判官', tier: 'silver' },
   { id: 'boss-wuxing',     name: '五行灵兽·胜', icon: '🐉', desc: '击败Boss五行灵兽', condition: '击败五行灵兽', tier: 'silver' },
   { id: 'daily-habit-7',   name: '一周坚持', icon: '🔥', desc: '连续打卡7天', condition: '连续打卡7天', tier: 'silver' },
 
   // 黄金级
-  { id: 'zone-jingluo',    name: '经络通达', icon: '⚡', desc: '通关经络殿堂上下全部章节', condition: '完成经络殿堂所有章节', tier: 'gold' },
-  { id: 'zone-diagnosis',  name: '四诊精通', icon: '🔍', desc: '通关诊断殿堂', condition: '完成诊断殿堂所有章节', tier: 'gold' },
-  { id: 'zone-zhongyao',   name: '百草精通', icon: '🌿', desc: '通关中药殿堂', condition: '完成中药殿堂所有章节', tier: 'gold' },
+  { id: 'zone-jingluo',    name: '经络通达', icon: '⚡', desc: '通关经络通途上下全部章节', condition: '完成经络通途所有章节', tier: 'gold' },
+  { id: 'zone-diagnosis',  name: '四诊精通', icon: '🔍', desc: '通关诊断之术', condition: '完成诊断之术所有章节', tier: 'gold' },
+  { id: 'zone-zhongyao',   name: '百草精通', icon: '🌿', desc: '通关百草药圃', condition: '完成百草药圃所有章节', tier: 'gold' },
   { id: 'boss-zangfu',     name: '藏象守护者·胜', icon: '🫀', desc: '击败Boss藏象守护者', condition: '击败藏象守护者', tier: 'gold' },
   { id: 'boss-jingluo',    name: '经络游龙·胜', icon: '⚡', desc: '击败Boss经络游龙', condition: '击败经络游龙', tier: 'gold' },
   { id: 'boss-diagnosis',  name: '四诊圣手·胜', icon: '🔮', desc: '击败Boss四诊圣手', condition: '击败四诊圣手', tier: 'gold' },
@@ -2476,16 +2875,16 @@ export const TCM_ACHIEVEMENTS: TcmAchievement[] = [
   { id: 'daily-habit-30',  name: '月度坚持', icon: '💎', desc: '连续打卡30天', condition: '连续打卡30天', tier: 'gold' },
 
   // 铂金级
-  { id: 'zone-fangji',     name: '方剂大成', icon: '📜', desc: '通关方剂殿堂上下全部章节', condition: '完成方剂殿堂所有章节', tier: 'platinum' },
-  { id: 'zone-zhenjiu',    name: '针灸大成', icon: '🪡', desc: '通关针灸殿堂', condition: '完成针灸殿堂所有章节', tier: 'platinum' },
-  { id: 'zone-yangsheng',  name: '养生大师', icon: '🧘', desc: '通关养生殿堂', condition: '完成养生殿堂所有章节', tier: 'platinum' },
+  { id: 'zone-fangji',     name: '方剂大成', icon: '📜', desc: '通关方剂之道上下全部章节', condition: '完成方剂之道所有章节', tier: 'platinum' },
+  { id: 'zone-zhenjiu',    name: '针灸大成', icon: '🪡', desc: '通关针灸玄门', condition: '完成针灸玄门所有章节', tier: 'platinum' },
+  { id: 'zone-yangsheng',  name: '养生大师', icon: '🧘', desc: '通关养生之道', condition: '完成养生之道所有章节', tier: 'platinum' },
   { id: 'boss-zhongyao',   name: '百草药王·胜', icon: '🌱', desc: '击败Boss百草药王', condition: '击败百草药王', tier: 'platinum' },
   { id: 'boss-fangji',     name: '方剂宗师·胜', icon: '📜', desc: '击败Boss方剂宗师', condition: '击败方剂宗师', tier: 'platinum' },
   { id: 'boss-zhenjiu',    name: '针灸灵尊·胜', icon: '🪡', desc: '击败Boss针灸灵尊', condition: '击败针灸灵尊', tier: 'platinum' },
   { id: 'boss-yangsheng',  name: '养生真人·胜', icon: '🧘', desc: '击败Boss养生真人', condition: '击败养生真人', tier: 'platinum' },
-  { id: 'all-zones',       name: '殿堂全通', icon: '🏛️', desc: '通关全部13个修炼殿堂', condition: '完成全部殿堂', tier: 'platinum' },
+  { id: 'all-zones',       name: '修炼全通', icon: '🏛️', desc: '通关全部13个修炼秘境', condition: '完成全部秘境', tier: 'platinum' },
   { id: 'all-bosses',     name: '万夫莫敌', icon: '👑', desc: '击败全部9个Boss', condition: '击败全部Boss', tier: 'platinum' },
-  { id: 'all-chapters',    name: '博学多才', icon: '📚', desc: '完成全部49个知识章节', condition: '完成全部章节', tier: 'platinum' },
+  { id: 'all-chapters',    name: '博学多才', icon: '📚', desc: '完成全部57个知识章节', condition: '完成全部章节', tier: 'platinum' },
   { id: 'all-achievements',name: '完美无缺', icon: '🌟', desc: '解锁全部成就', condition: '解锁全部其他成就', tier: 'platinum' },
   { id: 'lv20',            name: '医圣传人', icon: '⭐', desc: '达到20级最高等级', condition: '达到20级', tier: 'platinum' },
 ];

@@ -117,6 +117,7 @@ interface AudioServiceState {
   next: () => void;
   prev: () => void;
   setQueue: (tracks: AudioTrack[], startIndex?: number) => void;
+  playQueue: (tracks: AudioTrack[], startIndex?: number) => void;
   setPlayMode: (m: PlayMode) => void;
   startPrescription: (p: Prescription) => void;
   stopPrescription: () => void;
@@ -189,11 +190,18 @@ function fadeAmbient(targetGain: number, durationSec: number = 1.5): Promise<voi
 function getAudioElement(): HTMLAudioElement {
   if (!audioElement) {
     audioElement = new Audio();
-    // 不设置 crossOrigin — 跨域音频无 CORS 响应头时，
-    // createMediaElementSource 会判定音频被"污染"导致静音。
-    // 直接用 <audio>.play() 播放，不经过 Web Audio 效果链。
-    audioElement.loop = true; // 五音/颂钵无限循环
+    audioElement.loop = true;
     audioElement.preload = 'auto';
+
+    // ★ 自动切歌：曲目自然播放结束时，sequence 模式自动播放下一首
+    audioElement.addEventListener('ended', () => {
+      const state = useAudioService.getState();
+      if (state.playMode === 'sequence' && state.queue.length > 0) {
+        const nextIdx = (state.queueIndex + 1) % state.queue.length;
+        useAudioService.getState().set({ queueIndex: nextIdx });
+        useAudioService.getState().play(state.queue[nextIdx]);
+      }
+    });
   }
   return audioElement;
 }
@@ -466,7 +474,7 @@ export const useAudioService = create<AudioServiceState>()(
       currentTrack: null,
       currentTime: 0,
       duration: 0,
-      volume: 0.7,
+      volume: 0.85,
       isMuted: false,
 
       // 音频参数
@@ -533,7 +541,10 @@ export const useAudioService = create<AudioServiceState>()(
   el.load(); // [FIX] 显式触发加载
   const targetVol = get().isMuted ? 0 : get().volume;
   el.volume = 0; // 从0开始淡入
-  el.loop = !track.noLoop; // 敲击音不循环，其余循环
+  // sequence 模式不循环，让 ended 事件触发自动切歌
+  // loop/prescription 模式循环播放
+  const shouldLoop = track.noLoop ? false : get().playMode !== 'sequence';
+  el.loop = shouldLoop;
 
   // [FIX] play() 加 catch，失败时恢复音量并重试
   el.play().then(() => {
@@ -721,6 +732,7 @@ export const useAudioService = create<AudioServiceState>()(
         const nextIdx = (state.queueIndex + 1) % state.queue.length;
         set({ queueIndex: nextIdx });
         get().play(state.queue[nextIdx]);
+        // 保持双耳节拍和调制设置
       },
 
       prev: () => {
@@ -732,6 +744,11 @@ export const useAudioService = create<AudioServiceState>()(
       },
 
       setQueue: (tracks: AudioTrack[], startIndex = 0) => {
+        set({ queue: tracks, queueIndex: startIndex });
+      },
+
+      /** 设置队列并立即播放（兼容旧用法） */
+      playQueue: (tracks: AudioTrack[], startIndex = 0) => {
         set({ queue: tracks, queueIndex: startIndex });
         if (tracks.length > 0) {
           get().play(tracks[startIndex]);

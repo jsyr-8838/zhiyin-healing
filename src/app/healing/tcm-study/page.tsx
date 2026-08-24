@@ -510,7 +510,7 @@ function MapView({ isZoneUnlocked, getZoneProgress, onZoneClick, levelInfo }: {
   return (
     <div className="tcm-map-view">
       <div className="tcm-map-header">
-        <h2>修炼殿堂</h2>
+        <h2>修炼秘境</h2>
         <p>探索中医浩瀚知识，从阴阳五行到针灸养生，步步进阶</p>
       </div>
       <div className="tcm-zone-grid">
@@ -553,7 +553,7 @@ function MapView({ isZoneUnlocked, getZoneProgress, onZoneClick, levelInfo }: {
 }
 
 // ═══════════════════════════════════════
-// 殿堂详情
+// 秘境详情
 // ═══════════════════════════════════════
 
 function ZoneView({ zone, isChapterDone, onChapterClick, onBossClick, bossDefeated, isUnlocked }: {
@@ -571,7 +571,7 @@ function ZoneView({ zone, isChapterDone, onChapterClick, onBossClick, bossDefeat
     return (
       <div className="tcm-zone-locked-msg">
         <Lock size={48} />
-        <h3>殿堂未解锁</h3>
+        <h3>秘境未解锁</h3>
         <p>需达到 Lv.{zone.levelRequired} 方可进入「{zone.name}」</p>
       </div>
     );
@@ -1047,7 +1047,7 @@ function ProfileView({ progress, levelInfo }: {
       </div>
 
       <div className="tcm-profile-zones">
-        <h3>殿堂进度</h3>
+        <h3>修炼进度</h3>
         {TCM_ZONES.map(zone => {
           const done = zone.chapters.filter(id => progress.completedChapters.includes(id)).length;
           const pct = zone.chapters.length ? Math.round((done / zone.chapters.length) * 100) : 0;
