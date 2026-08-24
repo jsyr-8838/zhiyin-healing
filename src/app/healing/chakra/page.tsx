@@ -6,13 +6,15 @@ import HealingHeader from '@/components/layout/HealingHeader';
 import PageContainer from '@/components/layout/PageContainer';
 import HealingCanvas, { type HealingCanvasHandle, HEALING_PRESET_CHAKRA } from '@/components/healing/HealingCanvas';
 import { fmtTime } from '@/hooks/useTimer';
-import { Play, Pause, Volume2, Timer, Sparkles } from 'lucide-react';
+import { Play, Pause, Volume2, Timer, Sparkles, Headphones } from 'lucide-react';
+import { useTTS } from '@/hooks/useTTS';
+import { getChakraGuide } from '@/lib/healing-voice-guide';
 import {
   BINAURAL_MODES, MODULATIONS,
   type BinauralValue, type ModulationValue,
 } from '@/lib/five-tone-data';
 import {
-  useAudioService, createBowlTrack,
+  useAudioService, createBowlTrack, type AudioTrack,
 } from '@/lib/audio-service';
 import { useHealingRecommendation } from '@/hooks/useHealingRecommendation';
 import {
@@ -55,18 +57,29 @@ export default function ChakraPage() {
     play, pause, stop, closePlayer, togglePlay, setVolume,
     setBinauralBeat, setModulation,
     setTimer, startTimer, stopTimer,
+    setQueue, setPlayMode,
   } = useAudioService();
 
   // 本地 UI 状态
   const [selectedChakra, setSelectedChakra] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [audioEnergy, setAudioEnergy] = useState(0);
+  const [preludePlaying, setPreludePlaying] = useState(false);
+  const [guideText, setGuideText] = useState('');
+
+  // ===== TTS 男声导引 =====
+  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'slow', voiceId: 'zh-CN-YunjianNeural' });
+  const ttsRef = useRef(tts);
+  ttsRef.current = tts;
+  // 待播放参数：导引播完后自动播放音乐
+  const pendingPlayRef = useRef<{ freq: number; beat: BinauralValue; mod: ModulationValue } | null>(null);
 
   // Canvas 引用
   const healingCanvasRef = useRef<HealingCanvasHandle>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const energyIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const elapsedIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const guideEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 获取 AnalyserNode
   useEffect(() => {
@@ -103,7 +116,14 @@ export default function ChakraPage() {
   // 播放脉轮频率
   const startPlaying = useCallback((freq: number, beat: BinauralValue, mod: ModulationValue) => {
     const track = createBowlTrack(freq);
+
+    // ★ 构建七脉轮播放队列，播完自动切下一首
+    const chakraQueue: AudioTrack[] = CHAKRAS.map(c => createBowlTrack(c.freq));
+    const startIdx = Math.max(0, CHAKRAS.findIndex(c => c.freq === freq));
+    setPlayMode('sequence');
+    setQueue(chakraQueue, startIdx);
     play(track);
+
     if (beat !== binauralBeat) setBinauralBeat(beat);
     if (mod !== modulation) setModulation(mod);
     setElapsedSeconds(0);
@@ -114,9 +134,60 @@ export default function ChakraPage() {
     }, 1000);
   }, [play, binauralBeat, modulation, setBinauralBeat, setModulation]);
 
+  // ★ 带语音导引的播放（先播男声导引，播完自动进入音乐）
+  const startPlayingWithGuide = useCallback((freq: number, beat: BinauralValue, mod: ModulationValue, chakraId?: string) => {
+    // 停止任何正在进行的导引
+    ttsRef.current.stop();
+    if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
+
+    // 获取导引文案
+    const text = chakraId ? getChakraGuide(chakraId) : '';
+    if (text) {
+      setGuideText(text);
+      setPreludePlaying(true);
+      pendingPlayRef.current = { freq, beat, mod };
+
+      // 估算导引时长：中文约 3.5 字/秒（slow 语速 0.5x）
+      const charCount = text.replace(/[^\u4e00-\u9fa5]/g, '').length;
+      const estimatedMs = Math.max(8000, Math.ceil(charCount / 3.5) * 1000 + 2000);
+
+      // 播放 TTS 导引
+      ttsRef.current.speak(text, 0.5);
+
+      // 超时保险：即使 TTS onended 未触发，也按估算时长自动进入音乐
+      guideEndTimeoutRef.current = setTimeout(() => {
+        setPreludePlaying(false);
+        const pending = pendingPlayRef.current;
+        pendingPlayRef.current = null;
+        if (pending) {
+          startPlaying(pending.freq, pending.beat, pending.mod);
+        }
+      }, estimatedMs);
+    } else {
+      // 无导引文案，直接播放
+      startPlaying(freq, beat, mod);
+    }
+  }, [startPlaying]);
+
+  // 跳过导引，直接进入音乐
+  const skipPrelude = useCallback(() => {
+    ttsRef.current.stop();
+    if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
+    setPreludePlaying(false);
+    const pending = pendingPlayRef.current;
+    pendingPlayRef.current = null;
+    if (pending) {
+      startPlaying(pending.freq, pending.beat, pending.mod);
+    }
+  }, [startPlaying]);
+
   // 停止播放
   const stopAll = useCallback(() => {
     stop();
+    ttsRef.current.stop();
+    if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
+    setPreludePlaying(false);
+    pendingPlayRef.current = null;
     if (elapsedIntervalRef.current) {
       clearInterval(elapsedIntervalRef.current);
       elapsedIntervalRef.current = null;
@@ -130,8 +201,9 @@ export default function ChakraPage() {
     setSelectedChakra(chakraIdx >= 0 ? chakraIdx : 0);
     setTimer(preset.timer);
     const freq = CHAKRAS[chakraIdx >= 0 ? chakraIdx : 0].freq;
-    startPlaying(freq, preset.beat, preset.mod);
-  }, [startPlaying, setTimer]);
+    const chakraId = CHAKRAS[chakraIdx >= 0 ? chakraIdx : 0].id;
+    startPlayingWithGuide(freq, preset.beat, preset.mod, chakraId);
+  }, [startPlayingWithGuide, setTimer]);
 
   // 脉轮频率点击
   const toggleChakra = useCallback((idx: number) => {
@@ -140,9 +212,9 @@ export default function ChakraPage() {
       stopAll();
     } else {
       setSelectedChakra(idx);
-      startPlaying(chakra.freq, binauralBeat, modulation as ModulationValue);
+      startPlayingWithGuide(chakra.freq, binauralBeat, modulation as ModulationValue, chakra.id);
     }
-  }, [isPlaying, selectedChakra, binauralBeat, modulation, startPlaying, stopAll]);
+  }, [isPlaying, selectedChakra, binauralBeat, modulation, startPlayingWithGuide, stopAll]);
 
   // 通过任意频率播放（扩展频率）
   const toggleChakraByFreq = useCallback((freq: number) => {
@@ -155,9 +227,9 @@ export default function ChakraPage() {
       stopAll();
     } else {
       setSelectedChakra(idx);
-      startPlaying(freq, binauralBeat, modulation as ModulationValue);
+      startPlayingWithGuide(freq, binauralBeat, modulation as ModulationValue, closestChakra.id);
     }
-  }, [isPlaying, selectedChakra, binauralBeat, modulation, startPlaying, stopAll]);
+  }, [isPlaying, selectedChakra, binauralBeat, modulation, startPlayingWithGuide, stopAll]);
 
   // 定时器自动停止
   useEffect(() => {
@@ -179,6 +251,8 @@ export default function ChakraPage() {
     return () => {
       if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
+      if (guideEndTimeoutRef.current) clearTimeout(guideEndTimeoutRef.current);
+      ttsRef.current.stop();
       // 切页时完全关闭播放器（清除 currentTrack → 迷你播放器消失）
       closePlayer();
     };
@@ -249,7 +323,7 @@ export default function ChakraPage() {
         {/* 播放/暂停 */}
         <div className="absolute bottom-2 left-3">
           <button
-            onClick={() => isPlaying ? stopAll() : (selectedChakra !== null ? startPlaying(CHAKRAS[selectedChakra].freq, binauralBeat, modulation as ModulationValue) : startPlaying(528, 10, 'ocean'))}
+            onClick={() => isPlaying ? stopAll() : (selectedChakra !== null ? startPlayingWithGuide(CHAKRAS[selectedChakra].freq, binauralBeat, modulation as ModulationValue, CHAKRAS[selectedChakra].id) : startPlayingWithGuide(528, 10, 'ocean', 'heart'))}
             className="w-11 h-11 rounded-full flex items-center justify-center transition active:scale-90"
             style={{
               background: isPlaying
@@ -597,6 +671,58 @@ export default function ChakraPage() {
           </p>
         </div>
       </div>
+
+      {/* ===== 前奏导引浮层 — 沉浸聆听男声引导 ===== */}
+      {preludePlaying && currentChakra && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center"
+          style={{
+            background: `radial-gradient(ellipse at center, ${currentChakra.color}15 0%, rgba(253,248,240,0.96) 50%, rgba(253,248,240,0.88) 100%)`,
+            backdropFilter: 'blur(8px)',
+          }}>
+          {/* 脉轮大字 */}
+          <div className="font-black font-serif mb-4" style={{
+            fontSize: 88,
+            color: currentChakra.color,
+            textShadow: `0 0 48px ${currentChakra.color}50, 0 0 96px ${currentChakra.color}25`,
+            lineHeight: 1,
+          }}>
+            {currentChakra.icon}
+          </div>
+
+          {/* 脉轮信息 */}
+          <div className="text-base font-bold mb-1 tracking-wide" style={{ color: '#5C1A00' }}>
+            {currentChakra.name} · {currentChakra.sanskrit}
+          </div>
+          <div className="text-sm mb-2" style={{ color: '#8B7355' }}>
+            {currentChakra.freq}Hz · {currentChakra.element}行 · {currentChakra.desc}
+          </div>
+
+          {/* 引导状态指示 */}
+          <div className="flex items-center justify-center gap-2 mb-1" style={{ color: currentChakra.color }}>
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: currentChakra.color }} />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: currentChakra.color }} />
+            </span>
+            <span className="text-sm font-bold tracking-widest">正在深度引导</span>
+          </div>
+          <div className="flex items-center justify-center gap-1.5 mb-8 text-xs" style={{ color: '#8B7355' }}>
+            <Headphones size={12} />
+            <span>请闭目聆听，跟随引导放松身心</span>
+          </div>
+
+          {/* 跳过按钮 */}
+          <button onClick={skipPrelude}
+            className="px-6 py-2.5 rounded-full text-xs font-bold transition active:scale-95"
+            style={{
+              background: currentChakra.color + '15',
+              border: `1px solid ${currentChakra.color}40`,
+              color: currentChakra.color,
+              boxShadow: `0 0 16px ${currentChakra.color}10`,
+            }}>
+            跳过引导，直接开始
+          </button>
+        </div>
+      )}
 
       <BottomNav />
     </PageContainer>
