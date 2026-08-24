@@ -269,13 +269,13 @@ export default function SingingBowlPage() {
 
       {/* ═══ 深色沉浸式可视化舞台 ═══ */}
       <div className="relative overflow-hidden mx-2 mt-2" style={{
-        height: 260,
-        borderRadius: 20,
-        background: 'linear-gradient(180deg, #1a0f0a 0%, #2a1810 40%, #1a1208 100%)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+        height: 280,
+        borderRadius: 24,
+        background: 'radial-gradient(ellipse at 50% 30%, #1A1208 0%, #0F0A06 50%, #080503 100%)',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.5), 0 0 1px rgba(212,175,55,0.1), inset 0 1px 0 rgba(212,175,55,0.06)',
       }}>
         {/* Canvas 可视化 */}
-        <div className="absolute inset-0" style={{ opacity: 0.6 }}>
+        <div className="absolute inset-0" style={{ opacity: 0.65 }}>
           <HealingCanvas ref={healingCanvasRef} energy={audioEnergy} config={HEALING_PRESET_BOWL} />
         </div>
 
@@ -285,47 +285,49 @@ export default function SingingBowlPage() {
             {isPlaying && selectedFreq ? (
               <>
                 <div className="font-extralight tabular-nums tracking-tight" style={{
-                  fontSize: 56, lineHeight: 1,
-                  color: currentBowl?.color || '#C4A870',
-                  textShadow: `0 0 32px ${(currentBowl?.color || '#C4A870')}60, 0 0 64px ${(currentBowl?.color || '#C4A870')}30`,
+                  fontSize: 60, lineHeight: 1,
+                  color: currentBowl?.color || '#D4AF37',
+                  textShadow: `0 0 28px ${(currentBowl?.color || '#D4AF37')}55, 0 0 56px ${(currentBowl?.color || '#D4AF37')}25, 0 2px 8px rgba(0,0,0,0.6)`,
                 }}>
                   {selectedFreq}
-                  <span className="text-2xl ml-1" style={{ color: '#8B7355' }}>Hz</span>
+                  <span className="text-xl ml-1 font-extralight" style={{ color: '#D4AF37', opacity: 0.6 }}>Hz</span>
                 </div>
                 {currentBowl && (
-                  <div className="text-sm mt-2 font-serif" style={{ color: '#C4A870', letterSpacing: '0.1em' }}>
+                  <div className="text-sm mt-3 font-serif" style={{ color: 'rgba(212,175,55,0.7)', letterSpacing: '0.15em', textShadow: '0 0 12px rgba(212,175,55,0.2)' }}>
                     {currentBowl.name} · {currentBowl.element}·{currentBowl.organ}
                   </div>
                 )}
                 {bowlPlayMode !== 'synth' && (
-                  <div className="text-[10px] mt-1 inline-block px-2 py-0.5 rounded-full" style={{
-                    background: 'rgba(184,134,11,0.15)',
-                    border: '1px solid rgba(184,134,11,0.3)',
-                    color: '#D4A847',
+                  <div className="text-[10px] mt-2 inline-block px-2.5 py-0.5 rounded-full" style={{
+                    background: 'rgba(212,175,55,0.08)',
+                    border: '1px solid rgba(212,175,55,0.15)',
+                    color: 'rgba(232,197,71,0.8)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
                   }}>
                     {BOWL_PLAY_MODES.find(m => m.value === bowlPlayMode)?.name}模式
                   </div>
                 )}
               </>
             ) : (
-              <div className="text-2xl font-extralight tracking-[0.3em]" style={{ color: '#C4A870' }}>选择频率</div>
+              <div className="text-xl font-extralight tracking-[0.35em]" style={{ color: 'rgba(212,175,55,0.4)', textShadow: '0 0 24px rgba(212,175,55,0.15)' }}>选择频率</div>
             )}
           </div>
         </div>
 
         {/* 计时器 */}
         <div className="absolute right-3 top-3 rounded-xl px-3 py-1.5 font-mono text-xs tabular-nums"
-          style={{ background: 'rgba(26,15,10,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(196,168,112,0.15)', color: '#C4A870' }}>
+          style={{ background: 'rgba(15,10,6,0.7)', backdropFilter: 'blur(16px) saturate(1.2)', border: '1px solid rgba(212,175,55,0.12)', color: 'rgba(212,175,55,0.85)', boxShadow: '0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212,175,55,0.05)' }}>
           {fmtTime(elapsedSeconds)}
-          {timerMinutes > 0 && <span style={{ color: '#8B7355' }}>/{timerMinutes}:00</span>}
+          {timerMinutes > 0 && <span style={{ color: 'rgba(212,175,55,0.4)' }}>/{timerMinutes}:00</span>}
         </div>
 
         {/* 环境音标签 */}
         {isPlaying && ambientSoundId !== 'none' && currentAmbient && (
           <div className="absolute right-3 top-10">
             <span className="rounded-xl px-2.5 py-1 text-xs" style={{
-              background: `${currentAmbient.color}15`, backdropFilter: 'blur(12px)',
-              border: `1px solid ${currentAmbient.color}40`, color: currentAmbient.color,
+              background: `${currentAmbient.color}10`, backdropFilter: 'blur(16px) saturate(1.2)',
+              border: `1px solid ${currentAmbient.color}30`, color: currentAmbient.color,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
             }}>
               {currentAmbient.icon} {currentAmbient.name}
             </span>
@@ -336,58 +338,61 @@ export default function SingingBowlPage() {
         {isPlaying && binauralBeat > 0 && (
           <div className="absolute left-3 top-3 flex flex-col gap-1">
             <span className="rounded-xl px-2.5 py-1 text-xs font-bold" style={{
-              background: 'rgba(74,222,128,0.15)', backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(74,222,128,0.3)', color: '#4ADE80',
+              background: 'rgba(74,222,128,0.12)', backdropFilter: 'blur(16px) saturate(1.2)',
+              border: '1px solid rgba(74,222,128,0.25)', color: 'rgba(74,222,128,0.85)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(74,222,128,0.08)',
             }}>+{binauralBeat}Hz</span>
             {modulation !== 'none' && (
               <span className="rounded-xl px-2.5 py-1 text-xs" style={{
-                background: 'rgba(184,134,11,0.15)', backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(184,134,11,0.3)', color: '#D4A847',
+                background: 'rgba(212,175,55,0.10)', backdropFilter: 'blur(16px) saturate(1.2)',
+                border: '1px solid rgba(212,175,55,0.2)', color: 'rgba(232,197,71,0.8)',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
               }}>{MODULATIONS.find(m => m.value === modulation)?.name}</span>
             )}
           </div>
         )}
 
         {/* 播放/暂停 — 悬浮按钮 */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
           <button
             onClick={() => isPlaying ? stopAll() : (bowlPlayMode === 'synth' ? (selectedFreq ? startPlayingWithGuide(selectedFreq, binauralBeat, modulation as ModulationValue, selectedBowlTrackId || undefined) : startPlayingWithGuide(432, binauralBeat, modulation as ModulationValue)) : startBowl())}
             className="w-14 h-14 rounded-full flex items-center justify-center transition active:scale-90"
             style={{
-              background: isPlaying ? 'linear-gradient(135deg, rgba(220,38,38,0.3), rgba(220,38,38,0.1))' : 'linear-gradient(135deg, rgba(34,197,94,0.3), rgba(34,197,94,0.1))',
-              border: `1.5px solid ${isPlaying ? 'rgba(220,38,38,0.4)' : 'rgba(34,197,94,0.4)'}`,
-              backdropFilter: 'blur(12px)',
-              boxShadow: isPlaying ? '0 0 20px rgba(220,38,38,0.3)' : '0 0 20px rgba(34,197,94,0.3)',
+              background: isPlaying ? 'linear-gradient(135deg, rgba(220,38,38,0.25), rgba(220,38,38,0.08))' : 'linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.08))',
+              border: `1.5px solid ${isPlaying ? 'rgba(220,38,38,0.35)' : 'rgba(34,197,94,0.35)'}`,
+              backdropFilter: 'blur(16px) saturate(1.2)',
+              boxShadow: isPlaying ? '0 0 20px rgba(220,38,38,0.25), 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(220,38,38,0.08)' : '0 0 20px rgba(34,197,94,0.25), 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(34,197,94,0.08)',
             }}>
-            {isPlaying ? <Pause size={22} style={{ color: '#F87171' }} /> : <Play size={22} style={{ color: '#4ADE80' }} />}
+            {isPlaying ? <Pause size={22} style={{ color: 'rgba(248,113,113,0.9)' }} /> : <Play size={22} style={{ color: 'rgba(74,222,128,0.9)' }} />}
           </button>
         </div>
       </div>
 
       {/* ═══ 音量滑块 ═══ */}
       <div className="mx-2 mt-2 px-4 py-3 flex items-center gap-3"
-        style={{ background: 'rgba(253,248,240,0.8)', backdropFilter: 'blur(8px)', borderRadius: 14, border: '1px solid rgba(196,168,112,0.15)' }}>
-        <Volume2 size={16} style={{ color: '#8B7355' }} />
+        style={{ background: 'rgba(253,248,240,0.85)', backdropFilter: 'blur(12px) saturate(1.1)', borderRadius: 16, border: '1px solid rgba(212,175,55,0.12)', boxShadow: '0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.4)' }}>
+        <Volume2 size={16} style={{ color: '#B8860B' }} />
         <input type="range" min={0} max={100} value={volPercent}
           onChange={e => setVolume(Number(e.target.value) / 100)}
           className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
-          style={{ background: `linear-gradient(to right, #B8860B ${volPercent}%, #D4C5A9 ${volPercent}%)` }} />
+          style={{ background: `linear-gradient(to right, #D4AF37 ${volPercent}%, #E0D5C0 ${volPercent}%)` }} />
         <span className="text-xs w-8 text-right tabular-nums" style={{ color: '#8B7355' }}>{volPercent}%</span>
       </div>
 
       {/* ═══ 播放模式分段切换 ═══ */}
-      <div className="mx-2 mt-3 flex gap-1 p-1 rounded-2xl" style={{ background: 'rgba(92,26,0,0.08)' }}>
+      <div className="mx-2 mt-3 flex gap-1 p-1 rounded-2xl" style={{ background: 'rgba(15,10,6,0.06)', border: '1px solid rgba(212,175,55,0.08)' }}>
         {BOWL_PLAY_MODES.map((mode) => {
           const active = bowlPlayMode === mode.value;
           return (
             <button key={mode.value} onClick={() => switchPlayMode(mode.value)}
               className="flex-1 py-2.5 rounded-xl text-center transition-all"
               style={{
-                background: active ? 'linear-gradient(135deg, #5C1A00, #8B2500)' : 'transparent',
-                boxShadow: active ? '0 2px 12px rgba(92,26,0,0.25)' : 'none',
+                background: active ? 'linear-gradient(135deg, #1a1208, #0F0A06)' : 'transparent',
+                boxShadow: active ? '0 2px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(212,175,55,0.08)' : 'none',
+                border: active ? '1px solid rgba(212,175,55,0.12)' : '1px solid transparent',
               }}>
-              <div className="text-base mb-0.5" style={{ color: active ? '#E0C060' : '#8B2500' }}>{mode.icon}</div>
-              <div className="text-xs font-bold" style={{ color: active ? '#FDF8F0' : '#2C1810' }}>{mode.name}</div>
+              <div className="text-base mb-0.5" style={{ color: active ? '#E8C547' : '#8B7355' }}>{mode.icon}</div>
+              <div className="text-xs font-bold" style={{ color: active ? '#FDF8F0' : '#8B7355' }}>{mode.name}</div>
             </button>
           );
         })}
@@ -403,12 +408,12 @@ export default function SingingBowlPage() {
             <div className="mb-3">
               <button onClick={() => toggleSection('presets')}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition"
-                style={{ background: '#5C1A00', boxShadow: '0 2px 12px rgba(92,26,0,0.15)' }}>
+                style={{ background: 'linear-gradient(135deg, #1a1208, #0F0A06)', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', border: '1px solid rgba(212,175,55,0.08)' }}>
                 <div className="flex items-center gap-2">
-                  <Sparkles size={16} style={{ color: '#E0C060' }} />
-                  <span className="font-bold text-sm" style={{ color: '#FDF8F0' }}>五行疗愈方案</span>
+                  <Sparkles size={16} style={{ color: '#E8C547' }} />
+                  <span className="font-bold text-sm" style={{ color: '#F5EFE0' }}>五行疗愈方案</span>
                 </div>
-                {expandedSection === 'presets' ? <ChevronDown size={18} style={{ color: '#E0C060' }} /> : <ChevronRight size={18} style={{ color: '#E0C060' }} />}
+                {expandedSection === 'presets' ? <ChevronDown size={18} style={{ color: '#E8C547' }} /> : <ChevronRight size={18} style={{ color: '#E8C547' }} />}
               </button>
               {expandedSection === 'presets' && (
                 <div className="grid grid-cols-3 gap-2 mt-2">
@@ -436,15 +441,15 @@ export default function SingingBowlPage() {
             <div className="mb-3">
               <button onClick={() => toggleSection('freqs')}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition"
-                style={{ background: '#5C1A00', boxShadow: '0 2px 12px rgba(92,26,0,0.15)' }}>
+                style={{ background: 'linear-gradient(135deg, #1a1208, #0F0A06)', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', border: '1px solid rgba(212,175,55,0.08)' }}>
                 <div className="flex items-center gap-2">
-                  <Music size={16} style={{ color: '#E0C060' }} />
-                  <span className="font-bold text-sm" style={{ color: '#FDF8F0' }}>频率选择</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(224,192,96,0.2)', color: '#E0C060' }}>
+                  <Music size={16} style={{ color: '#E8C547' }} />
+                  <span className="font-bold text-sm" style={{ color: '#F5EFE0' }}>频率选择</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,197,71,0.12)', color: '#E8C547' }}>
                     {BOWL_FREQUENCIES.length}个
                   </span>
                 </div>
-                {expandedSection === 'freqs' ? <ChevronDown size={18} style={{ color: '#E0C060' }} /> : <ChevronRight size={18} style={{ color: '#E0C060' }} />}
+                {expandedSection === 'freqs' ? <ChevronDown size={18} style={{ color: '#E8C547' }} /> : <ChevronRight size={18} style={{ color: '#E8C547' }} />}
               </button>
               {expandedSection === 'freqs' && (
                 <>
@@ -480,8 +485,8 @@ export default function SingingBowlPage() {
                   {selectedFreq && availableBowlTracks.length > 0 && (
                     <div className="mt-3">
                       <div className="flex items-center gap-2 mb-2">
-                        <Music size={14} style={{ color: '#8B2500' }} />
-                        <h3 className="font-bold text-sm" style={{ color: '#5C1A00' }}>钵体选择</h3>
+                        <Music size={14} style={{ color: '#B8860B' }} />
+                        <h3 className="font-bold text-sm" style={{ color: '#5C3015' }}>钵体选择</h3>
                         <span className="text-[10px]" style={{ color: '#8B7355' }}>{availableBowlTracks.length}种可用</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -518,15 +523,15 @@ export default function SingingBowlPage() {
             <div className="mb-3">
               <button onClick={() => toggleSection('ext-freqs')}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition"
-                style={{ background: '#5C1A00', boxShadow: '0 2px 12px rgba(92,26,0,0.15)' }}>
+                style={{ background: 'linear-gradient(135deg, #1a1208, #0F0A06)', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', border: '1px solid rgba(212,175,55,0.08)' }}>
                 <div className="flex items-center gap-2">
-                  <Sparkles size={16} style={{ color: '#E0C060' }} />
-                  <span className="font-bold text-sm" style={{ color: '#FDF8F0' }}>扩展疗愈频率</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(224,192,96,0.2)', color: '#E0C060' }}>
+                  <Sparkles size={16} style={{ color: '#E8C547' }} />
+                  <span className="font-bold text-sm" style={{ color: '#F5EFE0' }}>扩展疗愈频率</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,197,71,0.12)', color: '#E8C547' }}>
                     {NEW_HEALING_FREQS.length}+
                   </span>
                 </div>
-                {expandedSection === 'ext-freqs' ? <ChevronDown size={18} style={{ color: '#E0C060' }} /> : <ChevronRight size={18} style={{ color: '#E0C060' }} />}
+                {expandedSection === 'ext-freqs' ? <ChevronDown size={18} style={{ color: '#E8C547' }} /> : <ChevronRight size={18} style={{ color: '#E8C547' }} />}
               </button>
               {expandedSection === 'ext-freqs' && (
                 <div className="space-y-3 mt-2">
@@ -571,12 +576,12 @@ export default function SingingBowlPage() {
             <div className="mb-3">
               <button onClick={() => toggleSection('beat-mod')}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition"
-                style={{ background: '#5C1A00', boxShadow: '0 2px 12px rgba(92,26,0,0.15)' }}>
+                style={{ background: 'linear-gradient(135deg, #1a1208, #0F0A06)', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', border: '1px solid rgba(212,175,55,0.08)' }}>
                 <div className="flex items-center gap-2">
-                  <Waves size={16} style={{ color: '#E0C060' }} />
-                  <span className="font-bold text-sm" style={{ color: '#FDF8F0' }}>双耳节拍 · 波形调制</span>
+                  <Waves size={16} style={{ color: '#E8C547' }} />
+                  <span className="font-bold text-sm" style={{ color: '#F5EFE0' }}>双耳节拍 · 波形调制</span>
                 </div>
-                {expandedSection === 'beat-mod' ? <ChevronDown size={18} style={{ color: '#E0C060' }} /> : <ChevronRight size={18} style={{ color: '#E0C060' }} />}
+                {expandedSection === 'beat-mod' ? <ChevronDown size={18} style={{ color: '#E8C547' }} /> : <ChevronRight size={18} style={{ color: '#E8C547' }} />}
               </button>
               {expandedSection === 'beat-mod' && (
                 <div className="mt-2">
@@ -608,8 +613,8 @@ export default function SingingBowlPage() {
                         onClick={() => { setModulation(m.value); if (isPlaying && selectedFreq) startPlaying(selectedFreq, binauralBeat, m.value); }}
                         className="px-4 py-2.5 rounded-xl border text-xs font-bold transition hover:shadow-sm"
                         style={{
-                          background: modulation === m.value ? 'linear-gradient(135deg, #8B2500, #5C1A00)' : '#FDF8F0',
-                          borderColor: modulation === m.value ? '#8B2500' : '#EDE4D3',
+                          background: modulation === m.value ? 'linear-gradient(135deg, #B8860B, #5C3015)' : '#FDF8F0',
+                          borderColor: modulation === m.value ? '#B8860B' : '#EDE4D3',
                           color: modulation === m.value ? '#FDF8F0' : '#2C1810',
                         }}>
                         {m.name}
@@ -626,9 +631,9 @@ export default function SingingBowlPage() {
         {bowlPlayMode === 'recording' && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
-              <Music size={16} style={{ color: '#8B2500' }} />
-              <h3 className="font-bold text-sm" style={{ color: '#5C1A00' }}>真钵录音</h3>
-              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: '#8B250015', color: '#8B2500' }}>真实颂钵·自然共鸣</span>
+              <Music size={16} style={{ color: '#B8860B' }} />
+              <h3 className="font-bold text-sm" style={{ color: '#5C3015' }}>真钵录音</h3>
+              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(184,134,11,0.08)', color: '#8B6508' }}>真实颂钵·自然共鸣</span>
             </div>
             <div className="grid grid-cols-1 gap-2">
               {BOWL_RECORDINGS.map((rec) => {
@@ -663,9 +668,9 @@ export default function SingingBowlPage() {
         {bowlPlayMode === 'hit' && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
-              <Music size={16} style={{ color: '#8B2500' }} />
-              <h3 className="font-bold text-sm" style={{ color: '#5C1A00' }}>敲击音色</h3>
-              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: '#8B250015', color: '#8B2500' }}>槌击起音·自然衰减</span>
+              <Music size={16} style={{ color: '#B8860B' }} />
+              <h3 className="font-bold text-sm" style={{ color: '#5C3015' }}>敲击音色</h3>
+              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(184,134,11,0.08)', color: '#8B6508' }}>槌击起音·自然衰减</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {BOWL_HIT_SAMPLES.map((hit) => {
@@ -697,8 +702,8 @@ export default function SingingBowlPage() {
         {/* 环境音叠加 */}
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-3">
-            <Waves size={16} style={{ color: '#8B2500' }} />
-            <h3 className="font-bold text-sm" style={{ color: '#5C1A00' }}>环境音叠加</h3>
+            <Waves size={16} style={{ color: '#B8860B' }} />
+            <h3 className="font-bold text-sm" style={{ color: '#5C3015' }}>环境音叠加</h3>
             {ambientSoundId !== 'none' && currentAmbient && (
               <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: currentAmbient.color + '20', color: currentAmbient.color }}>
                 {currentAmbient.name}
@@ -736,7 +741,7 @@ export default function SingingBowlPage() {
 
         {/* 定时器 */}
         <div className="mb-5">
-          <h3 className="font-bold text-sm mb-2" style={{ color: '#5C1A00' }}>
+          <h3 className="font-bold text-sm mb-2" style={{ color: '#5C3015' }}>
             <Timer size={14} className="inline mr-1" />时长
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -759,7 +764,7 @@ export default function SingingBowlPage() {
 
         {/* 科学说明 */}
         <div className="rounded-2xl p-4 mb-4" style={{ background: '#FDF8F0', border: '1px solid #EDE4D3' }}>
-          <h4 className="font-bold text-sm mb-2" style={{ color: '#5C1A00' }}>颂钵音疗原理</h4>
+          <h4 className="font-bold text-sm mb-2" style={{ color: '#5C3015' }}>颂钵音疗原理</h4>
           <p className="text-xs leading-relaxed" style={{ color: '#5C3015' }}>
             颂钵音疗运用特定频率作用于人体，通过共振原理影响生理机能。中医认为"五音入五脏"，
             角(木/肝)、徵(火/心)、宫(土/脾)、商(金/肺)、羽(水/肾)五种音阶与五行脏腑对应。

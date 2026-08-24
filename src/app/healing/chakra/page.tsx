@@ -242,10 +242,10 @@ export default function ChakraPage() {
 
       {/* ═══ 沉浸式可视化舞台 ═══ */}
       <div className="relative overflow-hidden mx-2 mt-2" style={{
-        height: 280,
-        borderRadius: 20,
-        background: 'linear-gradient(180deg, #1a0f0a 0%, #2a1810 40%, #1a1208 100%)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+        height: 300,
+        borderRadius: 24,
+        background: 'radial-gradient(ellipse at 50% 30%, #1A1208 0%, #0F0A06 50%, #080503 100%)',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.5), 0 0 1px rgba(212,175,55,0.1), inset 0 1px 0 rgba(212,175,55,0.06)',
       }}>
         {/* 七脉轮能量柱背景 */}
         <div className="absolute inset-0 flex items-end justify-around px-2 pb-4">
@@ -304,7 +304,7 @@ export default function ChakraPage() {
         </div>
 
         {/* Canvas 可视化叠加层 */}
-        <div className="absolute inset-0" style={{ opacity: 0.5, pointerEvents: 'none' }}>
+        <div className="absolute inset-0" style={{ opacity: 0.55, pointerEvents: 'none' }}>
           <HealingCanvas ref={healingCanvasRef} energy={audioEnergy} config={HEALING_PRESET_CHAKRA} />
         </div>
 
@@ -316,24 +316,24 @@ export default function ChakraPage() {
                 <div
                   className="font-extralight tabular-nums tracking-tight"
                   style={{
-                    fontSize: 56,
+                    fontSize: 60,
                     lineHeight: 1,
                     color: currentChakra.color,
-                    textShadow: `0 0 32px ${currentChakra.color}60, 0 0 64px ${currentChakra.color}30`,
+                    textShadow: `0 0 28px ${currentChakra.color}55, 0 0 56px ${currentChakra.color}25, 0 2px 8px rgba(0,0,0,0.6)`,
                   }}
                 >
                   {currentChakra.freq}
-                  <span className="text-2xl ml-1" style={{ color: '#8B7355' }}>Hz</span>
+                  <span className="text-xl ml-1 font-extralight" style={{ color: '#D4AF37', opacity: 0.6 }}>Hz</span>
                 </div>
-                <div className="font-bold font-serif mt-2" style={{ fontSize: 18, color: currentChakra.color, letterSpacing: '0.15em' }}>
+                <div className="font-bold font-serif mt-3" style={{ fontSize: 17, color: currentChakra.color, letterSpacing: '0.2em', textShadow: `0 0 12px ${currentChakra.color}40` }}>
                   {currentChakra.name}
                 </div>
-                <div className="text-xs mt-1 font-serif italic" style={{ color: '#8B7355' }}>
+                <div className="text-[11px] mt-1.5 font-serif italic tracking-wider" style={{ color: 'rgba(212,175,55,0.5)' }}>
                   {currentChakra.sanskrit} · {currentChakra.element}行
                 </div>
               </>
             ) : (
-              <div className="text-2xl font-extralight tracking-[0.3em]" style={{ color: '#C4A870' }}>
+              <div className="text-xl font-extralight tracking-[0.35em]" style={{ color: 'rgba(212,175,55,0.4)', textShadow: '0 0 24px rgba(212,175,55,0.15)' }}>
                 选择脉轮
               </div>
             )}
@@ -343,13 +343,14 @@ export default function ChakraPage() {
         {/* 计时器 — 玻璃拟态 */}
         <div className="absolute right-3 top-3 rounded-xl px-3 py-1.5 font-mono text-xs tabular-nums"
           style={{
-            background: 'rgba(26,15,10,0.6)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(196,168,112,0.15)',
-            color: '#C4A870',
+            background: 'rgba(15,10,6,0.7)',
+            backdropFilter: 'blur(16px) saturate(1.2)',
+            border: '1px solid rgba(212,175,55,0.12)',
+            color: 'rgba(212,175,55,0.85)',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212,175,55,0.05)',
           }}>
           {fmtTime(elapsedSeconds)}
-          {timerMinutes > 0 && <span style={{ color: '#8B7355' }}>/{timerMinutes}:00</span>}
+          {timerMinutes > 0 && <span style={{ color: 'rgba(212,175,55,0.4)' }}>/{timerMinutes}:00</span>}
         </div>
 
         {/* 双耳节拍标签 */}
@@ -357,10 +358,11 @@ export default function ChakraPage() {
           <div className="absolute left-3 top-3">
             <span className="rounded-xl px-2.5 py-1 text-xs font-bold"
               style={{
-                background: 'rgba(74,222,128,0.15)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(74,222,128,0.3)',
-                color: '#4ADE80',
+                background: 'rgba(74,222,128,0.12)',
+                backdropFilter: 'blur(16px) saturate(1.2)',
+                border: '1px solid rgba(74,222,128,0.25)',
+                color: 'rgba(74,222,128,0.85)',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(74,222,128,0.08)',
               }}>
               +{binauralBeat}Hz
             </span>
@@ -368,22 +370,22 @@ export default function ChakraPage() {
         )}
 
         {/* 播放/暂停 — 悬浮按钮 */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
           <button
             onClick={() => isPlaying ? stopAll() : (selectedChakra !== null ? startPlayingWithGuide(CHAKRAS[selectedChakra].freq, binauralBeat, modulation as ModulationValue, CHAKRAS[selectedChakra].id) : startPlayingWithGuide(528, 10, 'ocean', 'heart'))}
             className="w-14 h-14 rounded-full flex items-center justify-center transition active:scale-90"
             style={{
               background: isPlaying
-                ? 'linear-gradient(135deg, rgba(220,38,38,0.3), rgba(220,38,38,0.1))'
-                : 'linear-gradient(135deg, rgba(34,197,94,0.3), rgba(34,197,94,0.1))',
-              border: `1.5px solid ${isPlaying ? 'rgba(220,38,38,0.4)' : 'rgba(34,197,94,0.4)'}`,
-              backdropFilter: 'blur(12px)',
+                ? 'linear-gradient(135deg, rgba(220,38,38,0.25), rgba(220,38,38,0.08))'
+                : 'linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.08))',
+              border: `1.5px solid ${isPlaying ? 'rgba(220,38,38,0.35)' : 'rgba(34,197,94,0.35)'}`,
+              backdropFilter: 'blur(16px) saturate(1.2)',
               boxShadow: isPlaying
-                ? '0 0 20px rgba(220,38,38,0.3)'
-                : '0 0 20px rgba(34,197,94,0.3)',
+                ? '0 0 20px rgba(220,38,38,0.25), 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(220,38,38,0.08)'
+                : '0 0 20px rgba(34,197,94,0.25), 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(34,197,94,0.08)',
             }}
           >
-            {isPlaying ? <Pause size={22} style={{ color: '#F87171' }} /> : <Play size={22} style={{ color: '#4ADE80' }} />}
+            {isPlaying ? <Pause size={22} style={{ color: 'rgba(248,113,113,0.9)' }} /> : <Play size={22} style={{ color: 'rgba(74,222,128,0.9)' }} />}
           </button>
         </div>
       </div>
@@ -391,17 +393,18 @@ export default function ChakraPage() {
       {/* ═══ 音量滑块 — 玻璃条 ═══ */}
       <div className="mx-2 mt-2 px-4 py-3 flex items-center gap-3"
         style={{
-          background: 'rgba(253,248,240,0.8)',
-          backdropFilter: 'blur(8px)',
-          borderRadius: 14,
-          border: '1px solid rgba(196,168,112,0.15)',
+          background: 'rgba(253,248,240,0.85)',
+          backdropFilter: 'blur(12px) saturate(1.1)',
+          borderRadius: 16,
+          border: '1px solid rgba(212,175,55,0.12)',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.4)',
         }}>
-        <Volume2 size={16} style={{ color: '#8B7355' }} />
+        <Volume2 size={16} style={{ color: '#B8860B' }} />
         <input
           type="range" min={0} max={100} value={volPercent}
           onChange={e => setVolume(Number(e.target.value) / 100)}
           className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
-          style={{ background: `linear-gradient(to right, #B8860B ${volPercent}%, #D4C5A9 ${volPercent}%)` }}
+          style={{ background: `linear-gradient(to right, #D4AF37 ${volPercent}%, #E0D5C0 ${volPercent}%)` }}
         />
         <span className="text-xs w-8 text-right tabular-nums" style={{ color: '#8B7355' }}>{volPercent}%</span>
       </div>
@@ -420,10 +423,11 @@ export default function ChakraPage() {
             className="flex-1 py-2.5 text-xs font-bold transition-all rounded-lg"
             style={{
               background: activePanel === tab.key
-                ? 'linear-gradient(135deg, #5C1A00, #8B2500)'
+                ? 'linear-gradient(135deg, #1a1208, #0F0A06)'
                 : 'transparent',
-              color: activePanel === tab.key ? '#FDF8F0' : '#8B7355',
-              boxShadow: activePanel === tab.key ? '0 2px 12px rgba(92,26,0,0.25)' : 'none',
+              color: activePanel === tab.key ? '#E8C547' : '#8B7355',
+              boxShadow: activePanel === tab.key ? '0 2px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(212,175,55,0.08)' : 'none',
+              border: activePanel === tab.key ? '1px solid rgba(212,175,55,0.15)' : '1px solid transparent',
             }}
           >
             {tab.label}
@@ -439,12 +443,13 @@ export default function ChakraPage() {
           <div className="mb-5">
             {/* 脉轮轨道 — 垂直能量流 */}
             <div className="relative rounded-2xl p-4 mb-4" style={{
-              background: 'linear-gradient(135deg, #1a0f0a 0%, #2a1810 100%)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              background: 'radial-gradient(ellipse at 50% 30%, #1A1208 0%, #0F0A06 100%)',
+              boxShadow: '0 8px 28px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212,175,55,0.06)',
+              border: '1px solid rgba(212,175,55,0.08)',
             }}>
               {/* 中央能量线 */}
-              <div className="absolute left-1/2 top-4 bottom-4 w-px -translate-x-1/2"
-                style={{ background: 'linear-gradient(to bottom, #DC2626, #F97316, #EAB308, #22C55E, #06B6D4, #6366F1, #A855F7)' }} />
+              <div className="absolute left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2"
+                style={{ background: 'linear-gradient(to bottom, #DC2626, #F97316, #EAB308, #22C55E, #06B6D4, #6366F1, #A855F7)', opacity: 0.5, borderRadius: 1 }} />
               {CHAKRAS.map((chakra, i) => {
                 const active = isPlaying && selectedChakra === i;
                 const isRecommended = hasDiagnosis && recommendedChakra && chakra.id === recommendedChakra;
@@ -551,19 +556,19 @@ export default function ChakraPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="rounded-lg px-3 py-2" style={{ background: '#FDF8F0' }}>
-                    <span className="font-bold" style={{ color: '#5C1A00' }}>频率 </span>
+                    <span className="font-bold" style={{ color: '#5C3015' }}>频率 </span>
                     <span style={{ color: '#5C3015' }}>{CHAKRAS[selectedChakra].freq}Hz</span>
                   </div>
                   <div className="rounded-lg px-3 py-2" style={{ background: '#FDF8F0' }}>
-                    <span className="font-bold" style={{ color: '#5C1A00' }}>五行 </span>
+                    <span className="font-bold" style={{ color: '#5C3015' }}>五行 </span>
                     <span style={{ color: '#5C3015' }}>{CHAKRAS[selectedChakra].element}行</span>
                   </div>
                   <div className="rounded-lg px-3 py-2" style={{ background: '#FDF8F0' }}>
-                    <span className="font-bold" style={{ color: '#5C1A00' }}>对应 </span>
+                    <span className="font-bold" style={{ color: '#5C3015' }}>对应 </span>
                     <span style={{ color: '#5C3015' }}>{CHAKRAS[selectedChakra].organ}</span>
                   </div>
                   <div className="rounded-lg px-3 py-2" style={{ background: '#FDF8F0' }}>
-                    <span className="font-bold" style={{ color: '#5C1A00' }}>功能 </span>
+                    <span className="font-bold" style={{ color: '#5C3015' }}>功能 </span>
                     <span style={{ color: '#5C3015' }}>{CHAKRAS[selectedChakra].desc}</span>
                   </div>
                 </div>
@@ -576,8 +581,8 @@ export default function ChakraPage() {
         {activePanel === 'presets' && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles size={16} style={{ color: '#8B2500' }} />
-              <h3 className="font-bold text-sm" style={{ color: '#5C1A00' }}>疗愈预设</h3>
+              <Sparkles size={16} style={{ color: '#B8860B' }} />
+              <h3 className="font-bold text-sm" style={{ color: '#5C3015' }}>疗愈预设</h3>
             </div>
             <div className="space-y-3">
               {CHAKRA_PRESETS.map((preset, i) => {
@@ -622,7 +627,7 @@ export default function ChakraPage() {
 
             {/* 定时器 */}
             <div className="mt-5">
-              <h3 className="font-bold text-sm mb-2" style={{ color: '#5C1A00' }}>
+              <h3 className="font-bold text-sm mb-2" style={{ color: '#5C3015' }}>
                 <Timer size={14} className="inline mr-1" />时长
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -657,7 +662,7 @@ export default function ChakraPage() {
           <div className="mb-5">
             {/* 脉轮补充频率 */}
             <div className="mb-5">
-              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C1A00' }}>脉轮补充频率</h3>
+              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C3015' }}>脉轮补充频率</h3>
               <p className="text-[10px] mb-3" style={{ color: '#8B7355' }}>宇宙八度体系·含波长参数</p>
               <div className="space-y-2">
                 {CHAKRA_EXTENDED_FREQS.map((cf, i) => {
@@ -704,7 +709,7 @@ export default function ChakraPage() {
 
             {/* 扩展疗愈频率类别 */}
             <div className="mb-5">
-              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C1A00' }}>扩展疗愈频率</h3>
+              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C3015' }}>扩展疗愈频率</h3>
               <p className="text-[10px] mb-3" style={{ color: '#8B7355' }}>healing-frequencies 项目·11类频率</p>
               <div className="space-y-3">
                 {(Object.keys(FREQ_BY_CATEGORY) as FreqCategory[]).map((cat) => {
@@ -747,7 +752,7 @@ export default function ChakraPage() {
           <div className="mb-5">
             {/* 双耳节拍 */}
             <div className="mb-5">
-              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C1A00' }}>双耳节拍</h3>
+              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C3015' }}>双耳节拍</h3>
               <div className="grid grid-cols-2 gap-2">
                 {BINAURAL_MODES.map((bm) => (
                   <button
@@ -779,7 +784,7 @@ export default function ChakraPage() {
 
             {/* 波形调制 */}
             <div className="mb-5">
-              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C1A00' }}>波形调制</h3>
+              <h3 className="font-bold text-sm mb-3" style={{ color: '#5C3015' }}>波形调制</h3>
               <div className="flex flex-wrap gap-2">
                 {MODULATIONS.map((m) => (
                   <button
@@ -792,8 +797,8 @@ export default function ChakraPage() {
                     }}
                     className="px-4 py-2.5 rounded-xl border text-xs font-bold transition hover:shadow-sm"
                     style={{
-                      background: modulation === m.value ? 'linear-gradient(135deg, #8B2500, #5C1A00)' : '#FDF8F0',
-                      borderColor: modulation === m.value ? '#8B2500' : '#EDE4D3',
+                      background: modulation === m.value ? 'linear-gradient(135deg, #B8860B, #5C3015)' : '#FDF8F0',
+                      borderColor: modulation === m.value ? '#B8860B' : '#EDE4D3',
                       color: modulation === m.value ? '#FDF8F0' : '#2C1810',
                     }}
                   >
@@ -805,7 +810,7 @@ export default function ChakraPage() {
 
             {/* 脉轮说明 */}
             <div className="rounded-2xl p-4 mb-4" style={{ background: '#FDF8F0', border: '1px solid #EDE4D3' }}>
-              <h4 className="font-bold text-sm mb-2" style={{ color: '#5C1A00' }}>脉轮调谐原理</h4>
+              <h4 className="font-bold text-sm mb-2" style={{ color: '#5C3015' }}>脉轮调谐原理</h4>
               <p className="text-xs leading-relaxed" style={{ color: '#5C3015' }}>
                 脉轮系统源于古印度瑜伽传统，认为人体有七个能量中心，沿脊柱由下而上排列。
                 每个脉轮对应特定的索尔菲吉奥频率：396Hz(根轮)释放恐惧、417Hz(腹轮)促进转化、

@@ -95,9 +95,9 @@ export const HEALING_PRESET_BOWL: HealingCanvasConfig = {
   particleBaseSize: 2.0,
   particleEnergyMul: 3,
   interactive: true,
-  bgColorCenter: '#FDF8F0',
-  bgColorEdge: '#F0E8D8',
-  particleHueCenter: 38,
+  bgColorCenter: '#1A1208',
+  bgColorEdge: '#0F0A06',
+  particleHueCenter: 42,
   particleHueWidth: 18,
 };
 
@@ -107,8 +107,8 @@ export const HEALING_PRESET_CHAKRA: HealingCanvasConfig = {
   particleBaseSize: 2.0,
   particleEnergyMul: 4,
   interactive: true,
-  bgColorCenter: '#FDF8F0',
-  bgColorEdge: '#E8DFD0',
+  bgColorCenter: '#1A1208',
+  bgColorEdge: '#0F0A06',
   particleHueCenter: 0,
   particleHueWidth: 360,
 };
@@ -148,9 +148,9 @@ function drawWuyin(
   const cy = h * 0.5;
 
   // ── 中央脉冲圆环（随能量呼吸） ──
-  if (e > 0.01) {
-    const pulseRadius = Math.min(w, h) * (0.08 + e * 0.12);
-    const pulseAlpha = 0.06 + e * 0.15;
+  if (e > 0.005) {
+    const pulseRadius = Math.min(w, h) * (0.06 + e * 0.16);
+    const pulseAlpha = 0.08 + e * 0.20;
     // 外圈光晕
     const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, pulseRadius * 2.5);
     glowGrad.addColorStop(0, `hsla(42, 60%, 70%, ${pulseAlpha * 0.5})`);
@@ -174,15 +174,15 @@ function drawWuyin(
   }
 
   // ── 能量粒子飞溅 ──
-  if (e > 0.15) {
-    const particleCount = Math.floor(e * 8);
+  if (e > 0.08) {
+    const particleCount = Math.floor(e * 12);
     for (let pi = 0; pi < particleCount; pi++) {
       const angle = waveTime * 0.5 + pi * (Math.PI * 2 / particleCount);
-      const dist = Math.min(w, h) * (0.15 + e * 0.2 + Math.sin(waveTime * 2 + pi) * 0.05);
+      const dist = Math.min(w, h) * (0.12 + e * 0.25 + Math.sin(waveTime * 2 + pi) * 0.06);
       const px = cx + Math.cos(angle) * dist;
       const py = cy + Math.sin(angle) * dist;
-      const psize = 1.5 + e * 2;
-      const palpha = 0.3 + e * 0.3;
+      const psize = 1.5 + e * 3;
+      const palpha = 0.35 + e * 0.35;
       ctx.beginPath();
       ctx.arc(px, py, psize, 0, Math.PI * 2);
       ctx.fillStyle = `hsla(42, 60%, 70%, ${palpha})`;
@@ -198,8 +198,8 @@ function drawWuyin(
 
     const baseY = band.yRatio * h;
     // 妙曼舞姿：基础振幅极低（静止时近乎平直），音频驱动时大幅舒展
-    const amp = band.amp * (0.12 + combined * 3.5);
-    const alpha = 0.04 + combined * 0.36;
+    const amp = band.amp * (0.15 + combined * 4.5);
+    const alpha = 0.05 + combined * 0.42;
 
     // ── 宽波带（渐变填充） ──
     ctx.beginPath();
@@ -437,21 +437,21 @@ function drawBowl(ctx: CanvasRenderingContext2D, w: number, h: number, time: num
   ctx.fillStyle = goldenGlow;
   ctx.fillRect(cx - coreR * 3, cy - coreR * 3, coreR * 6, coreR * 6);
 
-  // ── 第2层：色彩斑斓同心共振涟漪（瀑布式扩散） ──
-  // 每圈使用不同色相，形成彩虹色谱效果
-  const RAINBOW_HUES = [0, 30, 55, 120, 180, 220, 270, 310, 340];
+  // ── 第2层：金色同心共振涟漪（统一金调，瀑布式扩散） ──
+  // 以金色/琥珀色为主，营造高级金属感
+  const GOLD_HUES = [38, 42, 45, 35, 40, 48, 36, 44, 42];
   const ringCount = 12;
   for (let i = 0; i < ringCount; i++) {
     const phase = (time * 0.35 + i * 0.4) % 4;
     const progress = phase / 4;
     const radius = progress * maxR;
     const fadeOut = 1 - progress;
-    const hue = RAINBOW_HUES[i % RAINBOW_HUES.length];
-    const sat = 55 + e * 20;
-    const light = 55 + e * 15;
+    const hue = GOLD_HUES[i % GOLD_HUES.length];
+    const sat = 55 + e * 25;
+    const light = 55 + e * 18;
     // 震动脉冲：线条粗细随能量跳动
     const pulse = 1 + Math.sin(time * 3 + i * 0.7) * (0.2 + e * 0.5);
-    const alpha = fadeOut * (0.12 + e * 0.25) * pulse;
+    const alpha = fadeOut * (0.14 + e * 0.28) * pulse;
     const lw = (3.5 + e * 4) * fadeOut * pulse;
 
     ctx.beginPath();
@@ -460,21 +460,21 @@ function drawBowl(ctx: CanvasRenderingContext2D, w: number, h: number, time: num
     ctx.lineWidth = Math.max(lw, 0.5);
     ctx.stroke();
 
-    // 每圈的内发光（双层效应）
+    // 每圈的内发光（双层金属感）
     if (e > 0.1) {
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `hsla(${hue}, ${sat + 10}%, ${light + 15}%, ${alpha * 0.3})`;
+      ctx.strokeStyle = `hsla(${hue}, ${sat + 15}%, ${light + 18}%, ${alpha * 0.3})`;
       ctx.lineWidth = lw * 2.5;
       ctx.stroke();
     }
   }
 
-  // ── 第3层：频率波纹（正弦圆环 × 色彩斑斓） ──
+  // ── 第3层：频率波纹（正弦圆环 × 金色调） ──
   const freqRings = 5 + Math.floor(e * 4);
   for (let i = 0; i < freqRings; i++) {
     const baseR = 25 + i * 28 + e * 18;
-    const hue = (i * 45 + time * 20) % 360;
+    const hue = (i * 8 + 38 + time * 8) % 360; // 以金色为中心微变
     const wobbleAmp = (3 + e * 8) * (1 + Math.sin(time * 2.5 + i) * 0.3);
     ctx.beginPath();
     for (let a = 0; a <= Math.PI * 2; a += 0.015) {
@@ -486,8 +486,8 @@ function drawBowl(ctx: CanvasRenderingContext2D, w: number, h: number, time: num
       if (a === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.closePath();
-    const alpha = (0.15 + e * 0.20) * (1 - i * 0.08);
-    ctx.strokeStyle = `hsla(${hue}, 60%, ${55 + e * 10}%, ${Math.min(alpha, 0.5)})`;
+    const alpha = (0.15 + e * 0.22) * (1 - i * 0.08);
+    ctx.strokeStyle = `hsla(${hue}, 50%, ${58 + e * 12}%, ${Math.min(alpha, 0.5)})`;
     ctx.lineWidth = (1.5 + e * 2.5) * (1 - i * 0.05);
     ctx.stroke();
   }
@@ -528,7 +528,7 @@ function drawBowl(ctx: CanvasRenderingContext2D, w: number, h: number, time: num
   ctx.lineWidth = 2 + e * 2;
   ctx.stroke();
 
-  // ── 第6层：曼陀罗花瓣纹饰（钵体装饰） ──
+  // ── 第6层：莲瓣曼陀罗（钵体装饰，双层金调） ──
   const petalCount = 8;
   ctx.save();
   ctx.translate(cx, cy);
@@ -543,24 +543,45 @@ function drawBowl(ctx: CanvasRenderingContext2D, w: number, h: number, time: num
       10 + e * 5, 3.5 + e * 2,
       angle, 0, Math.PI * 2,
     );
-    const petalHue = (i * 45 + 30) % 360;
-    ctx.fillStyle = `hsla(${petalHue}, 45%, 62%, ${0.04 + e * 0.06})`;
+    const petalHue = (i * 8 + 35) % 60 + 30; // 金色系微变
+    ctx.fillStyle = `hsla(${petalHue}, 50%, 65%, ${0.05 + e * 0.07})`;
     ctx.fill();
-    ctx.strokeStyle = `hsla(${petalHue}, 55%, 68%, ${0.06 + e * 0.08})`;
+    ctx.strokeStyle = `hsla(${petalHue}, 60%, 72%, ${0.08 + e * 0.10})`;
     ctx.lineWidth = 0.8;
     ctx.stroke();
   }
   ctx.restore();
 
-  // ── 第7层：外围环形装饰光弧 ──
+  // 内层8瓣（反向旋转，更精致）
+  if (e > 0.05) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-time * 0.06);
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2 + Math.PI / 8;
+      const pr = 18 + e * 8;
+      ctx.beginPath();
+      ctx.ellipse(
+        Math.cos(angle) * pr * 0.55,
+        Math.sin(angle) * pr * 0.55,
+        7 + e * 3, 2.5 + e * 1.5,
+        angle, 0, Math.PI * 2,
+      );
+      ctx.fillStyle = `hsla(42, 55%, 70%, ${0.04 + e * 0.06})`;
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ── 第7层：外围装饰光弧（金色调，更含蓄） ──
   for (let i = 0; i < 3; i++) {
     const arcR = maxR * (0.7 + i * 0.12);
     const startAngle = time * (0.2 + i * 0.1) + i * Math.PI * 0.7;
     const sweep = Math.PI * (0.3 + e * 0.4);
-    const arcHue = (i * 80 + time * 15) % 360;
+    const arcHue = (40 + i * 5 + time * 5) % 60 + 30; // 金色系
     ctx.beginPath();
     ctx.arc(cx, cy, arcR, startAngle, startAngle + sweep);
-    ctx.strokeStyle = `hsla(${arcHue}, 50%, 60%, ${0.06 + e * 0.10})`;
+    ctx.strokeStyle = `hsla(${arcHue}, 45%, 62%, ${0.06 + e * 0.10})`;
     ctx.lineWidth = 2 + e * 2;
     ctx.lineCap = 'round';
     ctx.stroke();
@@ -569,66 +590,181 @@ function drawBowl(ctx: CanvasRenderingContext2D, w: number, h: number, time: num
 }
 
 // ===== 绘制函数：脉轮 =====
+// 七脉轮传统莲瓣数：根4·腹6·脐10·心12·喉16·眉心2·顶轮千瓣(以32近似)
+const CHAKRA_PETALS = [4, 6, 10, 12, 16, 2, 32];
+
 function drawChakra(ctx: CanvasRenderingContext2D, w: number, h: number, time: number, e: number) {
   const cx = w * 0.5;
   const cy = h * 0.50;
   const baseR = Math.min(w, h) * 0.35;
 
-  // 七脉轮竖直排列的能量光晕（始终可见）
+  // ── 第1层：深漆暗角晕影（营造沉浸空间感） ──
+  const vignette = ctx.createRadialGradient(cx, cy, baseR * 0.5, cx, cy, Math.max(w, h) * 0.75);
+  vignette.addColorStop(0, 'hsla(36, 25%, 4%, 0)');
+  vignette.addColorStop(0.5, 'hsla(36, 25%, 3%, 0.15)');
+  vignette.addColorStop(1, 'hsla(36, 25%, 2%, 0.45)');
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, w, h);
+
+  // ── 第2层：中脉 Sushumna（金色能量通道，七色渐变） ──
+  const sushumnaGrad = ctx.createLinearGradient(cx, h * 0.05, cx, h * 0.95);
+  sushumnaGrad.addColorStop(0,    `hsla(280, 55%, 62%, ${0.08 + e * 0.06})`);
+  sushumnaGrad.addColorStop(0.17, `hsla(240, 50%, 62%, ${0.07 + e * 0.05})`);
+  sushumnaGrad.addColorStop(0.34, `hsla(190, 45%, 62%, ${0.06 + e * 0.04})`);
+  sushumnaGrad.addColorStop(0.50, `hsla(120, 50%, 62%, ${0.06 + e * 0.04})`);
+  sushumnaGrad.addColorStop(0.66, `hsla(35,  60%, 62%, ${0.07 + e * 0.05})`);
+  sushumnaGrad.addColorStop(0.83, `hsla(25,  55%, 62%, ${0.08 + e * 0.05})`);
+  sushumnaGrad.addColorStop(1,    `hsla(0,   55%, 62%, ${0.08 + e * 0.06})`);
+  ctx.strokeStyle = sushumnaGrad;
+  ctx.lineWidth = 3 + e * 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(cx, h * 0.05);
+  ctx.lineTo(cx, h * 0.95);
+  ctx.stroke();
+  ctx.lineCap = 'butt';
+
+  // ── 第3层：七脉轮莲瓣光球（传统花瓣数 + 径向发光 + 核心） ──
   for (let i = 0; i < CHAKRAS.length; i++) {
     const ch = CHAKRAS[i];
     const y = ch.y * h;
-    const pulse = 1 + Math.sin(time * 0.8 + i * 0.9) * 0.15 + e * 0.2;
-    const radius = (10 + e * 6) * pulse;
+    const pulse = 1 + Math.sin(time * 0.7 + i * 0.9) * 0.12 + e * 0.25;
+    const orbR = (7 + e * 7) * pulse;
+    const petalCount = CHAKRA_PETALS[i];
 
-    const glow = ctx.createRadialGradient(cx, y, 0, cx, y, radius * 3);
-    glow.addColorStop(0, `hsla(${ch.hue}, ${ch.sat}%, 60%, ${0.18 + e * 0.12})`);
-    glow.addColorStop(0.4, `hsla(${ch.hue}, ${ch.sat - 10}%, 50%, ${0.08 + e * 0.05})`);
+    // 外层弥散光晕
+    const glow = ctx.createRadialGradient(cx, y, 0, cx, y, orbR * 4.5);
+    glow.addColorStop(0, `hsla(${ch.hue}, ${ch.sat}%, 68%, ${0.22 + e * 0.18})`);
+    glow.addColorStop(0.3, `hsla(${ch.hue}, ${ch.sat}%, 55%, ${0.10 + e * 0.08})`);
     glow.addColorStop(1, `hsla(${ch.hue}, ${ch.sat - 20}%, 40%, 0)`);
     ctx.fillStyle = glow;
-    ctx.fillRect(cx - radius * 3, y - radius * 3, radius * 6, radius * 6);
+    ctx.fillRect(cx - orbR * 4.5, y - orbR * 4.5, orbR * 9, orbR * 9);
 
-    // 脉轮圆点
+    // 莲花瓣（传统数量，随能量展开）
+    if (petalCount > 0 && e > 0.02) {
+      ctx.save();
+      ctx.translate(cx, y);
+      ctx.rotate(time * 0.08 + i * 0.3);
+      const petalR = orbR * 2.8;
+      const petalOpen = Math.min(1, e * 2.5); // 能量越高花瓣越展开
+      for (let p = 0; p < petalCount; p++) {
+        const angle = (p / petalCount) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.ellipse(
+          Math.cos(angle) * petalR * 0.45 * petalOpen,
+          Math.sin(angle) * petalR * 0.45 * petalOpen,
+          petalR * 0.38, petalR * 0.12,
+          angle, 0, Math.PI * 2,
+        );
+        ctx.fillStyle = `hsla(${ch.hue}, ${ch.sat}%, 65%, ${0.05 + e * 0.07})`;
+        ctx.fill();
+        ctx.strokeStyle = `hsla(${ch.hue}, ${ch.sat + 10}%, 72%, ${0.08 + e * 0.10})`;
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 顶轮千瓣效果（高能量时绽放多层）
+    if (i === 6 && e > 0.08) {
+      ctx.save();
+      ctx.translate(cx, y);
+      ctx.rotate(time * 0.04);
+      for (let layer = 0; layer < 3; layer++) {
+        const layerR = orbR * (2.5 + layer * 0.8);
+        const layerPetals = 24;
+        for (let p = 0; p < layerPetals; p++) {
+          const angle = (p / layerPetals) * Math.PI * 2 + layer * 0.2;
+          ctx.beginPath();
+          ctx.ellipse(
+            Math.cos(angle) * layerR * 0.6,
+            Math.sin(angle) * layerR * 0.6,
+            layerR * 0.22, layerR * 0.06,
+            angle, 0, Math.PI * 2,
+          );
+          ctx.fillStyle = `hsla(280, 45%, 65%, ${0.02 + e * 0.03 - layer * 0.005})`;
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    // 脉轮核心光球（径向渐变，更精致）
+    const coreR = orbR * 0.55;
+    const coreGrad = ctx.createRadialGradient(cx, y, 0, cx, y, coreR);
+    coreGrad.addColorStop(0, `hsla(${ch.hue}, ${ch.sat + 15}%, 80%, ${0.55 + e * 0.30})`);
+    coreGrad.addColorStop(0.5, `hsla(${ch.hue}, ${ch.sat}%, 65%, ${0.35 + e * 0.20})`);
+    coreGrad.addColorStop(1, `hsla(${ch.hue}, ${ch.sat}%, 55%, 0)`);
+    ctx.fillStyle = coreGrad;
     ctx.beginPath();
-    ctx.arc(cx, y, radius * 0.6, 0, Math.PI * 2);
-    ctx.fillStyle = `hsla(${ch.hue}, ${ch.sat + 10}%, 65%, ${0.40 + e * 0.20})`;
+    ctx.arc(cx, y, coreR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 核心亮点
+    ctx.beginPath();
+    ctx.arc(cx, y, Math.max(1.5, orbR * 0.18), 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${ch.hue}, ${ch.sat + 20}%, 88%, ${0.60 + e * 0.30})`;
     ctx.fill();
   }
 
-  // 中脉线（垂直能量通道）
-  ctx.beginPath();
-  ctx.moveTo(cx, h * 0.08);
-  ctx.lineTo(cx, h * 0.92);
-  ctx.strokeStyle = `hsla(0, 0%, 80%, ${0.06 + e * 0.04})`;
-  ctx.lineWidth = 2 + e * 2;
-  ctx.stroke();
+  // ── 第4层：神圣几何（生命之花，能量激活时显现） ──
+  if (e > 0.04) {
+    const geoR = baseR * 0.32;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(time * 0.02);
+    ctx.strokeStyle = `hsla(45, 35%, 68%, ${0.04 + e * 0.06})`;
+    ctx.lineWidth = 0.7;
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const ox = Math.cos(angle) * geoR * 0.5;
+      const oy = Math.sin(angle) * geoR * 0.5;
+      ctx.beginPath();
+      ctx.arc(ox, oy, geoR * 0.5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(0, 0, geoR * 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 
-  // 旋转轮盘装饰（外层大圆上的花瓣纹理）
-  const petalCount = 12;
-  const rotation = time * 0.15;
+  // ── 第5层：外层旋转曼陀罗（24瓣，金属色调） ──
+  const mandalaR = baseR * 0.85;
+  const mandalaPetals = 24;
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.rotate(rotation);
-  for (let i = 0; i < petalCount; i++) {
-    const angle = (i / petalCount) * Math.PI * 2;
-    const petalR = baseR * (0.5 + e * 0.15);
+  ctx.rotate(time * 0.05);
+  for (let i = 0; i < mandalaPetals; i++) {
+    const angle = (i / mandalaPetals) * Math.PI * 2;
+    const petalLen = mandalaR * (0.28 + e * 0.12);
     ctx.beginPath();
     ctx.ellipse(
-      Math.cos(angle) * petalR * 0.7,
-      Math.sin(angle) * petalR * 0.7,
-      12 + e * 5, 4 + e * 2,
+      Math.cos(angle) * mandalaR * 0.62,
+      Math.sin(angle) * mandalaR * 0.62,
+      petalLen * 0.5, petalLen * 0.13,
       angle, 0, Math.PI * 2,
     );
-    ctx.fillStyle = `hsla(${(i * 30) % 360}, 40%, 65%, ${0.06 + e * 0.04})`;
+    ctx.fillStyle = `hsla(${(i * 15) % 360}, 30%, 60%, ${0.025 + e * 0.035})`;
     ctx.fill();
+    ctx.strokeStyle = `hsla(45, 25%, 65%, ${0.02 + e * 0.03})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
   }
   ctx.restore();
 
-  // 外环
+  // ── 第6层：外环细线（精致金线） ──
   ctx.beginPath();
-  ctx.arc(cx, cy, baseR * 0.6, 0, Math.PI * 2);
-  ctx.strokeStyle = `hsla(0, 0%, 70%, ${0.08 + e * 0.06})`;
+  ctx.arc(cx, cy, mandalaR * 0.72, 0, Math.PI * 2);
+  ctx.strokeStyle = `hsla(45, 30%, 65%, ${0.06 + e * 0.05})`;
   ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // 内环
+  ctx.beginPath();
+  ctx.arc(cx, cy, baseR * 0.35, 0, Math.PI * 2);
+  ctx.strokeStyle = `hsla(45, 25%, 60%, ${0.04 + e * 0.04})`;
+  ctx.lineWidth = 0.8;
   ctx.stroke();
 }
 
