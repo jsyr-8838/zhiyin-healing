@@ -155,7 +155,7 @@ export default function SingingBowlPage() {
     pendingPlayRef.current = { freq, beat, mod, trackId };
     const charCount = text.replace(/[^\u4e00-\u9fa5]/g, '').length;
     const estimatedMs = Math.max(8000, Math.ceil(charCount / 3.5) * 1000 + 2000);
-    ttsRef.current.speak(text, 0.5);
+    ttsRef.current.speak(text, 0.5, 0.7);
     guideEndTimeoutRef.current = setTimeout(() => {
       setPreludePlaying(false);
       const pending = pendingPlayRef.current;

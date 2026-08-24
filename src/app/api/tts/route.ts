@@ -7,7 +7,8 @@ import { ttsPostSchema, validateOrError } from '@/lib/validators';
  * 
  * 优质中文音色：
  *   女声：zh-CN-XiaoxiaoNeural（晓晓，温柔知性）
- *   男声：zh-CN-YunxiNeural（云希，沉稳温暖）
+ *   男声：zh-CN-YunjianNeural（云健，沉稳厚重，低沉磁性，强感染力）
+ *   默认回退声音：男声云健（禁止用女声引导疗愈）
  */
 
 export async function POST(request: NextRequest) {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     if ('error' in validation) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
-    const { text, voice, speed } = validation.data;
+    const { text, voice, speed, pitch } = validation.data;
 
     const ttsBase = process.env.TTS_API_BASE;
 
@@ -31,10 +32,11 @@ export async function POST(request: NextRequest) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'tts-1',
-            voice: voice || 'zh-CN-XiaoxiaoNeural',
+            voice: voice || 'zh-CN-YunjianNeural',
             input: text,
             response_format: 'mp3',
             speed: speed ?? 1.0,
+            pitch: pitch ?? 0.7,
           }),
           signal: controller.signal,
         });

@@ -304,7 +304,7 @@ export default function LiuzijuePage() {
     // 六字诀模式：前奏已涵盖姿势/闭眼/呼吸预演，这里不再播开场短文案
     // 通用呼吸模式：仍播开场短文案引导用户
     if (audioEnabled && mode !== 'liuzijue') {
-      ttsRef.current.speak(GUIDE_TEXTS_START.startGeneric(currentMode), 0.6);
+      ttsRef.current.speak(GUIDE_TEXTS_START.startGeneric(currentMode), 0.6, 0.7);
     }
     const startDelay = mode === 'liuzijue' ? 1500 : 3500;
     setTimeout(() => runPhase('inhale', currentMode.inhale), startDelay);
@@ -391,7 +391,7 @@ export default function LiuzijuePage() {
       if (audioEnabled) {
         ttsRef.current.speak(
           mode === 'liuzijue' ? GUIDE_TEXTS_START.completeLiuzijue(currentJue) : GUIDE_TEXTS_START.completeGeneric,
-          0.5, 0.8,
+          0.5, 0.7,
         );
       }
       // 停止呼吸引擎（不调用 stopBreathing 避免截断 TTS）

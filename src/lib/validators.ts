@@ -74,6 +74,7 @@ export const ttsPostSchema = z.object({
   text: z.string().min(1).max(5000),
   voice: z.string().max(64).optional(),
   speed: z.number().min(0.25).max(4.0).optional(),
+  pitch: z.number().min(0.0).max(2.0).optional(),
 });
 
 // ===== 占卜 API =====

@@ -313,7 +313,7 @@ export default function GroundingPage() {
   // ===== 播放话术 =====
   const speakScript = useCallback((text: string) => {
     if (!audioEnabled) return;
-    ttsRef.current.speak(text, modeConfig.rate);
+    ttsRef.current.speak(text, modeConfig.rate, 0.7);
   }, [audioEnabled, modeConfig.rate]);
 
   // ===== 进入一个新步骤 =====
@@ -516,7 +516,7 @@ export default function GroundingPage() {
           } catch {}
           setPhase('complete');
           if (audioEnabled) {
-            ttsRef.current.speak('十大流程已全部完成。静禅国灸，以禅入灸，以灸养禅，愿您身心安泰。', modeConfig.rate);
+            ttsRef.current.speak('十大流程已全部完成。静禅国灸，以禅入灸，以灸养禅，愿您身心安泰。', modeConfig.rate, 0.7);
           }
         }
       }

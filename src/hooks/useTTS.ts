@@ -10,7 +10,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  *
  * 音色：
  *   女声：zh-CN-XiaoxiaoNeural（晓晓）
- *   男声：zh-CN-YunxiNeural（云希）
+ *   男声：zh-CN-YunjianNeural（云健·沉稳厚重·感染力强）
+ *   男声默认 pitch=0.7（低沉磁性），避免偏高女声感
  */
 export type VoiceGender = 'female' | 'male';
 export type VoiceSpeed = 'slow' | 'normal' | 'fast';
@@ -39,11 +40,14 @@ interface UseTTSReturn {
 
 const EDGE_VOICE_MAP: Record<VoiceGender, string> = {
   female: 'zh-CN-XiaoxiaoNeural',
-  male: 'zh-CN-YunxiNeural',
+  male: 'zh-CN-YunjianNeural',
 };
 
 const FEMALE_KEYWORDS = ['yaoyao', 'huihui', 'xiaoxiao', 'xiaoyi', 'female'];
-const MALE_KEYWORDS = ['kangkang', 'yunxi', 'yunyang', 'yunjian', 'male'];
+const MALE_KEYWORDS = ['yunjian', 'yunxi', 'yunyang', 'kangkang', 'male'];
+
+// 男声默认音高：0.7 = 低沉磁性，避免偏高女声感
+const DEFAULT_PITCH_MALE = 0.7;
 
 const SPEED_MAP: Record<VoiceSpeed, number> = { slow: 0.5, normal: 0.75, fast: 1.0 };
 
@@ -55,11 +59,14 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   const {
     defaultGender = 'female',
     defaultSpeed = 'slow',
-    pitch: defaultPitch = 0.85,
+    pitch: defaultPitch,
     volume = 0.9,
     lang = 'zh-CN',
     voiceId,
   } = options;
+
+  // 男声默认 pitch=0.7（低沉磁性），女声默认 0.85
+  const effectiveDefaultPitch = defaultPitch ?? (defaultGender === 'male' ? DEFAULT_PITCH_MALE : 0.85);
 
   const [gender, setGenderState] = useState<VoiceGender>(defaultGender);
   const [speed, setSpeedState] = useState<VoiceSpeed>(defaultSpeed);
@@ -67,8 +74,8 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   const [usingEdgeTTS, setUsingEdgeTTS] = useState(true);
 
   // 用 ref 保存所有可变值，避免 useCallback 依赖循环
-  const stateRef = useRef({ gender, speed, usingEdgeTTS, defaultPitch, volume, lang, voiceId });
-  stateRef.current = { gender, speed, usingEdgeTTS, defaultPitch, volume, lang, voiceId };
+  const stateRef = useRef({ gender, speed, usingEdgeTTS, effectiveDefaultPitch, volume, lang, voiceId });
+  stateRef.current = { gender, speed, usingEdgeTTS, effectiveDefaultPitch, volume, lang, voiceId };
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const browserVoicesRef = useRef<SpeechSynthesisVoice[]>([]);
@@ -133,7 +140,8 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = s.lang;
     u.rate = rate;
-    u.pitch = s.defaultPitch;
+    // 男声使用低沉 pitch，女声使用默认偏高 pitch
+    u.pitch = g === 'male' ? DEFAULT_PITCH_MALE : s.effectiveDefaultPitch;
     u.volume = s.volume;
 
     const voices = browserVoicesRef.current;
@@ -154,11 +162,13 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   }, []);
 
   // 对外 speak — 唯一入口
-  const speak = useCallback((text: string, rate?: number, _pitch?: number) => {
+  const speak = useCallback((text: string, rate?: number, pitchOverride?: number) => {
     const s = stateRef.current;
     const effectiveRate = rate ?? SPEED_MAP[s.speed];
     const voiceName = s.voiceId || EDGE_VOICE_MAP[s.gender];
     const g = s.gender;
+    // pitch 参数优先使用调用方传入的，否则用男声低沉默认值
+    const effectivePitch = pitchOverride ?? (g === 'male' ? DEFAULT_PITCH_MALE : s.effectiveDefaultPitch);
 
     // 每次新 speak 都使旧异步回调失效
     const myId = ++speakIdRef.current;
@@ -180,7 +190,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
         const response = await fetch('/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, voice: voiceName, speed: clampRate(effectiveRate) }),
+          body: JSON.stringify({ text, voice: voiceName, speed: clampRate(effectiveRate), pitch: effectivePitch }),
         });
 
         // 检查是否已被更新的 speak 取代
