@@ -69,7 +69,7 @@ export default function ChakraPage() {
   const [activePanel, setActivePanel] = useState<'chakras' | 'presets' | 'freqs' | 'controls'>('chakras');
 
   // ===== TTS 男声导引 =====
-  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'slow', voiceId: 'zh-CN-YunjianNeural' });
+  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'normal', voiceId: 'zh-CN-YunjianNeural' });
   const ttsRef = useRef(tts);
   ttsRef.current = tts;
   const pendingPlayRef = useRef<{ freq: number; beat: BinauralValue; mod: ModulationValue } | null>(null);
@@ -140,7 +140,7 @@ export default function ChakraPage() {
       pendingPlayRef.current = { freq, beat, mod };
       const charCount = text.replace(/[^\u4e00-\u9fa5]/g, '').length;
       const estimatedMs = Math.max(8000, Math.ceil(charCount / 3.5) * 1000 + 2000);
-      ttsRef.current.speak(text, 0.5, 0.7);
+      ttsRef.current.speak(text, 1.0, 0.7);
       guideEndTimeoutRef.current = setTimeout(() => {
         setPreludePlaying(false);
         const pending = pendingPlayRef.current;
