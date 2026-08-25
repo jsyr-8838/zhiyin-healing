@@ -247,6 +247,14 @@ export default function ChakraPage() {
         background: 'radial-gradient(ellipse at 50% 30%, #1A1208 0%, #0F0A06 50%, #080503 100%)',
         boxShadow: '0 12px 40px rgba(0,0,0,0.5), 0 0 1px rgba(212,175,55,0.1), inset 0 1px 0 rgba(212,175,55,0.06)',
       }}>
+        {/* 莲花光能背景层 */}
+        <img
+          src="/images/healing/lotus-light.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+          style={{ opacity: 0.35, mixBlendMode: 'screen' }}
+        />
+
         {/* 七脉轮能量柱背景 */}
         <div className="absolute inset-0 flex items-end justify-around px-2 pb-4">
           {CHAKRAS.map((chakra, i) => {
