@@ -307,6 +307,40 @@ export default function HealingPage() {
           </div>
         </div>
 
+        {/* ===== 中医修真 · 游戏化学习 ===== */}
+        <div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-1 h-5 rounded-full bg-red-800" />
+            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">中医修真</h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-red-800/40 to-transparent" />
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">3000题</span>
+          </div>
+          <Link href="/healing/tcm-quest" className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-900 via-amber-800 to-amber-700" />
+            <div className="absolute inset-0 opacity-20" style={{
+              backgroundImage: 'radial-gradient(circle at 15% 50%, rgba(201,146,42,0.4) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(181,49,28,0.3) 0%, transparent 50%)',
+            }} />
+            <div className="relative z-10 p-4 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-amber-300 border border-white/20 flex-shrink-0 text-2xl">
+                🏆
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-sm font-serif text-white flex items-center gap-2">
+                  中医修真 · TCM Quest
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-amber-500/30 text-amber-200 font-normal">Ultra</span>
+                </h4>
+                <p className="text-[10px] text-white/50 mt-0.5">3000题库 · 500中药 · 200方剂 · 100医案 · Boss挑战 · 间隔复习</p>
+              </div>
+              <div className="flex items-center gap-0.5 flex-shrink-0">
+                {[0.4, 0.7, 1, 0.6, 0.8].map((h, i) => (
+                  <div key={i} className="w-1 bg-amber-400/60 rounded-full animate-pulse" style={{ height: `${h * 16}px`, animationDelay: `${i * 200}ms` }} />
+                ))}
+              </div>
+              <ArrowRight size={16} className="text-amber-300/60 flex-shrink-0" />
+            </div>
+          </Link>
+        </div>
+
         {/* ===== 音频疗愈专区（三模块统一入口） ===== */}
         <div>
           <div className="flex items-center gap-3 mb-3">
