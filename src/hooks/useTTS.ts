@@ -211,6 +211,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   }, []);
 
   // 对外 speak — 唯一入口
+  // 核心策略：先同步调用 speechSynthesis（保证手机端有声音），再异步 fetch Edge TTS 增强
   const speak = useCallback((text: string, rate?: number, pitchOverride?: number) => {
     const s = stateRef.current;
     const effectiveRate = rate ?? SPEED_MAP[s.speed];
@@ -221,11 +222,11 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     // 每次新 speak 都使旧异步回调失效
     const myId = ++speakIdRef.current;
 
-    // 在用户手势上下文中解锁音频（speak 通常由按钮点击触发）
+    // 在用户手势上下文中解锁音频
     unlockAudio();
 
-    // 先停止之前的所有播放（若刚解锁则静音播放正在进行，跳过暂停避免打断解锁）
-    if (audioUnlockedRef.current && audioRef.current) {
+    // 先停止之前的播放
+    if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.removeAttribute('src');
     }
@@ -235,7 +236,10 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
 
     speakingRef.current = true;
 
-    // 异步请求 Edge TTS
+    // ===== 第一步：立即同步调用 speechSynthesis（在用户手势上下文中，手机不会拦截） =====
+    speakBrowser(text, effectiveRate, g);
+
+    // ===== 第二步：异步请求 Edge TTS，成功则用高质量音频替换 =====
     (async () => {
       try {
         const response = await fetch('/api/tts', {
@@ -249,18 +253,21 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
 
         const ct = response.headers.get('content-type') ?? '';
         if (!response.ok || ct.includes('application/json')) {
-          // Edge TTS 本次失败，仅当次回退到浏览器语音
-          speakBrowser(text, effectiveRate, g);
+          // Edge TTS 不可用，继续使用 speechSynthesis（已在播放中）
           return;
         }
 
         const audioBlob = await response.blob();
         if (speakIdRef.current !== myId) return;
 
+        // Edge TTS 成功，停止 speechSynthesis，切换到高质量音频
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          speechSynthesis.cancel();
+        }
+
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = audioRef.current!;
         audio.src = audioUrl;
-        // 确保音量恢复正常（解锁时可能设为 0）
         audio.volume = s.volume;
 
         audio.onended = () => {
@@ -275,18 +282,15 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
         try {
           await audio.play();
         } catch (playErr: unknown) {
-          // play() 被中断（新的 speak 到来）— 正常，不需要 fallback
+          // Edge TTS 播放失败（如手机自动播放限制），speechSynthesis 已在播放，无需额外处理
           if (playErr instanceof DOMException && playErr.name === 'AbortError') return;
-          // 其他播放错误（如手机自动播放限制） → fallback 到浏览器语音
-          if (speakIdRef.current === myId) {
+          // 如果 speechSynthesis 已被停止，尝试重新启动
+          if (speakIdRef.current === myId && !speechSynthesis.speaking) {
             speakBrowser(text, effectiveRate, g);
           }
         }
       } catch (err) {
-        // fetch 失败 → 仅当次回退
-        if (speakIdRef.current === myId) {
-          speakBrowser(text, effectiveRate, g);
-        }
+        // fetch 失败，speechSynthesis 已在播放中，无需额外处理
       }
     })();
   }, [speakBrowser, unlockAudio]);
