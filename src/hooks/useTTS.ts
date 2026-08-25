@@ -30,6 +30,7 @@ interface UseTTSReturn {
   speak: (text: string, rate?: number, pitch?: number) => void;
   stop: () => void;
   isSpeaking: () => boolean;
+  unlockAudio: () => void;
   gender: VoiceGender;
   setGender: (g: VoiceGender) => void;
   speed: VoiceSpeed;
@@ -49,7 +50,11 @@ const MALE_KEYWORDS = ['yunjian', 'yunxi', 'yunyang', 'kangkang', 'male'];
 // 男声默认音高：0.7 = 低沉磁性，避免偏高女声感
 const DEFAULT_PITCH_MALE = 0.7;
 
-const SPEED_MAP: Record<VoiceSpeed, number> = { slow: 0.5, normal: 0.75, fast: 1.0 };
+// 正常语速：1.0 = 自然人声速度
+const SPEED_MAP: Record<VoiceSpeed, number> = { slow: 0.5, normal: 1.0, fast: 1.5 };
+
+// 极短静音 WAV（用于解锁手机 Audio 自动播放限制）
+const SILENCE_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
 
 function clampRate(rate: number): number {
   return Math.max(0.25, Math.min(4.0, rate));
@@ -80,6 +85,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const browserVoicesRef = useRef<SpeechSynthesisVoice[]>([]);
   const speakingRef = useRef(false);
+  const audioUnlockedRef = useRef(false);
 
   // 递增 speakId：每次新 speak 自增，旧 speak 的异步回调检查 id 是否过期
   const speakIdRef = useRef(0);
@@ -111,6 +117,49 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     const timer = setTimeout(loadVoices, 300);
     return () => { speechSynthesis.removeEventListener('voiceschanged', loadVoices); clearTimeout(timer); };
   }, []);
+
+  // ===== 音频解锁（修复手机端无法播放问题） =====
+  // 手机浏览器要求 audio.play() 必须在用户手势中调用至少一次。
+  // speak() 内部有异步 fetch，等到 play() 时已脱离手势上下文，被自动播放策略拦截。
+  // 解决：在用户首次交互时用静音音频解锁 Audio 元素，之后异步播放不再被拦截。
+  const unlockAudio = useCallback(() => {
+    if (audioUnlockedRef.current || !audioRef.current) return;
+    audioUnlockedRef.current = true; // 立即标记，避免竞态
+    const audio = audioRef.current;
+    const prevVolume = audio.volume;
+    audio.volume = 0;
+    audio.src = SILENCE_WAV;
+    audio.play().then(() => {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.volume = prevVolume;
+    }).catch(() => {
+      audio.volume = prevVolume;
+    });
+    // 同时解锁 speechSynthesis（部分手机浏览器也需要）
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        const u = new SpeechSynthesisUtterance(' ');
+        u.volume = 0;
+        u.rate = 10;
+        speechSynthesis.speak(u);
+        speechSynthesis.cancel();
+      } catch {}
+    }
+  }, []);
+
+  // 全局监听首次用户交互，自动解锁
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = () => unlockAudio();
+    const opts = { once: true, passive: true } as AddEventListenerOptions;
+    document.addEventListener('click', handler, opts);
+    document.addEventListener('touchend', handler, opts);
+    return () => {
+      document.removeEventListener('click', handler);
+      document.removeEventListener('touchend', handler);
+    };
+  }, [unlockAudio]);
 
   // 停止所有播放
   const stop = useCallback(() => {
@@ -167,14 +216,16 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     const effectiveRate = rate ?? SPEED_MAP[s.speed];
     const voiceName = s.voiceId || EDGE_VOICE_MAP[s.gender];
     const g = s.gender;
-    // pitch 参数优先使用调用方传入的，否则用男声低沉默认值
     const effectivePitch = pitchOverride ?? (g === 'male' ? DEFAULT_PITCH_MALE : s.effectiveDefaultPitch);
 
     // 每次新 speak 都使旧异步回调失效
     const myId = ++speakIdRef.current;
 
-    // 先停止之前的所有播放
-    if (audioRef.current) {
+    // 在用户手势上下文中解锁音频（speak 通常由按钮点击触发）
+    unlockAudio();
+
+    // 先停止之前的所有播放（若刚解锁则静音播放正在进行，跳过暂停避免打断解锁）
+    if (audioUnlockedRef.current && audioRef.current) {
       audioRef.current.pause();
       audioRef.current.removeAttribute('src');
     }
@@ -209,6 +260,8 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = audioRef.current!;
         audio.src = audioUrl;
+        // 确保音量恢复正常（解锁时可能设为 0）
+        audio.volume = s.volume;
 
         audio.onended = () => {
           if (speakIdRef.current === myId) speakingRef.current = false;
@@ -224,7 +277,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
         } catch (playErr: unknown) {
           // play() 被中断（新的 speak 到来）— 正常，不需要 fallback
           if (playErr instanceof DOMException && playErr.name === 'AbortError') return;
-          // 其他播放错误 → fallback
+          // 其他播放错误（如手机自动播放限制） → fallback 到浏览器语音
           if (speakIdRef.current === myId) {
             speakBrowser(text, effectiveRate, g);
           }
@@ -236,7 +289,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
         }
       }
     })();
-  }, [speakBrowser]);
+  }, [speakBrowser, unlockAudio]);
 
   const isSpeaking = useCallback((): boolean => {
     if (typeof window === 'undefined') return false;
@@ -255,7 +308,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     setSpeedState(s);
   }, []);
 
-  return { speak, stop, isSpeaking, gender, setGender, speed, setSpeed, voicesReady, usingEdgeTTS };
+  return { speak, stop, isSpeaking, unlockAudio, gender, setGender, speed, setSpeed, voicesReady, usingEdgeTTS };
 }
 
 export default useTTS;
