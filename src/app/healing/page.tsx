@@ -78,6 +78,13 @@ export default function HealingPage() {
     <PageContainer theme="healing">
       {/* ===== 顶部：问候 + 体质信息 ===== */}
       <div className="px-5 pt-12 pb-8 text-white relative overflow-hidden bg-gradient-to-br from-red-950 via-red-900 to-red-800">
+        {/* 莲花光能装饰背景 */}
+        <img
+          src="/images/healing/lotus-light.jpg"
+          alt=""
+          className="absolute right-[-20px] top-1/2 -translate-y-1/2 w-32 h-32 object-contain pointer-events-none"
+          style={{ opacity: 0.22, mixBlendMode: 'screen', filter: 'blur(0.5px)' }}
+        />
         {/* 装饰印章 */}
         <div className="absolute top-4 right-4 opacity-10 -rotate-[8deg]">
           <div className="border-2 border-amber-400 px-3 py-1 text-amber-400 text-[0.7em] font-bold tracking-[4px]">疗愈</div>
