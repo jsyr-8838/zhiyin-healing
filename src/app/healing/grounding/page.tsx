@@ -32,10 +32,17 @@ type Phase = 'intro' | 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6'
 type VoiceMode = 'immersive' | 'deep' | 'natural';
 
 const VOICE_MODES: { id: VoiceMode; name: string; desc: string; rate: number; icon: string }[] = [
-  { id: 'immersive', name: '沉浸式', desc: '全程序引导·娓娓道来', rate: 0.5, icon: '🌊' },
-  { id: 'deep', name: '深入式', desc: '深层引导·呼吸同步', rate: 0.4, icon: '🔮' },
-  { id: 'natural', name: '顺应自然式', desc: '简约引导·留白静养', rate: 0.6, icon: '🍃' },
+  { id: 'immersive', name: '沉浸式', desc: '全程引导·自然语速', rate: 1.0, icon: '🌊' },
+  { id: 'deep', name: '深入式', desc: '深层引导·缓慢呼吸', rate: 0.9, icon: '🔮' },
+  { id: 'natural', name: '顺应自然式', desc: '简约引导·留白静养', rate: 1.05, icon: '🍃' },
 ];
+
+// ===== 语音时长估算 =====
+// 云健男声正常语速约 3.5 字/秒，rate=1.0；rate 越低越慢
+function estimateSpeechSeconds(text: string, rate: number): number {
+  const charCount = text.replace(/[^\u4e00-\u9fa5]/g, '').length;
+  return Math.ceil(charCount / (3.5 * rate)) + 2; // +2 秒缓冲
+}
 
 interface StepData {
   id: Phase;
@@ -62,7 +69,7 @@ const STEPS: StepData[] = [
   {
     id: 'step1', num: 1, title: '闻灸', subtitle: '辨识药灸品质·开启疗愈',
     icon: Wind, color: '#8B6914', duration: 60, stage: 'preparation',
-    openingScript: `欢迎您体验静禅国灸。今天，我们将用六十分钟的时间，带您走完十大操作流程，从辨识药灸，到禅定收功，一步一步，身心安泰。
+    openingScript: `欢迎您体验静禅国灸。今天，我们将带您走完十大操作流程，从辨识药灸，到禅定收功，一步一步，身心安泰。
 现在，第一步——闻灸。
 请您轻轻靠近这根灸条，用鼻子慢慢地闻一闻。
 您是否闻到了淡淡的中草药香？这是十几味中药、两味藏药，和三年以上黄金艾绒，按照君臣佐使的原理配伍而成的味道。
@@ -294,8 +301,8 @@ export default function GroundingPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [currentScriptPart, setCurrentScriptPart] = useState<'opening' | 'midway' | 'closing'>('opening');
 
-  // ===== TTS 男声导引 =====
-  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'slow', voiceId: 'zh-CN-YunjianNeural' });
+  // ===== TTS 男声导引（正常语速，自然真实人声感） =====
+  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'normal', voiceId: 'zh-CN-YunjianNeural' });
   const ttsRef = useRef(tts);
   ttsRef.current = tts;
 
@@ -306,9 +313,31 @@ export default function GroundingPage() {
   const closingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const phaseStartTimeRef = useRef<number>(0);
   const totalStartTimeRef = useRef<number>(0);
+  const effectiveDurationRef = useRef<number>(0); // 语音让步后的有效步骤时长
 
   const currentStep = STEPS[currentStepIdx];
   const modeConfig = VOICE_MODES.find(m => m.id === voiceMode)!;
+
+  // ===== 计算步骤有效时长（语音时间让步） =====
+  // 逻辑：先算所有话术语音需要多少时间，再加上留白时间，取"语音总时长+留白"和"原始时长"中较大者
+  const getEffectiveDuration = useCallback((step: StepData, rate: number, mode: VoiceMode): number => {
+    const openSec = estimateSpeechSeconds(step.openingScript, rate);
+    const midSec = step.midwayScript ? estimateSpeechSeconds(step.midwayScript, rate) : 0;
+    const closeSec = step.closingScript ? estimateSpeechSeconds(step.closingScript, rate) : 0;
+    if (mode === 'natural') {
+      // 顺应自然式：只播开场 + 收尾，中间大段留白
+      const speechTotal = openSec + closeSec;
+      const silenceNeeded = 30; // 最少 30 秒留白
+      return Math.max(step.duration, speechTotal + silenceNeeded);
+    }
+    // 沉浸式 / 深入式：开场 + 留白 + 中段 + 留白 + 收尾
+    const speechTotal = openSec + midSec + closeSec;
+    const silenceNeeded = 40; // 留白时间合计至少 40 秒
+    return Math.max(step.duration, speechTotal + silenceNeeded);
+  }, []);
+
+  // 当前步骤的有效时长（用于 UI 和计时器）
+  const effectiveDuration = currentStep ? getEffectiveDuration(currentStep, modeConfig.rate, voiceMode) : 0;
 
   // ===== 播放话术 =====
   const speakScript = useCallback((text: string) => {
@@ -319,17 +348,20 @@ export default function GroundingPage() {
   // ===== 进入一个新步骤 =====
   const enterStep = useCallback((idx: number) => {
     if (idx >= STEPS.length) {
-      // 全部完成
       setPhase('complete');
       return;
     }
     const step = STEPS[idx];
+    const rate = VOICE_MODES.find(m => m.id === voiceMode)!.rate;
+    const effDur = getEffectiveDuration(step, rate, voiceMode);
+
     setCurrentStepIdx(idx);
     setPhase(step.id);
     setStepElapsed(0);
     setShowTips(false);
     setCurrentScriptPart('opening');
     phaseStartTimeRef.current = Date.now();
+    effectiveDurationRef.current = effDur;
 
     // 清理之前的定时器
     if (midwayTimeoutRef.current) { clearTimeout(midwayTimeoutRef.current); midwayTimeoutRef.current = null; }
@@ -338,76 +370,59 @@ export default function GroundingPage() {
     // 播放开场话术
     speakScript(step.openingScript);
 
-    // 顺应自然式：不播中段和收尾，只在开始播开场
-    // 沉浸式 & 深入式：安排中段和收尾话术
+    // 计算时间线（语音时间让步）
+    const openSec = estimateSpeechSeconds(step.openingScript, rate);
+
     if (voiceMode !== 'natural') {
-      // 中段话术：在步骤进行到约 50% 时播放
+      // 沉浸式 / 深入式：开场 → 留白 → 中段 → 留白 → 收尾
       if (step.midwayScript) {
-        const midwayDelay = step.duration * 1000 * 0.45;
+        const midSec = estimateSpeechSeconds(step.midwayScript, rate);
+        const closeSec = step.closingScript ? estimateSpeechSeconds(step.closingScript, rate) : 0;
+        // 中段播放在开场讲完后 + 留白
+        const midwayDelay = (openSec + 15) * 1000; // 开场讲完 + 15 秒留白
         midwayTimeoutRef.current = setTimeout(() => {
           setCurrentScriptPart('midway');
           speakScript(step.midwayScript!);
         }, midwayDelay);
-      }
 
-      // 收尾话术：在步骤结束前约 15 秒播放
-      if (step.closingScript) {
-        const closingDelay = Math.max(0, (step.duration - 15) * 1000);
+        // 收尾播放：中段讲完 + 留白后
+        if (step.closingScript) {
+          const closingDelay = (openSec + 15 + midSec + 15) * 1000;
+          closingTimeoutRef.current = setTimeout(() => {
+            setCurrentScriptPart('closing');
+            speakScript(step.closingScript!);
+          }, closingDelay);
+        }
+      } else if (step.closingScript) {
+        // 无中段：开场讲完 + 留白 → 收尾
+        const closingDelay = (openSec + 20) * 1000;
         closingTimeoutRef.current = setTimeout(() => {
           setCurrentScriptPart('closing');
           speakScript(step.closingScript!);
         }, closingDelay);
       }
     } else {
-      // 顺应自然式：只在结束前 5 秒播收尾过渡
+      // 顺应自然式：只播开场 + 收尾（中间大段留白）
       if (step.closingScript) {
-        const closingDelay = Math.max(0, (step.duration - 5) * 1000);
+        const closingDelay = Math.max((openSec + 30) * 1000, (effDur - estimateSpeechSeconds(step.closingScript, rate) - 5) * 1000);
         closingTimeoutRef.current = setTimeout(() => {
           setCurrentScriptPart('closing');
           speakScript(step.closingScript!);
         }, closingDelay);
       }
     }
-  }, [speakScript, voiceMode]);
+  }, [speakScript, voiceMode, getEffectiveDuration]);
 
   // ===== 开始疏导 =====
   const startTherapy = useCallback(() => {
-    setPhase('step1');
     setCurrentStepIdx(0);
     setStepElapsed(0);
     setTotalElapsed(0);
     setShowTips(false);
     setIsPaused(false);
     totalStartTimeRef.current = Date.now();
-    phaseStartTimeRef.current = Date.now();
-    setCurrentScriptPart('opening');
-
-    // 播放开场话术
-    speakScript(STEPS[0].openingScript);
-
-    // 安排中段和收尾
-    if (voiceMode !== 'natural') {
-      if (STEPS[0].midwayScript) {
-        midwayTimeoutRef.current = setTimeout(() => {
-          setCurrentScriptPart('midway');
-          speakScript(STEPS[0].midwayScript!);
-        }, STEPS[0].duration * 1000 * 0.45);
-      }
-      if (STEPS[0].closingScript) {
-        closingTimeoutRef.current = setTimeout(() => {
-          setCurrentScriptPart('closing');
-          speakScript(STEPS[0].closingScript!);
-        }, Math.max(0, (STEPS[0].duration - 15) * 1000));
-      }
-    } else {
-      if (STEPS[0].closingScript) {
-        closingTimeoutRef.current = setTimeout(() => {
-          setCurrentScriptPart('closing');
-          speakScript(STEPS[0].closingScript!);
-        }, Math.max(0, (STEPS[0].duration - 5) * 1000));
-      }
-    }
-  }, [speakScript, voiceMode]);
+    enterStep(0);
+  }, [enterStep]);
 
   // ===== 暂停/继续 =====
   const togglePause = useCallback(() => {
@@ -489,8 +504,9 @@ export default function GroundingPage() {
       setStepElapsed(stepNow);
       setTotalElapsed(totalNow);
 
-      // 自动推进到下一步
-      if (currentStep && stepNow >= currentStep.duration) {
+      // 自动推进到下一步（使用语音让步后的有效时长）
+      const effDur = effectiveDurationRef.current || (currentStep?.duration ?? 0);
+      if (currentStep && stepNow >= effDur) {
         ttsRef.current.stop();
         if (currentStepIdx < STEPS.length - 1) {
           enterStep(currentStepIdx + 1);
@@ -605,8 +621,9 @@ export default function GroundingPage() {
         ctx.strokeStyle = `${currentStep.color}22`;
         ctx.lineWidth = 6;
         ctx.stroke();
-        // 步骤时间进度（基于 stepElapsed / duration）
-        const timeProgress = Math.min(stepElapsed / currentStep.duration, 1);
+        // 步骤时间进度（基于 stepElapsed / 有效时长）
+        const effDur = effectiveDurationRef.current || currentStep.duration;
+        const timeProgress = Math.min(stepElapsed / effDur, 1);
         ctx.beginPath();
         ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + timeProgress * Math.PI * 2);
         ctx.strokeStyle = currentStep.color;
@@ -646,9 +663,9 @@ export default function GroundingPage() {
     return '#5B9BD5';
   };
 
-  const stepRemaining = currentStep ? Math.max(0, currentStep.duration - stepElapsed) : 0;
-  const stepProgress = currentStep ? Math.min(stepElapsed / currentStep.duration, 1) : 0;
-  const totalDuration = STEPS.reduce((sum, s) => sum + s.duration, 0); // 3600s = 60min
+  const stepRemaining = currentStep ? Math.max(0, effectiveDuration - stepElapsed) : 0;
+  const stepProgress = currentStep ? Math.min(stepElapsed / effectiveDuration, 1) : 0;
+  const totalDuration = STEPS.reduce((sum, s) => sum + getEffectiveDuration(s, modeConfig.rate, voiceMode), 0);
   const totalProgress = Math.min(totalElapsed / totalDuration, 1);
 
   return (
@@ -693,7 +710,7 @@ export default function GroundingPage() {
             <div className="text-center">
               <div className="text-3xl font-black" style={{ color: currentStep.color }}>{currentStep.num}</div>
               <div className="text-sm text-white/80 mt-1 font-bold">{currentStep.title}</div>
-              <div className="text-[10px] text-white/40">{stageLabel(currentStep.stage)} | {fmtTime(stepElapsed)}/{fmtTime(currentStep.duration)}</div>
+              <div className="text-[10px] text-white/40">{stageLabel(currentStep.stage)} | {fmtTime(stepElapsed)}/{fmtTime(effectiveDuration)}</div>
             </div>
           ) : null}
         </div>
@@ -706,7 +723,7 @@ export default function GroundingPage() {
         {/* 总进度 */}
         {phase !== 'intro' && phase !== 'complete' && (
           <div className="absolute left-3 top-3 rounded px-2 py-1 font-mono text-[10px] tabular-nums" style={{ background: 'rgba(8,4,2,0.7)', color: '#C4A35A' }}>
-            总 {fmtTime(totalElapsed)}/60:00
+            总 {fmtTime(totalElapsed)}/{fmtTime(totalDuration)}
           </div>
         )}
       </div>
@@ -720,7 +737,7 @@ export default function GroundingPage() {
             <div className="mb-4 rounded-xl p-4" style={{ background: '#FDF8F0', border: '1px solid #EDE4D3' }}>
               <h3 className="font-bold text-sm mb-2" style={{ color: '#5C1A00' }}>静禅国灸 · 十大操作流程</h3>
               <p className="text-xs leading-relaxed" style={{ color: '#5C3015' }}>
-                今天您体验的是中华第一灸，静禅国灸。全程六十分钟，十大操作流程，从闻灸辨识品质开始，经热敷、响钟、药油、行钟、摇钟、定钟，到病理火灸温通经脉，灸感沟通了解身体反应，最终以禅定心法收功。全程男性磁性嗓音引导陪伴，沉浸式疗愈体验。
+                今天您体验的是中华第一灸，静禅国灸。十大操作流程，从闻灸辨识品质开始，经热敷、响钟、药油、行钟、摇钟、定钟，到病理火灸温通经脉，灸感沟通了解身体反应，最终以禅定心法收功。全程男性磁性嗓音引导陪伴，自然真实的人声语速，沉浸式疗愈体验。
               </p>
             </div>
 
@@ -782,8 +799,7 @@ export default function GroundingPage() {
                     {stageLabel(step.stage)}
                   </div>
                   <div className="text-[10px] font-mono tabular-nums" style={{ color: '#8B7355' }}>
-                    {step.duration >= 60 ? `${Math.floor(step.duration / 60)}分` : `${step.duration}秒`}
-                  </div>
+                    {step.duration >= 60 ? `${Math.floor(step.duration / 60)}分` : `${step.duration}秒`}{' ≈'}</div>
                 </div>
               ))}
             </div>
@@ -793,7 +809,7 @@ export default function GroundingPage() {
               className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition active:scale-95"
               style={{ background: 'linear-gradient(135deg, #8B2500, #C4A35A)' }}
             >
-              开始体验 · 六十分钟全程引导
+              开始体验 · 全程语音引导
             </button>
           </div>
         )}
@@ -830,7 +846,7 @@ export default function GroundingPage() {
               </div>
               <div className="flex justify-between mt-1 text-[10px]" style={{ color: '#8B7355' }}>
                 <span>{fmtTime(totalElapsed)}</span>
-                <span>60:00</span>
+                <span>{fmtTime(totalDuration)}</span>
               </div>
             </div>
 
@@ -859,7 +875,7 @@ export default function GroundingPage() {
               </div>
               <div className="flex justify-between mt-1 text-[10px] font-mono" style={{ color: '#8B7355' }}>
                 <span>{fmtTime(stepElapsed)}</span>
-                <span>{fmtTime(currentStep.duration)}</span>
+                <span>{fmtTime(effectiveDuration)}</span>
               </div>
             </div>
 
@@ -976,7 +992,7 @@ export default function GroundingPage() {
           <p className="text-xs leading-relaxed" style={{ color: '#5C3015' }}>
             静禅国灸是中华第一灸，以"国"字号药灸为核心，由十几味中药、两味藏药、三年以上黄金艾绒根据君臣佐使原理配伍而成，效果为普通艾灸的8.4倍。
             十大流程从闻灸辨识品质，经热敷排寒、悬钟激活、药油引经、行钟排毒、摇钟松解、定钟拔毒，到病理火灸温通经脉，灸感沟通了解身体反应，最终以禅定心法收功。
-            全程六十分钟，以禅入灸，以灸养禅，实现身心合一的疗愈体验。
+            全程语音引导，以禅入灸，以灸养禅，实现身心合一的疗愈体验。
           </p>
         </div>
       </div>
