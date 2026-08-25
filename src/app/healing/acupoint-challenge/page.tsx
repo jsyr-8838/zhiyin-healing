@@ -9,7 +9,7 @@ import { useCultivationStore } from '@/lib/cultivation-store';
 import { XWS_VIDEO_ACUPOINTS } from '@/lib/xws-video-names';
 import { ACUPOINT_LOCATION_IMAGES } from '@/lib/acupoint-image-names';
 import { cosUrl } from '@/lib/cos-url';
-import { ArrowLeft, Target, Check, X, Award, RotateCw, Zap, ChevronRight, MapPin, Video, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Target, Check, X, Award, RotateCw, Zap, ChevronRight, MapPin, Video, ExternalLink, BookOpen } from 'lucide-react';
 
 // ═══════════════════════════════════════
 // 经脉中文映射
@@ -24,22 +24,6 @@ const MERIDIAN_ZH: Record<string, string> = {
 const WUXING_EN: Record<string, string> = {
   '金': 'metal', '水': 'water', '木': 'wood', '火': 'fire', '土': 'earth',
 };
-
-// ═══════════════════════════════════════
-// 2D 人体模型坐标映射
-// 与穴位定位模块(MeridianClient/TcmBodyModel)统一的2D人体图
-// 坐标系：SVG viewBox 300×400，与挑战页人体图一致
-// 原始3D坐标 Y:0~1.714, X:-0.557~0.557 → 转为SVG百分比
-// ═══════════════════════════════════════
-
-const Y_MIN = 0, Y_MAX = 1.714;
-const X_MIN = -0.557, X_MAX = 0.557;
-
-function pointTo2D(pos: [number, number, number]): { x: number; y: number } {
-  const xNorm = (pos[0] - X_MIN) / (X_MAX - X_MIN);
-  const yNorm = 1 - (pos[1] - Y_MIN) / (Y_MAX - Y_MIN);
-  return { x: xNorm * 100, y: yNorm * 100 };
-}
 
 // ═══════════════════════════════════════
 // 进度持久化
@@ -71,42 +55,73 @@ function saveProgress(p: ChallengeProgress) {
 // 穴位详情卡片（含定位图+视频，与穴位定位模块信息打通）
 // ═══════════════════════════════════════
 
-function AcupointInfoCard({ point, meridian, showFullDetail }: { point: TcmAcupoint; meridian?: TcmMeridian; showFullDetail: boolean }) {
+function AcupointDetailCard({ point, meridian }: { point: TcmAcupoint; meridian?: TcmMeridian }) {
   const hasImage = ACUPOINT_LOCATION_IMAGES.has(point.name);
   const hasVideo = XWS_VIDEO_ACUPOINTS.has(point.name) || XWS_VIDEO_ACUPOINTS.has(point.name + '穴');
   const meridianName = MERIDIAN_ZH[point.meridian] || point.meridian;
+  const [showVideo, setShowVideo] = useState(false);
 
-  if (!showFullDetail) {
-    // 简洁模式（答题中显示定位信息）
-    return (
-      <div className="mt-3 p-3 rounded-lg bg-blue-50/80 border border-blue-200">
-        <div className="flex items-center gap-2 mb-1">
-          <MapPin size={12} className="text-blue-600" />
-          <span className="text-[10px] text-blue-700 font-bold">定位</span>
-        </div>
-        <p className="text-[11px] text-gray-700 leading-relaxed">{point.location}</p>
-      </div>
-    );
-  }
-
-  // 完整模式（答对后展示图片+视频+主治）
   return (
-    <div className="mt-3 space-y-2">
-      {/* 定位 */}
+    <div className="space-y-3">
+      {/* 定位图（核心：答题时直接展示真实穴位图） */}
+      {hasImage ? (
+        <div className="rounded-xl overflow-hidden bg-white border-2 border-emerald-300 shadow-lg">
+          <div className="bg-emerald-50 px-3 py-1.5 flex items-center gap-1.5 border-b border-emerald-200">
+            <MapPin size={13} className="text-emerald-600" />
+            <span className="text-xs font-bold text-emerald-700">{point.name} 穴位定位图</span>
+            <span className="text-[10px] text-gray-400 ml-auto">{meridianName}</span>
+          </div>
+          <img
+            src={cosUrl(`/assets/acupoint/images/${encodeURIComponent(point.name)}.jpg`)}
+            alt={`${point.name}穴位定位图`}
+            className="w-full"
+            loading="eager"
+          />
+        </div>
+      ) : (
+        <div className="rounded-xl bg-amber-50 border-2 border-amber-200 p-4 text-center">
+          <MapPin size={20} className="text-amber-500 mx-auto mb-1" />
+          <p className="text-xs text-amber-700">暂无 {point.name} 定位图</p>
+        </div>
+      )}
+
+      {/* 定位描述 */}
       <div className="p-3 rounded-lg bg-blue-50/80 border border-blue-200">
         <div className="flex items-center gap-2 mb-1">
-          <MapPin size={12} className="text-blue-600" />
-          <span className="text-[10px] text-blue-700 font-bold">定位</span>
-          <Link
-            href={`/meridian?focus=${point.code}`}
-            className="ml-auto text-[9px] text-emerald-600 flex items-center gap-0.5 hover:text-emerald-700 transition-colors"
-          >
-            <ExternalLink size={10} />
-            穴位定位模块
-          </Link>
+          <BookOpen size={12} className="text-blue-600" />
+          <span className="text-[10px] text-blue-700 font-bold">定位描述</span>
         </div>
         <p className="text-[11px] text-gray-700 leading-relaxed">{point.location}</p>
       </div>
+
+      {/* 穴位定位视频（折叠，点击展开） */}
+      {hasVideo && (
+        <div className="rounded-xl overflow-hidden bg-white border border-gray-200">
+          <button
+            onClick={() => setShowVideo(!showVideo)}
+            className="w-full px-3 py-2 flex items-center gap-1.5 bg-purple-50 border-b border-purple-200 transition hover:bg-purple-100"
+          >
+            <Video size={13} className="text-purple-600" />
+            <span className="text-xs font-bold text-purple-700">{showVideo ? '收起视频' : '观看定位视频'}</span>
+            <ChevronRight size={13} className={`text-purple-400 ml-auto transition-transform ${showVideo ? 'rotate-90' : ''}`} />
+          </button>
+          {showVideo && (
+            <video
+              src={cosUrl(`/videos/acupoints/${encodeURIComponent(point.name + '穴')}.mp4`)}
+              controls
+              autoPlay
+              preload="metadata"
+              playsInline
+              className="w-full"
+              style={{ maxHeight: '50vh' }}
+              onError={(e) => {
+                const target = e.target as HTMLVideoElement;
+                target.parentElement!.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">视频加载失败</p>';
+              }}
+            />
+          )}
+        </div>
+      )}
 
       {/* 主治 */}
       {point.indications && (
@@ -122,45 +137,12 @@ function AcupointInfoCard({ point, meridian, showFullDetail }: { point: TcmAcupo
         </div>
       )}
 
-      {/* 定位图 */}
-      {hasImage && (
-        <div className="p-2 rounded-lg bg-white/60 border border-gray-200">
-          <div className="text-[10px] text-gray-500 font-bold mb-1 flex items-center gap-1">
-            <span className="text-blue-500">◉</span> 穴位定位图
-          </div>
-          <img
-            src={cosUrl(`/assets/acupoint/images/${encodeURIComponent(point.name)}.jpg`)}
-            alt={`${point.name}穴位定位图`}
-            className="w-full rounded-lg"
-            loading="lazy"
-          />
-        </div>
-      )}
-
-      {/* 穴位视频 */}
-      {hasVideo && (
-        <div className="p-2 rounded-lg bg-white/60 border border-gray-200">
-          <div className="text-[10px] text-gray-500 font-bold mb-1 flex items-center gap-1">
-            <Video size={10} className="text-emerald-500" /> 穴位定位视频
-          </div>
-          <video
-            src={cosUrl(`/videos/acupoints/${encodeURIComponent(point.name + '穴')}.mp4`)}
-            controls
-            preload="metadata"
-            playsInline
-            className="w-full rounded-lg"
-            style={{ maxHeight: '40vh' }}
-            onError={(e) => { (e.target as HTMLVideoElement).parentElement!.style.display = 'none'; }}
-          />
-        </div>
-      )}
-
       {/* 跳转穴位定位模块 */}
       <Link
         href={`/meridian?focus=${point.code}`}
         className="block w-full p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-center text-xs text-emerald-700 font-bold hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1"
       >
-        <MapPin size={12} />
+        <ExternalLink size={12} />
         前往穴位定位模块查看完整详情
         <ChevronRight size={12} />
       </Link>
@@ -169,88 +151,132 @@ function AcupointInfoCard({ point, meridian, showFullDetail }: { point: TcmAcupo
 }
 
 // ═══════════════════════════════════════
+// 生成多选题选项
+// ═══════════════════════════════════════
+
+function generateOptions(correctPoint: TcmAcupoint, allPoints: TcmAcupoint[], count: number = 4): TcmAcupoint[] {
+  // 选项从同一经脉的其他穴位中选取，如果不够则从附近经脉补充
+  const sameMeridian = allPoints.filter(p => p.meridian === correctPoint.meridian && p.code !== correctPoint.code);
+  const otherPoints = allPoints.filter(p => p.meridian !== correctPoint.meridian);
+
+  // 打乱
+  const shuffle = <T,>(arr: T[]): T[] => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  // 优先从同经脉取，不够再从其他经脉补
+  const pool = shuffle(sameMeridian);
+  const extra = shuffle(otherPoints);
+  const wrongOptions = [...pool, ...extra].slice(0, count - 1);
+
+  // 随机插入正确答案
+  const allOptions = shuffle([correctPoint, ...wrongOptions]);
+  return allOptions;
+}
+
+// ═══════════════════════════════════════
 // 主组件
 // ═══════════════════════════════════════
 
 type GameState = 'idle' | 'playing' | 'finished';
+type QuestionData = {
+  point: TcmAcupoint;
+  options: TcmAcupoint[];
+  showHint: boolean;     // 是否已展示定位图提示
+  answered: 'correct' | 'wrong' | null;
+  selectedCode: string | null;
+};
 
 export default function AcupointChallengePage() {
   const allPoints = useMemo(() => getTcmAcupoints(), []);
   const meridians = useMemo(() => getTcmMeridians(), []);
 
+  // 只保留有定位图的穴位作为题目
+  const qualifiedPoints = useMemo(() => {
+    return allPoints.filter(p => ACUPOINT_LOCATION_IMAGES.has(p.name));
+  }, [allPoints]);
+
   const validMeridianCodes = useMemo(() => {
-    return meridians.filter(m => m.acupoints.length >= 5).map(m => m.code);
+    return meridians
+      .filter(m => m.acupoints.filter(p => ACUPOINT_LOCATION_IMAGES.has(p.name)).length >= 3)
+      .map(m => m.code);
   }, [meridians]);
 
   const [selectedMeridian, setSelectedMeridian] = useState<string>('all');
   const [gameState, setGameState] = useState<GameState>('idle');
-  const [questionPool, setQuestionPool] = useState<TcmAcupoint[]>([]);
+  const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong'; msg: string; detail?: string } | null>(null);
-  const [highlightCode, setHighlightCode] = useState<string | null>(null);
-  const [showAllLabels, setShowAllLabels] = useState(false);
   const [progress, setProgress] = useState<ChallengeProgress>(loadProgress);
   const [roundSize, setRoundSize] = useState(10);
-  const [rewardGiven, setRewardGiven] = useState(false);
-
-  const { addXiuWei, recordPractice, completeTodayStep } = useCultivationStore();
   const rewardGivenRef = useRef(false);
 
   useEffect(() => { saveProgress(progress); }, [progress]);
 
-  const currentQuestion = useMemo(() => questionPool[currentIdx] || null, [questionPool, currentIdx]);
+  const currentQuestion = questions[currentIdx] || null;
 
   const gamePoints = useMemo(() => {
     if (selectedMeridian === 'all') {
-      return allPoints;
+      return qualifiedPoints;
     }
-    return allPoints.filter(p => p.meridian === selectedMeridian);
-  }, [allPoints, selectedMeridian]);
-
-  // 计算2D位置（统一坐标系，不再用3D投影）
-  const points2d = useMemo(() => {
-    return gamePoints.map(p => ({ ...p, pos2d: pointTo2D(p.position3d) }));
-  }, [gamePoints]);
+    return qualifiedPoints.filter(p => p.meridian === selectedMeridian);
+  }, [qualifiedPoints, selectedMeridian]);
 
   const startGame = useCallback(() => {
     const pool = [...gamePoints];
+    // Fisher-Yates 洗牌
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
     const round = pool.slice(0, Math.min(roundSize, pool.length));
-    setQuestionPool(round);
+
+    // 为每题生成选项
+    const qs: QuestionData[] = round.map(point => ({
+      point,
+      options: generateOptions(point, allPoints, 4),
+      showHint: true, // 默认展示定位图
+      answered: null,
+      selectedCode: null,
+    }));
+
+    setQuestions(qs);
     setCurrentIdx(0);
     setCorrectCount(0);
     setWrongCount(0);
     setStreak(0);
-    setFeedback(null);
-    setHighlightCode(null);
     setGameState('playing');
-    setRewardGiven(false);
     rewardGivenRef.current = false;
-  }, [gamePoints, roundSize]);
+  }, [gamePoints, roundSize, allPoints]);
 
-  const handleClickPoint = useCallback((point: TcmAcupoint) => {
-    if (gameState !== 'playing' || !currentQuestion) return;
+  const handleAnswer = useCallback((selectedPoint: TcmAcupoint) => {
+    if (!currentQuestion || currentQuestion.answered) return;
 
-    if (point.code === currentQuestion.code) {
+    const isCorrect = selectedPoint.code === currentQuestion.point.code;
+
+    // 更新当前题目状态
+    setQuestions(prev => prev.map((q, i) =>
+      i === currentIdx
+        ? { ...q, answered: isCorrect ? 'correct' : 'wrong', selectedCode: selectedPoint.code }
+        : q
+    ));
+
+    if (isCorrect) {
       const newCorrect = correctCount + 1;
       const newStreak = streak + 1;
       setCorrectCount(newCorrect);
       setStreak(newStreak);
-      setHighlightCode(point.code);
-      setFeedback({
-        type: 'correct',
-        msg: `正确！${point.name} · ${MERIDIAN_ZH[point.meridian] || point.meridian}`,
-        detail: point.location,
-      });
 
-      const meridian = meridians.find(m => m.code === point.meridian);
+      const meridian = meridians.find(m => m.code === currentQuestion.point.meridian);
       const el = (meridian ? WUXING_EN[meridian.wuxing] : 'earth') as 'wood' | 'fire' | 'earth' | 'metal' | 'water';
+      const { addXiuWei, recordPractice, completeTodayStep } = useCultivationStore.getState();
       addXiuWei(el, 2);
       recordPractice('acupoint-challenge', 30, el, 2);
 
@@ -259,60 +285,37 @@ export default function AcupointChallengePage() {
         totalCorrect: prev.totalCorrect + 1,
         totalAttempts: prev.totalAttempts + 1,
         bestStreak: Math.max(prev.bestStreak, newStreak),
-        playedMeridians: prev.playedMeridians.includes(point.meridian) ? prev.playedMeridians : [...prev.playedMeridians, point.meridian],
+        playedMeridians: prev.playedMeridians.includes(currentQuestion.point.meridian)
+          ? prev.playedMeridians
+          : [...prev.playedMeridians, currentQuestion.point.meridian],
       }));
-
-      setTimeout(() => {
-        if (currentIdx + 1 >= questionPool.length) {
-          if (!rewardGivenRef.current) {
-            rewardGivenRef.current = true;
-            completeTodayStep('acupoint-challenge');
-          }
-          setGameState('finished');
-        } else {
-          setCurrentIdx(currentIdx + 1);
-          setFeedback(null);
-          setHighlightCode(null);
-        }
-      }, 2500);
     } else {
-      const newWrong = wrongCount + 1;
-      setWrongCount(newWrong);
+      setWrongCount(wrongCount + 1);
       setStreak(0);
-      setFeedback({
-        type: 'wrong',
-        msg: `错误！你点的是「${point.name}」`,
-        detail: `正确答案是「${currentQuestion.name}」`,
-      });
-      setHighlightCode(currentQuestion.code);
-
       setProgress(prev => ({ ...prev, totalAttempts: prev.totalAttempts + 1 }));
-
-      setTimeout(() => {
-        if (currentIdx + 1 >= questionPool.length) {
-          if (!rewardGivenRef.current) {
-            rewardGivenRef.current = true;
-            completeTodayStep('acupoint-challenge');
-          }
-          setGameState('finished');
-        } else {
-          setCurrentIdx(currentIdx + 1);
-          setFeedback(null);
-          setHighlightCode(null);
-        }
-      }, 3500);
     }
-  }, [gameState, currentQuestion, correctCount, wrongCount, streak, currentIdx, questionPool.length, meridians, addXiuWei, recordPractice, completeTodayStep]);
+  }, [currentQuestion, currentIdx, correctCount, wrongCount, streak, meridians]);
+
+  const nextQuestion = useCallback(() => {
+    if (currentIdx + 1 >= questions.length) {
+      if (!rewardGivenRef.current) {
+        rewardGivenRef.current = true;
+        const { completeTodayStep } = useCultivationStore.getState();
+        completeTodayStep('acupoint-challenge');
+      }
+      setGameState('finished');
+    } else {
+      setCurrentIdx(currentIdx + 1);
+    }
+  }, [currentIdx, questions.length]);
 
   const resetGame = useCallback(() => {
     setGameState('idle');
-    setQuestionPool([]);
+    setQuestions([]);
     setCurrentIdx(0);
     setCorrectCount(0);
     setWrongCount(0);
     setStreak(0);
-    setFeedback(null);
-    setHighlightCode(null);
   }, []);
 
   const accuracy = useMemo(() => {
@@ -321,11 +324,13 @@ export default function AcupointChallengePage() {
   }, [correctCount, wrongCount]);
 
   const progressPercent = useMemo(() => {
-    if (questionPool.length === 0) return 0;
-    return Math.round((currentIdx / questionPool.length) * 100);
-  }, [currentIdx, questionPool.length]);
+    if (questions.length === 0) return 0;
+    return Math.round((currentIdx / questions.length) * 100);
+  }, [currentIdx, questions.length]);
 
-  const currentMeridian = currentQuestion ? meridians.find(m => m.code === currentQuestion.meridian) : undefined;
+  const currentMeridian = currentQuestion
+    ? meridians.find(m => m.code === currentQuestion.point.meridian)
+    : undefined;
 
   // ═══════════════════════════════════════
   // 渲染
@@ -340,9 +345,9 @@ export default function AcupointChallengePage() {
             <ArrowLeft size={22} />
           </button>
           <h1 className="text-xl font-black font-serif">穴位挑战</h1>
-          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-teal-400/20 text-teal-300 font-bold ml-auto">看图找穴</span>
+          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-teal-400/20 text-teal-300 font-bold ml-auto">看图识穴</span>
         </div>
-        <p className="text-sm text-white/60 font-serif">571穴 · 经脉筛选 · 修为联动 · 图文视频互通</p>
+        <p className="text-sm text-white/60 font-serif">真实穴位图+视频 · 多选答题 · 修为联动</p>
 
         {/* 历史统计 */}
         <div className="mt-3 flex items-center gap-3 text-xs">
@@ -365,6 +370,17 @@ export default function AcupointChallengePage() {
         {/* 游戏未开始：选择经脉 + 题数 */}
         {gameState === 'idle' && (
           <>
+            {/* 说明 */}
+            <div className="glass-card p-4 bg-blue-50/50">
+              <div className="flex items-start gap-2">
+                <BookOpen size={16} className="text-blue-600 shrink-0 mt-0.5" />
+                <div className="text-xs text-gray-700 leading-relaxed">
+                  <p className="font-bold text-blue-700 mb-1">玩法说明</p>
+                  <p>每道题展示一张<b>真实穴位定位图</b>，请根据图片选择对应的穴位名称。答对后可查看穴位视频和主治信息。</p>
+                </div>
+              </div>
+            </div>
+
             {/* 经脉选择 */}
             <div>
               <div className="flex items-center gap-3 mb-3">
@@ -379,19 +395,24 @@ export default function AcupointChallengePage() {
                 >
                   <div className="text-lg">🌐</div>
                   <p className="text-xs font-bold mt-1 text-gray-800">全部</p>
-                  <p className="text-[9px] text-gray-400">{allPoints.length}穴</p>
+                  <p className="text-[9px] text-gray-400">{qualifiedPoints.length}穴</p>
                 </button>
-                {meridians.filter(m => m.acupoints.length >= 5).map(m => (
-                  <button
-                    key={m.code}
-                    onClick={() => setSelectedMeridian(m.code)}
-                    className={`glass-card p-3 text-center transition hover:shadow-md hover:-translate-y-0.5 ${selectedMeridian === m.code ? 'ring-2 ring-blue-500' : ''}`}
-                  >
-                    <div className="w-3 h-3 rounded-full mx-auto" style={{ backgroundColor: m.color }} />
-                    <p className="text-[10px] font-bold mt-1 text-gray-800 truncate">{m.nameZh}</p>
-                    <p className="text-[9px] text-gray-400">{m.acupoints.length}穴</p>
-                  </button>
-                ))}
+                {meridians
+                  .filter(m => m.acupoints.filter(p => ACUPOINT_LOCATION_IMAGES.has(p.name)).length >= 3)
+                  .map(m => {
+                    const count = m.acupoints.filter(p => ACUPOINT_LOCATION_IMAGES.has(p.name)).length;
+                    return (
+                      <button
+                        key={m.code}
+                        onClick={() => setSelectedMeridian(m.code)}
+                        className={`glass-card p-3 text-center transition hover:shadow-md hover:-translate-y-0.5 ${selectedMeridian === m.code ? 'ring-2 ring-blue-500' : ''}`}
+                      >
+                        <div className="w-3 h-3 rounded-full mx-auto" style={{ backgroundColor: m.color }} />
+                        <p className="text-[10px] font-bold mt-1 text-gray-800 truncate">{m.nameZh}</p>
+ <p className="text-[9px] text-gray-400">{count}穴</p>
+                      </button>
+                    );
+                  })}
               </div>
             </div>
 
@@ -427,7 +448,7 @@ export default function AcupointChallengePage() {
           </>
         )}
 
-        {/* 游戏中/结束：人体图 + 题目 */}
+        {/* 游戏中/结束 */}
         {(gameState === 'playing' || gameState === 'finished') && (
           <>
             {/* 进度条 + 统计 */}
@@ -436,7 +457,7 @@ export default function AcupointChallengePage() {
                 <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
                   <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-teal-500 transition-all duration-300" style={{ width: `${progressPercent}%` }} />
                 </div>
-                <span className="text-xs text-gray-500 font-bold shrink-0">{currentIdx}/{questionPool.length}</span>
+                <span className="text-xs text-gray-500 font-bold shrink-0">{currentIdx}/{questions.length}</span>
               </div>
               <div className="flex items-center gap-3 text-xs">
                 <span className="text-emerald-600 font-bold">✓ {correctCount}</span>
@@ -449,103 +470,102 @@ export default function AcupointChallengePage() {
             {/* 当前题目 */}
             {gameState === 'playing' && currentQuestion && (
               <div className="glass-card p-4 ring-2 ring-blue-500/30">
-                <p className="text-[10px] text-gray-400 text-center">请在人体图上找到以下穴位</p>
-                <p className="text-2xl font-black font-serif text-center text-gray-800 mt-1">{currentQuestion.name}</p>
-                <p className="text-[10px] text-gray-400 text-center mt-1">{MERIDIAN_ZH[currentQuestion.meridian] || currentQuestion.meridian}</p>
+                {/* 题目提示 */}
+                <p className="text-[10px] text-gray-400 text-center mb-1">请根据穴位定位图，选择正确的穴位名称</p>
+                <p className="text-[11px] text-gray-500 text-center mb-3">{MERIDIAN_ZH[currentQuestion.point.meridian] || currentQuestion.point.meridian}</p>
 
-                {/* 反馈 + 穴位详情 */}
-                {feedback ? (
-                  <div>
-                    <div className={`mt-3 p-3 rounded-lg text-sm font-medium ${feedback.type === 'correct' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                      <p>{feedback.msg}</p>
-                      {feedback.detail && <p className="text-[10px] mt-1 text-gray-500">{feedback.detail}</p>}
+                {/* 穴位定位图（题目核心） */}
+                {ACUPOINT_LOCATION_IMAGES.has(currentQuestion.point.name) ? (
+                  <div className="rounded-xl overflow-hidden bg-white border-2 border-emerald-300 shadow-lg mb-4">
+                    <div className="bg-emerald-50 px-3 py-1.5 flex items-center gap-1.5 border-b border-emerald-200">
+                      <MapPin size={13} className="text-emerald-600" />
+                      <span className="text-xs font-bold text-emerald-700">穴位定位图</span>
+                      <span className="text-[10px] text-gray-400 ml-auto">{MERIDIAN_ZH[currentQuestion.point.meridian]}</span>
                     </div>
-                    {/* 答对后展示完整详情（图片+视频+主治），答错仅展示定位图 */}
-                    <AcupointInfoCard
-                      point={feedback.type === 'correct' ? currentQuestion : currentQuestion}
-                      meridian={currentMeridian}
-                      showFullDetail={feedback.type === 'correct'}
+                    <img
+                      src={cosUrl(`/assets/acupoint/images/${encodeURIComponent(currentQuestion.point.name)}.jpg`)}
+                      alt="穴位定位图"
+                      className="w-full"
+                      loading="eager"
                     />
                   </div>
                 ) : (
-                  /* 未答题时显示定位提示 */
-                  <AcupointInfoCard
-                    point={currentQuestion}
-                    meridian={currentMeridian}
-                    showFullDetail={false}
-                  />
+                  <div className="rounded-xl bg-amber-50 border-2 border-amber-200 p-4 text-center mb-4">
+                    <MapPin size={20} className="text-amber-500 mx-auto mb-1" />
+                    <p className="text-xs text-amber-700">暂无定位图，请根据定位描述答题</p>
+                    <p className="text-[11px] text-gray-600 mt-2 text-left">{currentQuestion.point.location}</p>
+                  </div>
+                )}
+
+                {/* 选项按钮 */}
+                <div className="grid grid-cols-2 gap-2">
+                  {currentQuestion.options.map((opt) => {
+                    const isCorrect = opt.code === currentQuestion.point.code;
+                    const isSelected = currentQuestion.selectedCode === opt.code;
+                    let btnClass = 'glass-card p-3 text-center text-sm font-bold font-serif transition ';
+                    let btnStyle: React.CSSProperties = {};
+
+                    if (currentQuestion.answered) {
+                      if (isCorrect) {
+                        btnClass += 'bg-emerald-50 border-2 border-emerald-400 text-emerald-700';
+                      } else if (isSelected) {
+                        btnClass += 'bg-red-50 border-2 border-red-400 text-red-600';
+                      } else {
+                        btnClass += 'opacity-50 border-2 border-transparent text-gray-400';
+                      }
+                    } else {
+                      btnClass += 'border-2 border-transparent text-gray-700 hover:border-blue-300 hover:bg-blue-50 active:scale-95';
+                    }
+
+                    return (
+                      <button
+                        key={opt.code}
+                        onClick={() => handleAnswer(opt)}
+                        disabled={!!currentQuestion.answered}
+                        className={btnClass}
+                        style={btnStyle}
+                      >
+                        <span className="text-base">{opt.name}</span>
+                        {currentQuestion.answered && isCorrect && <Check size={14} className="inline ml-1 text-emerald-500" />}
+                        {currentQuestion.answered && isSelected && !isCorrect && <X size={14} className="inline ml-1 text-red-500" />}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 答题反馈 */}
+                {currentQuestion.answered && (
+                  <div className="mt-4">
+                    <div className={`p-3 rounded-lg text-sm font-medium ${currentQuestion.answered === 'correct' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                      <p className="font-bold">
+                        {currentQuestion.answered === 'correct' ? '✓ 正确！' : '✗ 错误'}
+                      </p>
+                      <p className="text-[11px] mt-1 text-gray-600">
+                        {currentQuestion.answered === 'correct'
+                          ? `这是 ${currentQuestion.point.name} · ${MERIDIAN_ZH[currentQuestion.point.meridian] || currentQuestion.point.meridian}`
+                          : `正确答案是 ${currentQuestion.point.name} · ${MERIDIAN_ZH[currentQuestion.point.meridian] || currentQuestion.point.meridian}`
+                        }
+                      </p>
+                    </div>
+
+                    {/* 答对/答错后展示完整详情 */}
+                    <div className="mt-3">
+                      <AcupointDetailCard point={currentQuestion.point} meridian={currentMeridian} />
+                    </div>
+
+                    {/* 下一题按钮 */}
+                    <button
+                      onClick={nextQuestion}
+                      className="mt-4 w-full rounded-xl p-3 flex items-center justify-center gap-2 text-white font-bold text-sm font-serif transition hover:shadow-md"
+                      style={{ background: 'linear-gradient(135deg, #1565C0, #0D47A1)' }}
+                    >
+                      {currentIdx + 1 >= questions.length ? '查看结果' : '下一题'}
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
                 )}
               </div>
             )}
-
-            {/* 人体图 + 穴位点 */}
-            <div className="glass-card p-2 relative">
-              <div className="relative w-full mx-auto" style={{ maxWidth: '400px', aspectRatio: '3/4' }}>
-                {/* SVG 人体轮廓（与穴位定位模块统一的2D风格） */}
-                <svg viewBox="0 0 300 400" className="absolute inset-0 w-full h-full" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.1))' }}>
-                  {/* 头部 */}
-                  <ellipse cx="150" cy="45" rx="28" ry="32" fill="#fde4d0" stroke="#d4a574" strokeWidth="1" />
-                  {/* 颈部 */}
-                  <rect x="140" y="72" width="20" height="15" fill="#f5d5ae" stroke="#d4a574" strokeWidth="0.5" />
-                  {/* 躯干 */}
-                  <path d="M 110 87 Q 100 90 95 110 L 90 200 Q 90 230 100 250 L 120 270 L 180 270 L 200 250 Q 210 230 210 200 L 205 110 Q 200 90 190 87 Z" fill="#fde4d0" stroke="#d4a574" strokeWidth="1" />
-                  {/* 左臂 */}
-                  <path d="M 95 110 Q 80 130 72 165 Q 68 185 66 210 Q 66 215 72 215 Q 78 215 80 210 Q 82 190 88 170 Q 92 145 95 110 Z" fill="#f5d5ae" stroke="#d4a574" strokeWidth="0.5" />
-                  {/* 右臂 */}
-                  <path d="M 205 110 Q 220 130 228 165 Q 232 185 234 210 Q 234 215 228 215 Q 222 215 220 210 Q 218 190 212 170 Q 208 145 205 110 Z" fill="#f5d5ae" stroke="#d4a574" strokeWidth="0.5" />
-                  {/* 左腿 */}
-                  <path d="M 120 270 Q 115 290 112 330 Q 110 360 115 395 L 135 395 Q 138 370 140 340 Q 142 305 145 270 Z" fill="#f5d5ae" stroke="#d4a574" strokeWidth="0.5" />
-                  {/* 右腿 */}
-                  <path d="M 180 270 Q 185 290 188 330 Q 190 360 185 395 L 165 395 Q 162 370 160 340 Q 158 305 155 270 Z" fill="#f5d5ae" stroke="#d4a574" strokeWidth="0.5" />
-                </svg>
-
-                {/* 穴位点 */}
-                {points2d.map((p) => {
-                  const isHighlight = highlightCode === p.code;
-                  const isDimmed = gameState === 'playing' && !feedback;
-                  return (
-                    <button
-                      key={p.code}
-                      onClick={() => handleClickPoint(p)}
-                      className="absolute rounded-full border-2 border-white transition-all"
-                      style={{
-                        left: `${p.pos2d.x}%`,
-                        top: `${p.pos2d.y}%`,
-                        width: isHighlight ? '18px' : '10px',
-                        height: isHighlight ? '18px' : '10px',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: isHighlight ? '#f59e0b' : isDimmed ? '#6b7280' : '#ef4444',
-                        boxShadow: isHighlight ? '0 0 12px rgba(245,158,11,0.8)' : '0 2px 4px rgba(0,0,0,0.2)',
-                        zIndex: isHighlight ? 20 : 10,
-                        animation: isHighlight ? 'pulse 1.5s infinite' : 'none',
-                        opacity: isDimmed ? 0.5 : 1,
-                        cursor: gameState === 'playing' ? 'pointer' : 'default',
-                      }}
-                      title={showAllLabels ? p.name : undefined}
-                    />
-                  );
-                })}
-
-                {/* 显示所有标签 */}
-                {showAllLabels && points2d.map(p => (
-                  <div
-                    key={`label-${p.code}`}
-                    className="absolute text-[8px] px-1 py-0.5 rounded bg-black/70 text-white pointer-events-none whitespace-nowrap"
-                    style={{ left: `${p.pos2d.x}%`, top: `${p.pos2d.y}%`, transform: 'translate(-50%, -120%)' }}
-                  >
-                    {p.name}
-                  </div>
-                ))}
-              </div>
-
-              {/* 显示/隐藏标签 */}
-              <button
-                onClick={() => setShowAllLabels(!showAllLabels)}
-                className="absolute top-2 right-2 text-[10px] px-2 py-1 rounded-full bg-black/50 text-white"
-              >
-                {showAllLabels ? '隐藏' : '显示'}标签
-              </button>
-            </div>
 
             {/* 游戏结束 */}
             {gameState === 'finished' && (
