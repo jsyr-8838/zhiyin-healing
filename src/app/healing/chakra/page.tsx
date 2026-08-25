@@ -7,8 +7,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import HealingCanvas, { type HealingCanvasHandle, HEALING_PRESET_CHAKRA } from '@/components/healing/HealingCanvas';
 import { fmtTime } from '@/hooks/useTimer';
 import { Play, Pause, Volume2, Timer, Sparkles, Headphones, ChevronRight } from 'lucide-react';
-import { useTTS } from '@/hooks/useTTS';
-import { getChakraGuide } from '@/lib/healing-voice-guide';
+import { getChakraGuideAudio } from '@/lib/healing-guide-audio';
 import {
   BINAURAL_MODES, MODULATIONS,
   type BinauralValue, type ModulationValue,
@@ -68,11 +67,34 @@ export default function ChakraPage() {
   const [guideText, setGuideText] = useState('');
   const [activePanel, setActivePanel] = useState<'chakras' | 'presets' | 'freqs' | 'controls'>('chakras');
 
-  // ===== TTS 男声导引 =====
-  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'normal', voiceId: 'zh-CN-YunjianNeural' });
-  const ttsRef = useRef(tts);
-  ttsRef.current = tts;
+  // ===== 预生成 MP3 语音导引（与六字诀模块同架构） =====
+  const guideAudioRef = useRef<HTMLAudioElement | null>(null);
   const pendingPlayRef = useRef<{ freq: number; beat: BinauralValue; mod: ModulationValue } | null>(null);
+
+  const playGuideAudio = useCallback((url: string, onEnded?: () => void) => {
+    if (guideAudioRef.current) {
+      guideAudioRef.current.pause();
+      guideAudioRef.current.onended = null;
+      guideAudioRef.current = null;
+    }
+    if (!url) {
+      onEnded?.();
+      return;
+    }
+    const audio = new Audio(url);
+    audio.volume = 0.85;
+    guideAudioRef.current = audio;
+    if (onEnded) audio.onended = onEnded;
+    audio.play().catch(() => {});
+  }, []);
+
+  const stopGuideAudio = useCallback(() => {
+    if (guideAudioRef.current) {
+      guideAudioRef.current.pause();
+      guideAudioRef.current.onended = null;
+      guideAudioRef.current = null;
+    }
+  }, []);
 
   // Canvas 引用
   const healingCanvasRef = useRef<HealingCanvasHandle>(null);
@@ -131,45 +153,42 @@ export default function ChakraPage() {
   }, [play, binauralBeat, modulation, setBinauralBeat, setModulation]);
 
   const startPlayingWithGuide = useCallback((freq: number, beat: BinauralValue, mod: ModulationValue, chakraId?: string) => {
-    ttsRef.current.stop();
+    stopGuideAudio();
     if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
-    const text = chakraId ? getChakraGuide(chakraId) : '';
-    if (text) {
-      setGuideText(text);
+    const audioUrl = chakraId ? getChakraGuideAudio(chakraId) : '';
+    if (audioUrl) {
+      setGuideText('正在播放语音导引');
       setPreludePlaying(true);
       pendingPlayRef.current = { freq, beat, mod };
-      const charCount = text.replace(/[^\u4e00-\u9fa5]/g, '').length;
-      const estimatedMs = Math.max(8000, Math.ceil(charCount / 3.5) * 1000 + 2000);
-      ttsRef.current.speak(text, 1.0, 0.7);
-      guideEndTimeoutRef.current = setTimeout(() => {
+      playGuideAudio(audioUrl, () => {
         setPreludePlaying(false);
         const pending = pendingPlayRef.current;
         pendingPlayRef.current = null;
         if (pending) startPlaying(pending.freq, pending.beat, pending.mod);
-      }, estimatedMs);
+      });
     } else {
       startPlaying(freq, beat, mod);
     }
-  }, [startPlaying]);
+  }, [startPlaying, playGuideAudio, stopGuideAudio]);
 
   const skipPrelude = useCallback(() => {
-    ttsRef.current.stop();
+    stopGuideAudio();
     if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
     setPreludePlaying(false);
     const pending = pendingPlayRef.current;
     pendingPlayRef.current = null;
     if (pending) startPlaying(pending.freq, pending.beat, pending.mod);
-  }, [startPlaying]);
+  }, [startPlaying, stopGuideAudio]);
 
   const stopAll = useCallback(() => {
     stop();
-    ttsRef.current.stop();
+    stopGuideAudio();
     if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
     setPreludePlaying(false);
     pendingPlayRef.current = null;
     if (elapsedIntervalRef.current) { clearInterval(elapsedIntervalRef.current); elapsedIntervalRef.current = null; }
     setElapsedSeconds(0);
-  }, [stop]);
+  }, [stop, stopGuideAudio]);
 
   const applyPreset = useCallback((preset: typeof CHAKRA_PRESETS[number]) => {
     const chakraIdx = CHAKRAS.findIndex(c => c.id === preset.chakraId);
@@ -221,10 +240,10 @@ export default function ChakraPage() {
       if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
       if (guideEndTimeoutRef.current) clearTimeout(guideEndTimeoutRef.current);
-      ttsRef.current.stop();
+      stopGuideAudio();
       closePlayer();
     };
-  }, []);
+  }, [stopGuideAudio]);
 
   const currentChakra = selectedChakra !== null ? CHAKRAS[selectedChakra] : null;
   const volPercent = Math.round(volume * 100);
