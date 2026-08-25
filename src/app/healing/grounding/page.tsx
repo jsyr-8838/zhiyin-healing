@@ -6,7 +6,7 @@ import HealingHeader from '@/components/layout/HealingHeader';
 import PageContainer from '@/components/layout/PageContainer';
 import { fmtTime } from '@/hooks/useTimer';
 import { useHealingRecommendation } from '@/hooks/useHealingRecommendation';
-import { useTTS } from '@/hooks/useTTS';
+import { getGroundingAudio, GROUNDING_COMPLETE_AUDIO } from '@/lib/healing-guide-audio';
 import {
   FlameKindling, Flame, Hand, Ear, Wind, RotateCcw, Check,
   CircleDot, Heart, Sparkles, ShieldCheck, Eye, Coffee, BookOpen,
@@ -301,10 +301,9 @@ export default function GroundingPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [currentScriptPart, setCurrentScriptPart] = useState<'opening' | 'midway' | 'closing'>('opening');
 
-  // ===== TTS 男声导引（正常语速，自然真实人声感） =====
-  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'normal', voiceId: 'zh-CN-YunjianNeural' });
-  const ttsRef = useRef(tts);
-  ttsRef.current = tts;
+  // ===== 预生成 MP3 语音导引（与六字诀模块同架构） =====
+  // 使用 new Audio(url).play() 在用户点击的同步上下文中播放，手机不会拦截
+  const guideAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animFrameRef = useRef<number>(0);
@@ -339,13 +338,35 @@ export default function GroundingPage() {
   // 当前步骤的有效时长（用于 UI 和计时器）
   const effectiveDuration = currentStep ? getEffectiveDuration(currentStep, modeConfig.rate, voiceMode) : 0;
 
-  // ===== 播放话术 =====
-  const speakScript = useCallback((text: string) => {
-    if (!audioEnabled) return;
-    ttsRef.current.speak(text, modeConfig.rate, 0.7);
-  }, [audioEnabled, modeConfig.rate]);
+  // ===== 播放预生成 MP3 话术 =====
+  const playGuideAudio = useCallback((url: string, onEnded?: () => void) => {
+    // 停止上一个音频
+    if (guideAudioRef.current) {
+      guideAudioRef.current.pause();
+      guideAudioRef.current.onended = null;
+      guideAudioRef.current = null;
+    }
+    if (!audioEnabled || !url) {
+      onEnded?.();
+      return;
+    }
+    const audio = new Audio(url);
+    audio.volume = 0.85;
+    guideAudioRef.current = audio;
+    if (onEnded) audio.onended = onEnded;
+    audio.play().catch(() => {});
+  }, [audioEnabled]);
 
-  // ===== 进入一个新步骤 =====
+  // ===== 停止语音 =====
+  const stopGuideAudio = useCallback(() => {
+    if (guideAudioRef.current) {
+      guideAudioRef.current.pause();
+      guideAudioRef.current.onended = null;
+      guideAudioRef.current = null;
+    }
+  }, []);
+
+  // ===== 进入一个新步骤（使用预生成 MP3 + onended 链式播放） =====
   const enterStep = useCallback((idx: number) => {
     if (idx >= STEPS.length) {
       setPhase('complete');
@@ -354,6 +375,7 @@ export default function GroundingPage() {
     const step = STEPS[idx];
     const rate = VOICE_MODES.find(m => m.id === voiceMode)!.rate;
     const effDur = getEffectiveDuration(step, rate, voiceMode);
+    const audioUrls = getGroundingAudio(step.id);
 
     setCurrentStepIdx(idx);
     setPhase(step.id);
@@ -363,55 +385,44 @@ export default function GroundingPage() {
     phaseStartTimeRef.current = Date.now();
     effectiveDurationRef.current = effDur;
 
-    // 清理之前的定时器
+    // 清理之前的定时器和音频
     if (midwayTimeoutRef.current) { clearTimeout(midwayTimeoutRef.current); midwayTimeoutRef.current = null; }
     if (closingTimeoutRef.current) { clearTimeout(closingTimeoutRef.current); closingTimeoutRef.current = null; }
+    stopGuideAudio();
 
-    // 播放开场话术
-    speakScript(step.openingScript);
+    if (!audioUrls) return;
 
-    // 计算时间线（语音时间让步）
-    const openSec = estimateSpeechSeconds(step.openingScript, rate);
+    // 播放开场话术 MP3，用 onended 链式调度后续段落
+    setCurrentScriptPart('opening');
 
-    if (voiceMode !== 'natural') {
-      // 沉浸式 / 深入式：开场 → 留白 → 中段 → 留白 → 收尾
-      if (step.midwayScript) {
-        const midSec = estimateSpeechSeconds(step.midwayScript, rate);
-        const closeSec = step.closingScript ? estimateSpeechSeconds(step.closingScript, rate) : 0;
-        // 中段播放在开场讲完后 + 留白
-        const midwayDelay = (openSec + 15) * 1000; // 开场讲完 + 15 秒留白
+    if (voiceMode !== 'natural' && audioUrls.midway) {
+      // 沉浸式 / 深入式：开场 → 15秒留白 → 中段 → 15秒留白 → 收尾
+      playGuideAudio(audioUrls.opening, () => {
         midwayTimeoutRef.current = setTimeout(() => {
           setCurrentScriptPart('midway');
-          speakScript(step.midwayScript!);
-        }, midwayDelay);
-
-        // 收尾播放：中段讲完 + 留白后
-        if (step.closingScript) {
-          const closingDelay = (openSec + 15 + midSec + 15) * 1000;
-          closingTimeoutRef.current = setTimeout(() => {
-            setCurrentScriptPart('closing');
-            speakScript(step.closingScript!);
-          }, closingDelay);
-        }
-      } else if (step.closingScript) {
-        // 无中段：开场讲完 + 留白 → 收尾
-        const closingDelay = (openSec + 20) * 1000;
+          playGuideAudio(audioUrls.midway!, () => {
+            if (audioUrls.closing) {
+              closingTimeoutRef.current = setTimeout(() => {
+                setCurrentScriptPart('closing');
+                playGuideAudio(audioUrls.closing);
+              }, 15000);
+            }
+          });
+        }, 15000);
+      });
+    } else if (audioUrls.closing) {
+      // 顺应自然式 或 无中段：开场 → 留白 → 收尾
+      playGuideAudio(audioUrls.opening, () => {
+        const silenceMs = voiceMode === 'natural' ? 30000 : 20000;
         closingTimeoutRef.current = setTimeout(() => {
           setCurrentScriptPart('closing');
-          speakScript(step.closingScript!);
-        }, closingDelay);
-      }
+          playGuideAudio(audioUrls.closing);
+        }, silenceMs);
+      });
     } else {
-      // 顺应自然式：只播开场 + 收尾（中间大段留白）
-      if (step.closingScript) {
-        const closingDelay = Math.max((openSec + 30) * 1000, (effDur - estimateSpeechSeconds(step.closingScript, rate) - 5) * 1000);
-        closingTimeoutRef.current = setTimeout(() => {
-          setCurrentScriptPart('closing');
-          speakScript(step.closingScript!);
-        }, closingDelay);
-      }
+      playGuideAudio(audioUrls.opening);
     }
-  }, [speakScript, voiceMode, getEffectiveDuration]);
+  }, [playGuideAudio, stopGuideAudio, voiceMode, getEffectiveDuration]);
 
   // ===== 开始疏导 =====
   const startTherapy = useCallback(() => {
@@ -429,26 +440,26 @@ export default function GroundingPage() {
     setIsPaused(prev => {
       const newPaused = !prev;
       if (newPaused) {
-        ttsRef.current.stop();
+        stopGuideAudio();
       } else {
         // 继续：重置 phaseStartTime 以补偿暂停时间
         phaseStartTimeRef.current = Date.now() - stepElapsed * 1000;
       }
       return newPaused;
     });
-  }, [stepElapsed]);
+  }, [stepElapsed, stopGuideAudio]);
 
   // ===== 上一步 =====
   const prevStep = useCallback(() => {
     if (currentStepIdx > 0) {
-      ttsRef.current.stop();
+      stopGuideAudio();
       enterStep(currentStepIdx - 1);
     }
-  }, [currentStepIdx, enterStep]);
+  }, [currentStepIdx, enterStep, stopGuideAudio]);
 
   // ===== 下一步（手动跳过） =====
   const nextStep = useCallback(() => {
-    ttsRef.current.stop();
+    stopGuideAudio();
     if (currentStepIdx < STEPS.length - 1) {
       enterStep(currentStepIdx + 1);
     } else {
@@ -473,24 +484,24 @@ export default function GroundingPage() {
       } catch {}
       setPhase('complete');
       if (audioEnabled) {
-        speakScript('十大流程已全部完成。静禅国灸，以禅入灸，以灸养禅，愿您身心安泰。');
+        playGuideAudio(GROUNDING_COMPLETE_AUDIO);
       }
     }
-  }, [currentStepIdx, totalElapsed, audioEnabled, speakScript]);
+  }, [currentStepIdx, totalElapsed, audioEnabled, enterStep, stopGuideAudio, playGuideAudio]);
 
   // ===== 重置 =====
   const reset = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
     if (midwayTimeoutRef.current) { clearTimeout(midwayTimeoutRef.current); midwayTimeoutRef.current = null; }
     if (closingTimeoutRef.current) { clearTimeout(closingTimeoutRef.current); closingTimeoutRef.current = null; }
-    ttsRef.current.stop();
+    stopGuideAudio();
     setPhase('intro');
     setCurrentStepIdx(0);
     setStepElapsed(0);
     setTotalElapsed(0);
     setShowTips(false);
     setIsPaused(false);
-  }, []);
+  }, [stopGuideAudio]);
 
   // ===== 计时器（每秒更新 + 自动推进） =====
   useEffect(() => {
@@ -507,7 +518,7 @@ export default function GroundingPage() {
       // 自动推进到下一步（使用语音让步后的有效时长）
       const effDur = effectiveDurationRef.current || (currentStep?.duration ?? 0);
       if (currentStep && stepNow >= effDur) {
-        ttsRef.current.stop();
+        stopGuideAudio();
         if (currentStepIdx < STEPS.length - 1) {
           enterStep(currentStepIdx + 1);
         } else {
@@ -532,14 +543,14 @@ export default function GroundingPage() {
           } catch {}
           setPhase('complete');
           if (audioEnabled) {
-            ttsRef.current.speak('十大流程已全部完成。静禅国灸，以禅入灸，以灸养禅，愿您身心安泰。', modeConfig.rate, 0.7);
+            playGuideAudio(GROUNDING_COMPLETE_AUDIO);
           }
         }
       }
     }, 1000);
 
     return () => { if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; } };
-  }, [phase, isPaused, currentStep, currentStepIdx, audioEnabled, modeConfig.rate, enterStep]);
+  }, [phase, isPaused, currentStep, currentStepIdx, audioEnabled, modeConfig.rate, enterStep, stopGuideAudio, playGuideAudio]);
 
   // ===== 清理 =====
   useEffect(() => {
@@ -547,9 +558,9 @@ export default function GroundingPage() {
       if (timerRef.current) clearInterval(timerRef.current);
       if (midwayTimeoutRef.current) clearTimeout(midwayTimeoutRef.current);
       if (closingTimeoutRef.current) clearTimeout(closingTimeoutRef.current);
-      ttsRef.current.stop();
+      stopGuideAudio();
     };
-  }, []);
+  }, [stopGuideAudio]);
 
   // ===== Canvas 背景（温暖艾烟氛围） =====
   useEffect(() => {
