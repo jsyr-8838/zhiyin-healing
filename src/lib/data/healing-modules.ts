@@ -47,6 +47,7 @@ export const THERAPY_MODULES: ModuleConfig[] = [
 ];
 
 export const LIFESTYLE_MODULES: ModuleConfig[] = [
+  { href: '/healing/shichen', icon: 'Clock', name: '时辰养生', desc: '子午流注·十二时辰经络调养', element: 'water' },
   { href: '/healing/spine-solar', icon: 'Bone', name: '脊柱身心', desc: '节气↔椎骨↔经络深层关联', element: 'earth' },
   { href: '/healing/essence', icon: 'Droplets', name: '精油图谱', desc: '108精油·五行归经·疗愈方', element: 'water' },
   { href: '/season', icon: 'CalendarHeart', name: '节气养生', desc: '二十四节气·顺时调养', element: 'wood' },
@@ -56,7 +57,7 @@ export const LIFESTYLE_MODULES: ModuleConfig[] = [
   { href: '/healing/wine', icon: 'Wine', name: '酒道品鉴', desc: '药酒养生·五行配伍', element: 'fire' },
   { href: '/healing/flower', icon: 'Flower2', name: '花语养生', desc: '花语寄情·四季花令', element: 'wood' },
   { href: '/healing/wuxing-clothing', icon: 'Shirt', name: '五行穿衣', desc: '日柱五行·相生相克配色', element: 'earth' },
-  { href: '/healing/tcm-study', icon: 'BookOpen', name: '中医学习', desc: '中医通·20级修炼·49章节·9大Boss·成就系统', element: 'earth' },
+  { href: '/healing/tcm-study', icon: 'BookOpen', name: '中医学习', desc: '中医通·20级修炼·58章节·9大Boss·成就系统', element: 'earth' },
   { href: '/healing/numerology', icon: 'Hash', name: '灵数命理', desc: '七维灵数·探索生命密码', element: 'fire' },
 ];
 
