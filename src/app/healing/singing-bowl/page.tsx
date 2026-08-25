@@ -7,8 +7,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import HealingCanvas, { type HealingCanvasHandle, HEALING_PRESET_BOWL } from '@/components/healing/HealingCanvas';
 import { fmtTime } from '@/hooks/useTimer';
 import { Play, Pause, Volume2, Timer, Sparkles, Music, Waves, Headphones, ChevronDown, ChevronRight } from 'lucide-react';
-import { useTTS } from '@/hooks/useTTS';
-import { getBowlGuide, GENERIC_HEALING_GUIDE } from '@/lib/healing-voice-guide';
+import { getBowlGuideAudio } from '@/lib/healing-guide-audio';
 import {
   BOWL_FREQUENCIES, BINAURAL_MODES, MODULATIONS, SINGING_BOWL_PRESETS,
   AMBIENT_SOUNDSCAPES, BOWL_HIT_SAMPLES, BOWL_RECORDINGS, BOWL_PLAY_MODES,
@@ -61,12 +60,35 @@ export default function SingingBowlPage() {
   const [guideText, setGuideText] = useState('');
   const [expandedSection, setExpandedSection] = useState<string | null>('presets');
 
-  // ===== TTS 男声导引 =====
-  const tts = useTTS({ defaultGender: 'male', defaultSpeed: 'normal', voiceId: 'zh-CN-YunjianNeural' });
-  const ttsRef = useRef(tts);
-  ttsRef.current = tts;
+  // ===== 预生成 MP3 语音导引（与六字诀模块同架构） =====
+  const guideAudioRef = useRef<HTMLAudioElement | null>(null);
   const pendingPlayRef = useRef<{ freq: number; beat: BinauralValue; mod: ModulationValue; trackId?: string } | null>(null);
   const guideEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const playGuideAudio = useCallback((url: string, onEnded?: () => void) => {
+    if (guideAudioRef.current) {
+      guideAudioRef.current.pause();
+      guideAudioRef.current.onended = null;
+      guideAudioRef.current = null;
+    }
+    if (!url) {
+      onEnded?.();
+      return;
+    }
+    const audio = new Audio(url);
+    audio.volume = 0.85;
+    guideAudioRef.current = audio;
+    if (onEnded) audio.onended = onEnded;
+    audio.play().catch(() => {});
+  }, []);
+
+  const stopGuideAudio = useCallback(() => {
+    if (guideAudioRef.current) {
+      guideAudioRef.current.pause();
+      guideAudioRef.current.onended = null;
+      guideAudioRef.current = null;
+    }
+  }, []);
 
   // ---- 当前选中频率的可用曲目 ----
   const availableBowlTracks = useMemo(() => {
@@ -147,41 +169,38 @@ export default function SingingBowlPage() {
   }, [play, binauralBeat, modulation, setBinauralBeat, setModulation, selectedBowlTrackId]);
 
   const startPlayingWithGuide = useCallback((freq: number, beat: BinauralValue, mod: ModulationValue, trackId?: string) => {
-    ttsRef.current.stop();
+    stopGuideAudio();
     if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
-    const text = getBowlGuide(freq) || GENERIC_HEALING_GUIDE;
-    setGuideText(text);
+    const audioUrl = getBowlGuideAudio(freq);
+    setGuideText('正在播放语音导引');
     setPreludePlaying(true);
     pendingPlayRef.current = { freq, beat, mod, trackId };
-    const charCount = text.replace(/[^\u4e00-\u9fa5]/g, '').length;
-    const estimatedMs = Math.max(8000, Math.ceil(charCount / 3.5) * 1000 + 2000);
-    ttsRef.current.speak(text, 1.0, 0.7);
-    guideEndTimeoutRef.current = setTimeout(() => {
+    playGuideAudio(audioUrl, () => {
       setPreludePlaying(false);
       const pending = pendingPlayRef.current;
       pendingPlayRef.current = null;
       if (pending) startPlaying(pending.freq, pending.beat, pending.mod, pending.trackId);
-    }, estimatedMs);
-  }, [startPlaying]);
+    });
+  }, [startPlaying, playGuideAudio, stopGuideAudio]);
 
   const skipPrelude = useCallback(() => {
-    ttsRef.current.stop();
+    stopGuideAudio();
     if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
     setPreludePlaying(false);
     const pending = pendingPlayRef.current;
     pendingPlayRef.current = null;
     if (pending) startPlaying(pending.freq, pending.beat, pending.mod, pending.trackId);
-  }, [startPlaying]);
+  }, [startPlaying, stopGuideAudio]);
 
   const stopAll = useCallback(() => {
     stop();
-    ttsRef.current.stop();
+    stopGuideAudio();
     if (guideEndTimeoutRef.current) { clearTimeout(guideEndTimeoutRef.current); guideEndTimeoutRef.current = null; }
     setPreludePlaying(false);
     pendingPlayRef.current = null;
     if (elapsedIntervalRef.current) { clearInterval(elapsedIntervalRef.current); elapsedIntervalRef.current = null; }
     setElapsedSeconds(0);
-  }, [stop]);
+  }, [stop, stopGuideAudio]);
 
   const applyPreset = useCallback((preset: typeof SINGING_BOWL_PRESETS[number]) => {
     const freq = preset.freq ?? 432;
@@ -241,10 +260,10 @@ export default function SingingBowlPage() {
       if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
       if (energyIntervalRef.current) clearInterval(energyIntervalRef.current);
       if (guideEndTimeoutRef.current) clearTimeout(guideEndTimeoutRef.current);
-      ttsRef.current.stop();
+      stopGuideAudio();
       closePlayer();
     };
-  }, []);
+  }, [stopGuideAudio]);
 
   const currentBowl = BOWL_FREQUENCIES.find(b => b.value === selectedFreq);
   const volPercent = Math.round(volume * 100);
