@@ -80,7 +80,7 @@ function TopBar() {
           <ArrowLeft size={16} />
           <span>疗愈</span>
         </Link>
-        <h1 className="text-base font-bold font-serif text-red-800">中医修真</h1>
+        <h1 className="text-base font-bold font-serif text-red-800">灵兰秘典</h1>
         <div className="w-12" />
       </div>
 
