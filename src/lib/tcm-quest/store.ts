@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * 中医修真 · TCM Quest Ultra — Zustand Store
+ * 灵兰秘典 · Linglan Canon — Zustand Store
  *
  * 管理：等级/经验/金币、连续打卡、答题统计、错题本、间隔重复(SM-2)、
  *       中药/方剂浏览记录、医案进度、Boss进度、师承任务完成、成就解锁
