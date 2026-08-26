@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { QuizItem } from '@/lib/tcm-quest/types';
 
 /**
@@ -16,6 +16,8 @@ interface UseDynamicQuizReturn {
   allQuizzes: QuizItem[];
   /** 仅动态题 */
   dynamicQuizzes: QuizItem[];
+  /** 动态题数量 */
+  dynamicCount: number;
   /** 加载状态 */
   loading: boolean;
   /** 最后更新时间 */
@@ -28,6 +30,8 @@ export function useDynamicQuiz(staticQuizzes: QuizItem[]): UseDynamicQuizReturn 
   const [dynamicQuizzes, setDynamicQuizzes] = useState<QuizItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const staticRef = useRef(staticQuizzes);
+  staticRef.current = staticQuizzes;
 
   const fetchDynamic = useCallback(async () => {
     setLoading(true);
@@ -39,7 +43,7 @@ export function useDynamicQuiz(staticQuizzes: QuizItem[]): UseDynamicQuizReturn 
       const data = await resp.json();
       if (data.quizzes && Array.isArray(data.quizzes)) {
         // 去重：过滤掉与静态题重复的题目（按 q 字段匹配）
-        const staticQs = new Set(staticQuizzes.map(q => q.q));
+        const staticQs = new Set(staticRef.current.map(q => q.q));
         const unique = data.quizzes.filter((q: QuizItem) => !staticQs.has(q.q));
         setDynamicQuizzes(unique);
         setLastUpdated(data.updatedAt || new Date().toISOString());
@@ -49,18 +53,19 @@ export function useDynamicQuiz(staticQuizzes: QuizItem[]): UseDynamicQuizReturn 
     } finally {
       setLoading(false);
     }
-  }, [staticQuizzes]);
+  }, []);
 
   useEffect(() => {
     fetchDynamic();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const allQuizzes = [...staticQuizzes, ...dynamicQuizzes];
+  const allQuizzes = useMemo(() => [...staticQuizzes, ...dynamicQuizzes], [staticQuizzes, dynamicQuizzes]);
 
   return {
     allQuizzes,
     dynamicQuizzes,
+    dynamicCount: dynamicQuizzes.length,
     loading,
     lastUpdated,
     refresh: fetchDynamic,
