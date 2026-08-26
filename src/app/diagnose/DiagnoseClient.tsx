@@ -22,6 +22,7 @@ import {
   type DiagnosisType,
   type Tab,
 } from '@/lib/data/diagnosis-config';
+import { ensureUnderSize } from '@/lib/image-compress';
 
 export default function DiagnoseClient() {
   const { lastProfile, setLastProfile, unifiedDiagnosis, setJiuZhongResult, setVisualDiagnosisResult, setWuYinTestResult, diagnosisFlow, advanceDiagnosisFlow, startDiagnosisFlow, exitDiagnosisFlow } = useAppStore();
@@ -128,13 +129,32 @@ export default function DiagnoseClient() {
   }
 
   // 图片选择处理（通用）
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const [imageCompressing, setImageCompressing] = useState(false);
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setCaptureImage(file);
-    const reader = new FileReader();
-    reader.onload = (ev) => setCaptureImagePreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
+    // 超过 1MB 时自动压缩
+    if (file.size > 1024 * 1024) {
+      setImageCompressing(true);
+      try {
+        const result = await ensureUnderSize(file, 1024 * 1024);
+        setCaptureImage(result.blob);
+        setCaptureImagePreview(result.dataUrl);
+      } catch {
+        // 压缩失败，降级用原始文件
+        setCaptureImage(file);
+        const reader = new FileReader();
+        reader.onload = (ev) => setCaptureImagePreview(ev.target?.result as string);
+        reader.readAsDataURL(file);
+      } finally {
+        setImageCompressing(false);
+      }
+    } else {
+      setCaptureImage(file);
+      const reader = new FileReader();
+      reader.onload = (ev) => setCaptureImagePreview(ev.target?.result as string);
+      reader.readAsDataURL(file);
+    }
   }
 
   // 关闭摄像头
@@ -954,8 +974,8 @@ export default function DiagnoseClient() {
                  </div>
                  <label className="block cursor-pointer">
                    <div className="w-full py-5 rounded-xl border-2 border-dashed border-gray-300 hover:border-amber-400 transition text-center">
-                     <p className="font-bold text-gray-600">从相册选择图片</p>
-                     <p className="text-xs text-gray-400 mt-1">支持 JPG/PNG</p>
+                      <p className="font-bold text-gray-600">{imageCompressing ? '压缩中...' : '从相册选择图片'}</p>
+                      <p className="text-xs text-gray-400 mt-1">支持 JPG/PNG · 超过1MB自动压缩</p>
                    </div>
                    <input
                      ref={fileInputRef}
