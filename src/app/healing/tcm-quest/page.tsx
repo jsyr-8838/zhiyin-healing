@@ -16,6 +16,8 @@ import {
   Brain, Target, RotateCw, User, Trophy, Zap, Heart, Award,
   ChevronRight, Check, X, Lock, Sparkles, TrendingUp,
 } from 'lucide-react';
+import EvoFeedback from '@/components/common/EvoFeedback';
+import ContentVersionBadge from '@/components/common/ContentVersionBadge';
 
 // ═══════════════════════════════════════
 // Tab 配置
@@ -81,7 +83,8 @@ function TopBar() {
           <span>疗愈</span>
         </Link>
         <h1 className="text-base font-bold font-serif text-red-800">灵兰秘典</h1>
-        <div className="w-12" />
+        <ContentVersionBadge className="hidden sm:inline-flex" />
+        <div className="w-12 sm:hidden" />
       </div>
 
       {/* 等级 + 进度条 */}
@@ -530,6 +533,10 @@ function QuizCard({ quiz, showAnswer, selectedOption, onAnswer, onNext }: {
           <p className="text-xs text-gray-700 leading-relaxed">
             <span className="font-bold text-amber-700">解析：</span>{quiz.e}
           </p>
+          {/* Evo 反馈按钮 */}
+          <div className="mt-2 pt-2 border-t border-amber-200/30">
+            <EvoFeedback module="classics" action="quiz_explanation" detail={{ questionId: quiz.q, tag: quiz.t }} />
+          </div>
         </div>
       )}
 
@@ -892,6 +899,10 @@ function AITab() {
             <h4 className="text-sm font-bold text-gray-800">辨证结果</h4>
           </div>
           <div className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">{result}</div>
+          {/* Evo 反馈按钮 */}
+          <div className="pt-2 border-t border-gray-100">
+            <EvoFeedback module="diagnose" action="ai_diagnosis" detail={{ symptoms: symptoms.slice(0, 50) }} />
+          </div>
         </div>
       )}
 
