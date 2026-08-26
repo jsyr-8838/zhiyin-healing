@@ -9,9 +9,13 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "知音 - 中医五行五音疗愈 | ZhiYin",
+  metadataBase: new URL("https://zhiyin-bay.pages.dev"),
+  title: {
+    default: "知音 - 中医五行五音疗愈 | ZhiYin",
+    template: "%s | 知音 ZhiYin",
+  },
   description: "知音：基于中医五行理论的五音疗愈应用，通过角徵宫商羽五音调理肝心脾肺肾，AI智能体质辨识，个性化疗愈方案。",
-  keywords: "知音,五音疗愈,中医,五行,音乐疗法,体质辨识,AI导诊,养生,角徵宫商羽",
+  keywords: "知音,五音疗愈,中医,五行,音乐疗法,体质辨识,AI导诊,养生,角徵宫商羽,灵兰秘典,经络穴位,六字诀,舌诊,面诊",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -23,6 +27,11 @@ export const metadata: Metadata = {
     description: "角徵宫商羽五音调理肝心脾肺肾，AI智能体质辨识",
     type: "website",
     locale: "zh_CN",
+    siteName: "知音 ZhiYin",
+    images: [{ url: "/brand/zhiyin-logo-seal-mini-v8.jpg", width: 64, height: 64 }],
+  },
+  alternates: {
+    canonical: "https://zhiyin-bay.pages.dev",
   },
 };
 
@@ -46,6 +55,38 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="format-detection" content="telephone=no" />
+        {/* JSON-LD 结构化数据 — 提升搜索引擎理解 */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "知音 - 中医五行五音疗愈",
+              alternateName: "ZhiYin",
+              description: "基于中医五行理论的五音疗愈应用，通过角徵宫商羽五音调理肝心脾肺肾，AI智能体质辨识，个性化疗愈方案。",
+              applicationCategory: "HealthApplication",
+              operatingSystem: "Web Browser",
+              url: "https://zhiyin-bay.pages.dev",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "CNY",
+              },
+              featureList: [
+                "五音疗愈（角徵宫商羽调理五脏）",
+                "AI体质辨识与导诊",
+                "舌诊面诊",
+                "灵兰秘典（3000题中医知识库）",
+                "经络穴位定位",
+                "六字诀呼吸功法",
+                "时辰养生",
+                "灵数命理",
+              ],
+              inLanguage: "zh-CN",
+            }),
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-[#fafaf9]">
         {children}
