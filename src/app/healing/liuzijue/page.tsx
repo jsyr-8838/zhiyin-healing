@@ -5,6 +5,7 @@ import BottomNav from '@/components/BottomNav';
 import HealingHeader from '@/components/layout/HealingHeader';
 import HealingCanvas, { type HealingCanvasHandle, HEALING_PRESET_LIUZIJUE } from '@/components/healing/HealingCanvas';
 import { useTTS } from '@/hooks/useTTS';
+import { useTTSProgress } from '@/lib/use-tts-progress';
 import { useHealingRecommendation } from '@/hooks/useHealingRecommendation';
 import { Play, Pause, Volume2, RotateCcw, Sparkles, VolumeX, ArrowLeft, Brain, Heart, Wind, BookOpen, Lightbulb, Star, Headphones } from 'lucide-react';
 import { LIUZIJUE_GUIDE_CONFIG, getLiuzijueGuide } from '@/lib/liuzijue-guide-data';
@@ -186,6 +187,11 @@ export default function LiuzijuePage() {
   const ttsRef = useRef(tts);
   ttsRef.current = tts;
 
+  // ===== 前奏导引音频进度持久化 =====
+  // 用户退出页面再回来时，前奏音频能从上次位置继续
+  const preludeProgress = useTTSProgress('liuzijue-prelude');
+  const preludeCleanupRef = useRef<(() => void) | null>(null);
+
   // ===== 前奏 / 加深导引音频引用 =====
   const preludeAudioRef = useRef<HTMLAudioElement | null>(null);
   const deepenAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -332,6 +338,10 @@ export default function LiuzijuePage() {
         setPreludePlaying(true);
         const audio = new Audio(guide.preludeAudio);
         audio.volume = LIUZIJUE_GUIDE_CONFIG.preludeVolume;
+        // 绑定 TTS 进度持久化（记录/恢复播放位置）
+        if (preludeCleanupRef.current) preludeCleanupRef.current();
+        const cleanup = preludeProgress.bindAudio(audio);
+        preludeCleanupRef.current = cleanup;
         audio.onended = () => {
           setPreludePlaying(false);
           preludeAudioRef.current = null;
@@ -429,7 +439,7 @@ export default function LiuzijuePage() {
     audio.play().catch(() => { deepenAudioRef.current = null; });
   }, [cycleCount, isActive, totalCycles, mode, audioEnabled, currentJue]);
 
-  useEffect(() => () => { stopBreathing(); ttsRef.current.stop(); }, [stopBreathing]);
+  useEffect(() => () => { stopBreathing(); ttsRef.current.stop(); if (preludeCleanupRef.current) preludeCleanupRef.current(); }, [stopBreathing]);
 
   // ===== 画面状态 =====
   const jueColor = phase === 'idle'
