@@ -307,11 +307,11 @@ export default function HealingPage() {
           </div>
         </div>
 
-        {/* ===== 中医修真 · 游戏化学习 ===== */}
+        {/* ===== 灵兰秘典 · 游戏化学习 ===== */}
         <div>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-1 h-5 rounded-full bg-red-800" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">中医修真</h3>
+            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">灵兰秘典</h3>
             <div className="flex-1 h-px bg-gradient-to-r from-red-800/40 to-transparent" />
             <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">3000题</span>
           </div>
@@ -326,7 +326,7 @@ export default function HealingPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="font-bold text-sm font-serif text-white flex items-center gap-2">
-                  中医修真 · TCM Quest
+                  灵兰秘典 · Linglan Canon
                   <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-amber-500/30 text-amber-200 font-normal">Ultra</span>
                 </h4>
                 <p className="text-[10px] text-white/50 mt-0.5">3000题库 · 500中药 · 200方剂 · 100医案 · Boss挑战 · 间隔复习</p>
