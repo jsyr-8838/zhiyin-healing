@@ -4,13 +4,14 @@ import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import BottomNav from '@/components/BottomNav';
 import PageContainer from '@/components/layout/PageContainer';
+import ModuleEntryCard from '@/components/healing/ModuleEntryCard';
 import { useAppStore } from '@/lib/store';
 import { consolidateDiagnosis } from '@/lib/unified-diagnosis';
 import {
   MessageCircleHeart, FlameKindling, RotateCw, Hand,
   Wind, Music, Sparkles, Volume2, BarChart3, CircleDot,
   ArrowRight, Sun, Moon, Heart, Zap, Leaf, Dumbbell, Coffee, Wine, Flower2, Palette, Shirt, Music2, Bone,
-  Droplets, CalendarHeart, BookOpen, Target, Eye,
+  Droplets, CalendarHeart, BookOpen, Target, Eye, GitBranch, Clock, Hash,
 } from 'lucide-react';
 import {
   DAILY_QUOTES,
@@ -25,7 +26,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: 
   MessageCircleHeart, FlameKindling, RotateCw, Hand,
   Wind, Music, Sparkles, Volume2, BarChart3, CircleDot,
   ArrowRight, Sun, Moon, Heart, Zap, Leaf, Dumbbell, Coffee, Wine, Flower2, Palette, Shirt, Music2, Bone,
-  Droplets, CalendarHeart, BookOpen, Target, Eye,
+  Droplets, CalendarHeart, BookOpen, Target, Eye, GitBranch, Clock, Hash,
 };
 
 // ===== 时间问候 =====
@@ -68,7 +69,7 @@ export default function HealingPage() {
 
   // 问候/场景延迟到客户端渲染，避免 hydration mismatch
   const [greeting, setGreeting] = useState<{ text: string; icon: React.ReactNode }>({ text: '', icon: null });
-  const [scenes, setScenes] = useState<Array<{ id: string; name: string; desc: string; href: string; element: 'wood' | 'fire' | 'earth' | 'metal' | 'water'; icon: typeof Sun }>>([]); // 延迟初始化避免 SSR hydration mismatch
+  const [scenes, setScenes] = useState<Array<{ id: string; name: string; desc: string; href: string; element: 'wood' | 'fire' | 'earth' | 'metal' | 'water'; icon: typeof Sun }>>([]);
   useEffect(() => {
     setGreeting(getGreeting());
     setScenes(getScenes());
@@ -76,7 +77,7 @@ export default function HealingPage() {
 
   return (
     <PageContainer theme="healing">
-      {/* ===== 顶部：问候 + 体质信息 ===== */}
+      {/* ══════════ 顶部：Logo 门面 + 问候 + 体质信息 ══════════ */}
       <div className="px-5 pt-12 pb-8 text-white relative overflow-hidden bg-gradient-to-br from-red-950 via-red-900 to-red-800">
         {/* 莲花光能装饰背景 */}
         <img
@@ -85,22 +86,31 @@ export default function HealingPage() {
           className="absolute right-[-20px] top-1/2 -translate-y-1/2 w-32 h-32 object-contain pointer-events-none"
           style={{ opacity: 0.22, mixBlendMode: 'screen', filter: 'blur(0.5px)' }}
         />
-        {/* 装饰印章 */}
-        <div className="absolute top-4 right-4 opacity-10 -rotate-[8deg]">
-          <div className="border-2 border-amber-400 px-3 py-1 text-amber-400 text-[0.7em] font-bold tracking-[4px]">疗愈</div>
+        {/* 门面区：Logo + 品牌名 */}
+        <div className="flex items-center gap-3.5 mb-4">
+          <div className="song-logo-badge w-[76px] h-[76px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/zhiyin-logo-seal-mini-v8.jpg"
+              alt="知音"
+              className="w-full h-full object-cover rounded-full"
+              loading="eager"
+            />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-black font-serif tracking-[0.15em]">知音 · 疗愈</h1>
+            <p className="text-xs mt-1 font-serif text-white/60 tracking-wider">辨证论治 · 五法合一 · 调和阴阳</p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-3">
           {greeting.icon}
           <p className="text-sm font-serif text-white/70">{greeting.text}</p>
         </div>
 
-        <h1 className="text-2xl font-black font-serif tracking-[0.15em]">疗愈</h1>
-        <p className="text-sm mt-1 font-serif text-white/60">辨证论治 · 五法合一 · 调和阴阳</p>
-
         {/* 体质信息条 */}
         {consolidated.completedModules.length > 0 && (
-          <div className="mt-3 rounded-lg px-4 py-2 flex items-center gap-2 flex-wrap bg-amber-400/15 border border-amber-400/30">
+          <div className="mt-1 rounded-lg px-4 py-2 flex items-center gap-2 flex-wrap bg-amber-400/15 border border-amber-400/30">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-amber-400" />
               <span className="text-xs text-white/80">{consolidated.primaryConstitution}</span>
@@ -112,41 +122,36 @@ export default function HealingPage() {
         )}
       </div>
 
-      <div className="px-4 pt-4 space-y-4">
-        {/* ===== 场景推荐（4卡片） ===== */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-5 rounded-full bg-amber-500" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">推荐场景</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
+      <div className="px-4 pt-4 space-y-5">
+        {/* ═════════ 场景推荐（4卡片） ═════════ */}
+        <section className="song-section">
+          <div className="song-section-title mb-3">
+            <span className="st-label">推荐场景</span>
+            <span className="st-line" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             {scenes.map((scene, idx) => (
-              <Link key={scene.id} href={scene.href}
-                className={`glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 ${idx === 0 ? 'ring-1 ring-amber-400/30' : ''}`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-white ${ELEMENT_ICON_BG[scene.element]}`}>
-                    <scene.icon size={14} />
-                  </div>
-                  <span className="text-sm font-bold font-serif text-gray-800">{scene.name}</span>
-                </div>
-                <p className="text-[10px] text-gray-500 leading-relaxed">{scene.desc}</p>
-                {idx === 0 && (
-                  <div className="mt-2 flex items-center gap-1 text-[10px] text-amber-600 font-medium">
-                    <span className="px-1.5 py-0.5 rounded bg-amber-400/15">推荐</span>
-                  </div>
-                )}
-              </Link>
+              <ModuleEntryCard
+                key={scene.id}
+                href={scene.href}
+                icon={<scene.icon size={20} />}
+                title={scene.name}
+                desc={scene.desc}
+                element={scene.element}
+                badge={idx === 0 ? '推荐' : undefined}
+                iconBg={ELEMENT_ICON_BG[scene.element]}
+                className={idx === 0 ? 'ring-1 ring-amber-400/30' : ''}
+              />
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* ===== 个性化方案（有明辨数据时） ===== */}
+        {/* ═════════ 个性化方案（有明辨数据时） ═════════ */}
         {consolidated.completedModules.length > 0 && (
-          <div className="rounded-xl overflow-hidden glass-card ring-2 ring-amber-400/40 relative border-culture">
+          <section className="song-hero-card relative border-culture">
             {/* 左侧朱砂竖线 */}
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-red-700 to-red-500" />
-            {/* 四角角花补充（右上+左下） */}
+            {/* 四角角花补充 */}
             <div className="border-culture-tr" />
             <div className="border-culture-bl" />
             {/* 标题区 */}
@@ -195,10 +200,10 @@ export default function HealingPage() {
                 <MessageCircleHeart size={16} /> AI导诊 · 获取详细疗愈指导 <ArrowRight size={16} />
               </Link>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* ===== 无明辨数据引导 ===== */}
+        {/* ═════════ 无明辨数据引导 ═════════ */}
         {consolidated.completedModules.length === 0 && (
           <Link href="/diagnose" className="block rounded-xl p-5 text-center font-serif transition hover:shadow-md glass-card ring-2 ring-dashed ring-amber-400/50">
             <p className="text-sm font-bold text-red-700">尚未完成体质辨识</p>
@@ -209,111 +214,54 @@ export default function HealingPage() {
           </Link>
         )}
 
-        {/* ===== 辨证施治入口 ===== */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-5 rounded-full bg-red-700" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">辨证施治</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
+        {/* ═════════ 辨证施治入口 ═════════ */}
+        <section className="song-section">
+          <div className="song-section-title mb-3">
+            <span className="st-label">辨证施治</span>
+            <span className="st-line" />
+            <span className="st-badge bg-amber-100 text-amber-700 border border-amber-400/40">{TREATMENT_MODULES.length} 法</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {TREATMENT_MODULES.map(m => {
               const MIcon = ICON_MAP[m.icon];
               return (
-              <Link key={m.name} href={m.href}
-                className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-700/60" />
-                <div className={`w-11 h-11 rounded-lg mx-auto mb-2 flex items-center justify-center text-white ${ELEMENT_ICON_BG[m.element]}`}>
-                  {MIcon && <MIcon size={20} />}
-                  {m.name === 'AI导诊' && (
-                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-3 text-[7px] px-1 rounded-full text-white font-bold bg-red-400">AI</span>
-                  )}
-                </div>
-                <h4 className="font-bold text-sm font-serif text-gray-800">{m.name}</h4>
-                <p className="text-[10px] mt-0.5 text-gray-500">{m.desc}</p>
-              </Link>
+                <ModuleEntryCard
+                  key={m.name}
+                  href={m.href}
+                  icon={MIcon ? <MIcon size={20} /> : <CircleDot size={20} />}
+                  title={m.name}
+                  desc={m.desc}
+                  element={m.element}
+                  iconBg={ELEMENT_ICON_BG[m.element]}
+                />
               );
             })}
           </div>
-        </div>
+        </section>
 
-        {/* ===== 倪师智慧入口（TCM集成） ===== */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-5 rounded-full bg-amber-500" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">倪师智慧</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">NEW</span>
+        {/* ═════════ 倪师智慧入口 ═════════ */}
+        <section className="song-section">
+          <div className="song-section-title mb-3">
+            <span className="st-label">倪师智慧</span>
+            <span className="st-line" />
+            <span className="st-badge bg-amber-100 text-amber-700">NEW</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/healing/jingfang" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-700/60" />
-              <div className="w-11 h-11 rounded-lg mx-auto mb-2 flex items-center justify-center text-white bg-gradient-to-br from-red-700 to-red-800">
-                <FlameKindling size={20} />
-              </div>
-              <h4 className="font-bold text-sm font-serif text-gray-800">经方处方</h4>
-              <p className="text-[10px] mt-0.5 text-gray-500">190首·原文·配伍·倪注</p>
-            </Link>
-            <Link href="/healing/bencao" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-600/60" />
-              <div className="w-11 h-11 rounded-lg mx-auto mb-2 flex items-center justify-center text-white bg-gradient-to-br from-emerald-600 to-emerald-700">
-                <Leaf size={20} />
-              </div>
-              <h4 className="font-bold text-sm font-serif text-gray-800">本草药典</h4>
-              <p className="text-[10px] mt-0.5 text-gray-500">320味·性味归经·倪注</p>
-            </Link>
-            <Link href="/healing/zhishi" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500/60" />
-              <div className="w-11 h-11 rounded-lg mx-auto mb-2 flex items-center justify-center text-white bg-gradient-to-br from-purple-600 to-purple-700">
-                <Sparkles size={20} />
-              </div>
-              <h4 className="font-bold text-sm font-serif text-gray-800">知识图谱</h4>
-              <p className="text-[10px] mt-0.5 text-gray-500">179节点·333关系·11类</p>
-            </Link>
-            <Link href="/healing/bianzheng" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden col-span-2">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500" />
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-amber-500 to-amber-700 shrink-0">
-                  <BarChart3 size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm font-serif text-gray-800">辨证引擎</h4>
-                  <p className="text-[10px] mt-0.5 text-gray-500">六经辨证 · 十问歌 · 智能辨证 · 倪师注释</p>
-                </div>
-                <ArrowRight size={16} className="text-amber-600 ml-auto shrink-0" />
-              </div>
-            </Link>
-            <Link href="/healing/yunqi" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-teal-500/60" />
-              <div className="w-11 h-11 rounded-lg mx-auto mb-2 flex items-center justify-center text-white bg-gradient-to-br from-teal-500 to-teal-700">
-                <Sun size={20} />
-              </div>
-              <h4 className="font-bold text-sm font-serif text-gray-800">五运六气</h4>
-              <p className="text-[10px] mt-0.5 text-gray-500">天符岁会·主客顺逆·体质联动</p>
-            </Link>
-            <Link href="/healing/jibing" className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden col-span-2">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-rose-500" />
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-rose-500 to-rose-700 shrink-0">
-                  <Zap size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm font-serif text-gray-800">疾病仿真</h4>
-                  <p className="text-[10px] mt-0.5 text-gray-500">症状输入 → 六经辨证 → 倪师诊断 · 运气疾病倾向</p>
-                </div>
-                <ArrowRight size={16} className="text-rose-600 ml-auto shrink-0" />
-              </div>
-            </Link>
+            <ModuleEntryCard href="/healing/jingfang" icon={<FlameKindling size={20} />} title="经方处方" desc="190首·原文·配伍·倪注" element="fire" />
+            <ModuleEntryCard href="/healing/bencao" icon={<Leaf size={20} />} title="本草药典" desc="320味·性味归经·倪注" element="wood" />
+            <ModuleEntryCard href="/healing/zhishi" icon={<Sparkles size={20} />} title="知识图谱" desc="179节点·333关系·11类" element="metal" />
+            <ModuleEntryCard href="/healing/yunqi" icon={<Sun size={20} />} title="五运六气" desc="天符岁会·主客顺逆" element="water" />
+            <ModuleEntryCard href="/healing/bianzheng" icon={<BarChart3 size={20} />} title="辨证引擎" desc="六经辨证 · 十问歌 · 智能辨证 · 倪师注释" element="earth" variant="row" className="col-span-2" />
+            <ModuleEntryCard href="/healing/jibing" icon={<Zap size={20} />} title="疾病仿真" desc="症状输入 → 六经辨证 → 倪师诊断 · 运气疾病倾向" element="fire" variant="row" className="col-span-2" />
           </div>
-        </div>
+        </section>
 
-        {/* ===== 灵兰秘典 · 游戏化学习 ===== */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-5 rounded-full bg-red-800" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">灵兰秘典</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-red-800/40 to-transparent" />
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">3000题</span>
+        {/* ═════════ 灵兰秘典 · 游戏化学习 ═════════ */}
+        <section className="song-section">
+          <div className="song-section-title mb-3">
+            <span className="st-label">灵兰秘典</span>
+            <span className="st-line" />
+            <span className="st-badge bg-red-100 text-red-700">3000题</span>
           </div>
           <Link href="/healing/tcm-quest" className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
             <div className="absolute inset-0 bg-gradient-to-r from-red-900 via-amber-800 to-amber-700" />
@@ -339,20 +287,18 @@ export default function HealingPage() {
               <ArrowRight size={16} className="text-amber-300/60 flex-shrink-0" />
             </div>
           </Link>
-        </div>
+        </section>
 
-        {/* ===== 音频疗愈专区（三模块统一入口） ===== */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-5 rounded-full bg-blue-500" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">音频疗愈</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-blue-500/40 to-transparent" />
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold">3 modules</span>
+        {/* ═════════ 音频疗愈专区 ═════════ */}
+        <section className="song-section">
+          <div className="song-section-title mb-3">
+            <span className="st-label">音频疗愈</span>
+            <span className="st-line" />
+            <span className="st-badge bg-blue-100 text-blue-700">3 modules</span>
           </div>
           <div className="space-y-3">
             {/* 五音疗愈 */}
-            <Link href="/healing/wuyin"
-              className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
+            <Link href="/healing/wuyin" className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
               <div className="absolute inset-0 bg-gradient-to-r from-teal-900 via-cyan-800 to-blue-900" />
               <div className="absolute inset-0 opacity-20" style={{
                 backgroundImage: 'radial-gradient(circle at 15% 50%, rgba(20,184,166,0.4) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(59,130,246,0.3) 0%, transparent 50%)',
@@ -378,8 +324,7 @@ export default function HealingPage() {
             </Link>
 
             {/* 天籁 */}
-            <Link href="/healing/mineradio"
-              className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
+            <Link href="/healing/mineradio" className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-purple-900 to-slate-900" />
               <div className="absolute inset-0 opacity-20" style={{
                 backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(139,92,246,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(59,130,246,0.3) 0%, transparent 50%)',
@@ -405,8 +350,7 @@ export default function HealingPage() {
             </Link>
 
             {/* 知音之境 */}
-            <Link href="/healing/zhi-yin-zhi-jing"
-              className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
+            <Link href="/healing/zhi-yin-zhi-jing" className="block rounded-xl overflow-hidden relative transition hover:shadow-lg hover:-translate-y-0.5">
               <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-gray-800 to-indigo-950" />
               <div className="absolute inset-0 opacity-20" style={{
                 backgroundImage: 'radial-gradient(circle at 25% 50%, rgba(251,191,36,0.3) 0%, transparent 50%), radial-gradient(circle at 75% 40%, rgba(99,102,241,0.3) 0%, transparent 50%)',
@@ -431,75 +375,69 @@ export default function HealingPage() {
               </div>
             </Link>
           </div>
-        </div>
+        </section>
 
-        {/* ===== 六法疗愈入口 ===== */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-5 rounded-full bg-amber-600" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">六法疗愈</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
+        {/* ═════════ 六法疗愈入口 ═════════ */}
+        <section className="song-section">
+          <div className="song-section-title mb-3">
+            <span className="st-label">六法疗愈</span>
+            <span className="st-line" />
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             {THERAPY_MODULES.filter(m => m.name !== '天籁' && m.name !== '五音疗愈' && m.name !== '知音之境').map(m => {
               const MIcon = ICON_MAP[m.icon];
               return (
-              <Link key={m.name} href={m.href}
-                className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
-                <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${ELEMENT_STYLE[m.element].accent} opacity-40`} />
-                <div className={`w-11 h-11 rounded-lg mx-auto mb-2 flex items-center justify-center text-white ${ELEMENT_ICON_BG[m.element]}`}>
-                  {MIcon && <MIcon size={20} />}
-                </div>
-                <h4 className="font-bold text-sm font-serif text-gray-800">{m.name}</h4>
-                <p className="text-[10px] mt-0.5 text-gray-500">{m.desc}</p>
-              </Link>
+                <ModuleEntryCard
+                  key={m.name}
+                  href={m.href}
+                  icon={MIcon ? <MIcon size={20} /> : <CircleDot size={20} />}
+                  title={m.name}
+                  desc={m.desc}
+                  element={m.element}
+                  iconBg={ELEMENT_ICON_BG[m.element]}
+                />
               );
             })}
           </div>
-        </div>
+        </section>
 
-        {/* ===== 生活方式入口 ===== */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-1 h-5 rounded-full bg-emerald-600" />
-            <h3 className="font-bold font-serif text-base text-gray-800 tracking-wide">生活方式</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/40 to-transparent" />
+        {/* ═════════ 生活方式入口 ═════════ */}
+        <section className="song-section">
+          <div className="song-section-title mb-3">
+            <span className="st-label">生活方式</span>
+            <span className="st-line" />
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2.5">
             {LIFESTYLE_MODULES.map(m => {
               const MIcon = ICON_MAP[m.icon];
               return (
-              <Link key={m.name} href={m.href}
-                className="glass-card p-3 transition hover:shadow-md hover:-translate-y-0.5 text-center relative overflow-hidden">
-                <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${ELEMENT_STYLE[m.element].accent} opacity-40`} />
-                <div className={`w-9 h-9 rounded-lg mx-auto mb-1.5 flex items-center justify-center text-white ${ELEMENT_ICON_BG[m.element]}`}>
-                  {MIcon && <MIcon size={16} />}
-                </div>
-                <h4 className="font-bold text-xs font-serif text-gray-800">{m.name}</h4>
-                <p className="text-[8px] mt-0.5 text-gray-500">{m.desc}</p>
-              </Link>
+                <ModuleEntryCard
+                  key={m.name}
+                  href={m.href}
+                  icon={MIcon ? <MIcon size={16} /> : <CircleDot size={16} />}
+                  title={m.name}
+                  desc={m.desc}
+                  element={m.element}
+                  iconBg={ELEMENT_ICON_BG[m.element]}
+                  className="p-3"
+                />
               );
             })}
           </div>
-        </div>
+        </section>
 
-        {/* ===== 健康打卡入口 ===== */}
-        <Link href="/healing/dashboard"
-          className="glass-card p-4 transition hover:shadow-md hover:-translate-y-0.5 flex items-center gap-3 relative overflow-hidden ring-1 ring-amber-400/30">
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-700" />
-          <div className="w-11 h-11 rounded-lg flex items-center justify-center text-white flex-shrink-0 bg-gradient-to-br from-red-700 to-amber-500">
-            <BarChart3 size={20} />
-          </div>
-          <div className="flex-1">
-            <h4 className="font-bold text-sm font-serif text-gray-800">健康打卡</h4>
-            <p className="text-[10px] mt-0.5 text-gray-500">日历热力图 · 趋势追踪 · 五行推荐</p>
-          </div>
-          <ArrowRight size={16} className="text-amber-600" />
-        </Link>
+        {/* ═════════ 健康打卡入口 ═════════ */}
+        <ModuleEntryCard
+          href="/healing/dashboard"
+          icon={<BarChart3 size={20} />}
+          title="健康打卡"
+          desc="日历热力图 · 趋势追踪 · 五行推荐"
+          variant="row"
+          iconBg="bg-gradient-to-br from-red-700 to-amber-500"
+        />
 
-        {/* ===== 今日疗愈统计 ===== */}
-        <div className="glass-card p-4 relative overflow-hidden">
+        {/* ═════════ 今日疗愈统计 ═════════ */}
+        <div className="song-hero-card p-4 relative overflow-hidden">
           <div className="absolute right-1 top-1 bottom-1 w-0.5 border border-amber-400/20 border-l-0" />
           <h3 className="font-bold font-serif mb-2 text-red-700 border-l-[3px] border-amber-500 pl-2">今日疗愈</h3>
           <div className="flex items-center gap-4">
@@ -515,7 +453,7 @@ export default function HealingPage() {
           </div>
         </div>
 
-        {/* ===== 每日一言 ===== */}
+        {/* ═════════ 每日一言 ═════════ */}
         <div className="glass-card p-5 text-center relative border-culture">
           <div className="border-culture-tr" />
           <div className="border-culture-bl" />
