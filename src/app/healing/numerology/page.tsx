@@ -10,6 +10,7 @@ import {
   type NumerologyProfile, type NumerologyResult,
 } from '@/lib/numerology-engine';
 import { getMeaning, generateLifeGuidance, type LifeGuidance } from '@/lib/numerology-data';
+import EvoFeedback from '@/components/common/EvoFeedback';
 
 /* ================================================================
  *  灵数命理 · 宋韵宣纸风格
@@ -270,6 +271,10 @@ export default function NumerologyPage() {
                 <span className="text-xs font-bold" style={{ color: '#E0C060' }}>下一步怎么办</span>
               </div>
               <p className="text-[11px] leading-relaxed" style={{ color: '#F5EFE0' }}>{guidance.nextSteps}</p>
+            </div>
+            {/* Evo 反馈 */}
+            <div className="mt-3 pt-3 border-t" style={{ borderColor: 'rgba(224,192,96,0.15)' }}>
+              <EvoFeedback module="divination" action="numerology_reading" detail={{ name: name.slice(0, 10), birthDate: `${y}-${m}-${d}` }} />
             </div>
           </div>
 
