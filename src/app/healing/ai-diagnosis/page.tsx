@@ -7,6 +7,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import { useAppStore } from '@/lib/store';
 import { consolidateDiagnosis } from '@/lib/unified-diagnosis';
 import { Send, Stethoscope, X, Heart, Sparkles } from 'lucide-react';
+import EvoFeedback from '@/components/common/EvoFeedback';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -390,6 +391,12 @@ export default function AIDiagnosisPage() {
                   __html: msg.role === 'assistant' ? renderMarkdown(msg.content, mode === 'emotional') : msg.content.replace(/\n/g, '<br/>'),
                 }}
               />
+              {/* 最后一条 AI 回复加反馈按钮 */}
+              {msg.role === 'assistant' && i === messages.length - 1 && !loading && msg.content.length > 20 && (
+                <div className="mt-2 pt-2 border-t border-stone-100">
+                  <EvoFeedback module="diagnose" action="ai_chat_reply" detail={{ mode }} />
+                </div>
+              )}
             </div>
           </div>
         ))}
