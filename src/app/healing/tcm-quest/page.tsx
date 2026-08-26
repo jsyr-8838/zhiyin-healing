@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomNav from '@/components/BottomNav';
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import EvoFeedback from '@/components/common/EvoFeedback';
 import ContentVersionBadge from '@/components/common/ContentVersionBadge';
+import { useDynamicQuiz } from '@/lib/tcm-quest/use-dynamic-quiz';
 
 // ═══════════════════════════════════════
 // Tab 配置
@@ -42,23 +43,28 @@ export default function TCMQuestPage() {
   const [activeTab, setActiveTab] = useState<TabId>('home');
   const store = useTCMQuestStore();
 
+  // 动态题库：静态题 + EvoKnowledge 进化引擎生成的动态题
+  const { allQuizzes, dynamicCount } = useDynamicQuiz(QUIZ_DATA);
+  const allQuizzesRef = useRef(allQuizzes);
+  allQuizzesRef.current = allQuizzes;
+
   return (
     <PageContainer theme="healing">
       {/* ===== 顶部状态栏 ===== */}
-      <TopBar />
+      <TopBar dynamicCount={dynamicCount} />
 
       {/* ===== Tab 导航 ===== */}
       <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* ===== 内容区 ===== */}
       <div className="px-3 pb-4 min-h-[60vh]">
-        {activeTab === 'home'    && <HomeTab />}
-        {activeTab === 'battle'  && <BattleTab />}
+        {activeTab === 'home'    && <HomeTab allQuizzes={allQuizzes} />}
+        {activeTab === 'battle'  && <BattleTab allQuizzes={allQuizzes} />}
         {activeTab === 'herb'    && <HerbTab />}
         {activeTab === 'formula' && <FormulaTab />}
         {activeTab === 'cases'   && <CasesTab />}
         {activeTab === 'ai'      && <AITab />}
-        {activeTab === 'review'  && <ReviewTab />}
+        {activeTab === 'review'  && <ReviewTab allQuizzes={allQuizzes} />}
         {activeTab === 'me'      && <MeTab />}
       </div>
 
@@ -70,7 +76,7 @@ export default function TCMQuestPage() {
 // ═══════════════════════════════════════
 // 顶部状态栏 — 等级/经验/金币/连续天数
 // ═══════════════════════════════════════
-function TopBar() {
+function TopBar({ dynamicCount = 0 }: { dynamicCount?: number }) {
   const { xp, coin, level, levelTitle, streak, totalCorrect } = useTCMQuestStore();
   const progress = getLevelProgress(xp);
 
@@ -83,7 +89,14 @@ function TopBar() {
           <span>疗愈</span>
         </Link>
         <h1 className="text-base font-bold font-serif text-red-800">灵兰秘典</h1>
-        <ContentVersionBadge className="hidden sm:inline-flex" />
+        <div className="flex items-center gap-2">
+          <ContentVersionBadge className="hidden sm:inline-flex" />
+          {dynamicCount > 0 && (
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">
+              +{dynamicCount} 动态题
+            </span>
+          )}
+        </div>
         <div className="w-12 sm:hidden" />
       </div>
 
@@ -154,11 +167,13 @@ function TabNav({ activeTab, onTabChange }: { activeTab: TabId; onTabChange: (t:
 // ═══════════════════════════════════════
 // Home Tab — 学院首页
 // ═══════════════════════════════════════
-function HomeTab() {
+function HomeTab({ allQuizzes = QUIZ_DATA }: { allQuizzes?: QuizItem[] }) {
   const { xp, coin, level, streak, totalAnswered, totalCorrect, herbsViewed, formulasViewed, casesSolved, bossDefeated, missionsCompleted } = useTCMQuestStore();
 
+  const totalQuizCount = allQuizzes.length;
+
   const stats = [
-    { label: '题库', value: QUIZ_COUNT, icon: BookOpen, color: '#b5311c' },
+    { label: '题库', value: totalQuizCount, icon: BookOpen, color: '#b5311c' },
     { label: '中药', value: HERB_COUNT, icon: Leaf, color: '#1f7a4a' },
     { label: '方剂', value: FORMULA_COUNT, icon: Scroll, color: '#c9922a' },
     { label: '医案', value: CASE_COUNT, icon: Brain, color: '#5e2d91' },
@@ -272,7 +287,7 @@ function HomeTab() {
         <div className="grid grid-cols-2 gap-2">
           {QUIZ_TAGS.map(tag => {
             const answered = useTCMQuestStore.getState().perTagAnswered[tag] || 0;
-            const total = QUIZ_DATA.filter(q => q.tag === tag).length;
+            const total = allQuizzes.filter(q => q.tag === tag).length;
             const color = TAG_COLORS[tag];
             return (
               <div key={tag} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50">
@@ -296,7 +311,7 @@ function HomeTab() {
 // ═══════════════════════════════════════
 // Battle Tab — 闯关答题
 // ═══════════════════════════════════════
-function BattleTab() {
+function BattleTab({ allQuizzes = QUIZ_DATA }: { allQuizzes?: QuizItem[] }) {
   const [selectedTag, setSelectedTag] = useState<QuizTag | 'all'>('all');
   const [selectedDiff, setSelectedDiff] = useState<string>('all');
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -309,13 +324,13 @@ function BattleTab() {
   const [combo, setCombo] = useState(0);
   const { answerQuiz, defeatBoss, addXp, addCoin } = useTCMQuestStore();
 
-  // 题目筛选
+  // 题目筛选（含动态题库）
   const filteredQuizzes = useMemo(() => {
-    let qs = QUIZ_DATA;
+    let qs = allQuizzes;
     if (selectedTag !== 'all') qs = qs.filter(q => q.tag === selectedTag);
     if (selectedDiff !== 'all') qs = qs.filter(q => q.diff === selectedDiff);
     return qs;
-  }, [selectedTag, selectedDiff]);
+  }, [selectedTag, selectedDiff, allQuizzes]);
 
   const currentQuiz = filteredQuizzes[currentIdx];
 
@@ -967,7 +982,7 @@ function generateLocalDiagnosis(text: string): string {
 // ═══════════════════════════════════════
 // Review Tab — 间隔复习 (SM-2)
 // ═══════════════════════════════════════
-function ReviewTab() {
+function ReviewTab({ allQuizzes = QUIZ_DATA }: { allQuizzes?: QuizItem[] }) {
   const { wrongAnswers, srData, reviewCount, gradeSR } = useTCMQuestStore();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -977,8 +992,8 @@ function ReviewTab() {
     const today = new Date().toISOString().slice(0, 10);
     const dueIds = Object.values(srData).filter(sr => sr.nextDate <= today).map(sr => sr.quizId);
     const allIds = [...new Set([...wrongAnswers, ...dueIds])];
-    return allIds.map(id => QUIZ_DATA.find(q => q.id === id)).filter(Boolean) as QuizItem[];
-  }, [wrongAnswers, srData]);
+    return allIds.map(id => allQuizzes.find(q => q.id === id)).filter(Boolean) as QuizItem[];
+  }, [wrongAnswers, srData, allQuizzes]);
 
   const currentQuiz = dueReviews[currentIdx];
 
