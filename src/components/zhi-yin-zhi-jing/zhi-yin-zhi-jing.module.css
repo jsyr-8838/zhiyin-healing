@@ -38,7 +38,7 @@
   top: -50%;
   left: -50%;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(40px);
   opacity: 0.18;
   animation: zzjFloat 24s ease-in-out infinite;
 }
@@ -168,10 +168,9 @@
     var(--zzj-glow) 55%,
     transparent 70%);
   box-shadow:
-    0 0 100px color-mix(in srgb, var(--zzj-glow) 60%, transparent),
-    0 0 150px color-mix(in srgb, var(--zzj-glow) 40%, transparent),
-    0 0 220px color-mix(in srgb, var(--zzj-glow) 24%, transparent),
-    inset 0 0 80px rgba(255,255,255,0.55),
+    0 0 80px color-mix(in srgb, var(--zzj-glow) 60%, transparent),
+    0 0 120px color-mix(in srgb, var(--zzj-glow) 40%, transparent),
+    inset 0 0 60px rgba(255,255,255,0.55),
     inset 0 30px 60px rgba(255,255,255,0.38);
   animation: zzjBreathe 11s ease-in-out infinite;
   position: relative;
@@ -215,7 +214,7 @@
   background: radial-gradient(circle, rgba(255,255,255,0.88) 0%,
     color-mix(in srgb, var(--zzj-inner) 50%, transparent) 40%, transparent 70%);
   border-radius: 50%;
-  filter: blur(20px);
+  filter: blur(10px);
   animation: zzjLightPulse 11s ease-in-out infinite;
 }
 @keyframes zzjLightPulse {
@@ -253,16 +252,15 @@
   animation: zzjBreathe 11s ease-in-out infinite, zzjGlowPulse 2s ease-out;
 }
 @keyframes zzjGlowPulse {
-  0% { box-shadow: 0 0 100px color-mix(in srgb, var(--zzj-glow) 60%, transparent),
-       0 0 150px color-mix(in srgb, var(--zzj-glow) 40%, transparent),
-       inset 0 0 80px rgba(255,255,255,0.55); }
-  50% { box-shadow: 0 0 200px color-mix(in srgb, var(--zzj-accent) 90%, transparent),
-        0 0 320px color-mix(in srgb, var(--zzj-glow) 65%, transparent),
-        0 0 460px color-mix(in srgb, var(--zzj-glow) 40%, transparent),
-        inset 0 0 100px rgba(255,255,255,0.9); }
-  100% { box-shadow: 0 0 100px color-mix(in srgb, var(--zzj-glow) 60%, transparent),
-         0 0 150px color-mix(in srgb, var(--zzj-glow) 40%, transparent),
-         inset 0 0 80px rgba(255,255,255,0.55); }
+  0% { box-shadow: 0 0 80px color-mix(in srgb, var(--zzj-glow) 60%, transparent),
+        0 0 120px color-mix(in srgb, var(--zzj-glow) 40%, transparent),
+        inset 0 0 60px rgba(255,255,255,0.55); }
+  50% { box-shadow: 0 0 140px color-mix(in srgb, var(--zzj-accent) 90%, transparent),
+        0 0 200px color-mix(in srgb, var(--zzj-glow) 65%, transparent),
+        inset 0 0 80px rgba(255,255,255,0.9); }
+  100% { box-shadow: 0 0 80px color-mix(in srgb, var(--zzj-glow) 60%, transparent),
+         0 0 120px color-mix(in srgb, var(--zzj-glow) 40%, transparent),
+         inset 0 0 60px rgba(255,255,255,0.55); }
 }
 
 /* === 引导文字 === */
@@ -513,7 +511,7 @@
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  transition: opacity 1.6s ease-out, visibility 1.6s;
+  transition: opacity 0.4s ease-out, visibility 0.4s;
 }
 .loader.hidden { opacity: 0; visibility: hidden; }
 .loaderText {
