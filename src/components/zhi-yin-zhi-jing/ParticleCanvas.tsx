@@ -27,7 +27,7 @@ interface ParticleCanvasProps {
  * 粒子在四境主题色之间渐变，营造柔软漂浮的微光氛围。
  * 页面不可见时自动暂停以节省性能。
  */
-export default function ParticleCanvas({ colorA, colorB, count = 52 }: ParticleCanvasProps) {
+export default function ParticleCanvas({ colorA, colorB, count = 24 }: ParticleCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const colorARef = useRef(colorA);
   const colorBRef = useRef(colorB);
@@ -78,11 +78,8 @@ export default function ParticleCanvas({ colorA, colorB, count = 52 }: ParticleC
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-        gradient.addColorStop(0, colorARef.current.replace(/[\d.]+\)$/g, `${p.opacity})`));
-        gradient.addColorStop(0.5, colorBRef.current.replace(/[\d.]+\)$/g, `${p.opacity * 0.8})`));
-        gradient.addColorStop(1, colorBRef.current.replace(/[\d.]+\)$/g, `0)`));
-        ctx.fillStyle = gradient;
+        // 优化：用简单 fillStyle 替代每帧创建 RadialGradient
+        ctx.fillStyle = colorARef.current.replace(/[\d.]+\)$/g, `${p.opacity})`);
         ctx.fill();
       }
       animationId = requestAnimationFrame(draw);
