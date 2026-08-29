@@ -188,7 +188,7 @@ export default function ZhiYinZhiJingClient() {
 
   /* ---- 进场 ---- */
   useEffect(() => {
-    const t = setTimeout(() => setLoaded(true), 1100);
+    const t = setTimeout(() => setLoaded(true), 300);
     return () => clearTimeout(t);
   }, []);
 
